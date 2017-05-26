@@ -64,6 +64,9 @@ class VTailWing(Base):
     # p_zero = Input(0.25)
     # p_rib = Input(0.5)
     p_form_rib = Input(0.3)
+
+    #: number of used hinges
+    #: :type: integer
     number_hinges = Input(2)
     dz_root_hinge_rib = Input(0.2)
     dz_tip_hinge_rib = Input(0.2)
@@ -640,6 +643,8 @@ class VTailWing(Base):
     def turn_rudder(self):
         return RotatedShape(shape_in=self.things_for_rotation, rotation_point=self.hingerib_line.start,
                             vector=self.hingerib_line.direction_vector, angle=radians(30))
+
+
 
 
 if __name__ == '__main__':
