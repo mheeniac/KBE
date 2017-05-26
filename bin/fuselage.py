@@ -1,3 +1,4 @@
+import csv_handle as csvr
 from math import *
 import os
 from parapy.core import *
@@ -15,10 +16,7 @@ DIR = os.path.dirname(__file__)
 
 # Test push and commit
 class Fuselage(GeomBase):
-    # Read function from external file
-    read = ReadInput(file_name='settings.csv')
-    # Create dict
-    variables = read.read_input
+    variables = csvr.read_input("fuselage.csv")  # Fuselage Settings
 
     #: cabin diameter [m]
     #: :type: float
@@ -212,7 +210,7 @@ class Fuselage(GeomBase):
 
         :rtype: string and csv
         """
-        path = self.read.generate_path
+        path = csvr.generate_path("fuselage.csv")
         first_row = True
         with open(path[0], 'rb') as file:  # Open file
             reader = csv.reader(file, delimiter=',', quotechar='|')  # Read into reader and section rows and columns

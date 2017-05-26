@@ -5,14 +5,16 @@ import re
 
 
 from parapy.core import *
+from parapy.geom import GeomBase
 
-
-class ReadInput(Base):
+class ReadInput(GeomBase):
     #: Name of the csv file to be read
     #: :type: str
     file_name = Input()
+    dict_name = Input()
 
     variables = {}  # Creating empty dictionary to be filled and returned
+    variables.clear()
 
     @Attribute
     def generate_path(self):
@@ -33,6 +35,7 @@ class ReadInput(Base):
 
         :rtype: dict
         """
+        self.variables.clear()
         path = self.generate_path[0]  # Request the path
         with open(path, 'rb') as file:  # Open file
             reader = csv.reader(file, delimiter=',', quotechar='|')  # Read into reader and section rows and collumns

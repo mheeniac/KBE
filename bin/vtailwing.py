@@ -1,5 +1,5 @@
 from math import *
-
+import csv_handle as csvr
 from parapy.core import *
 from parapy.geom import *
 from wing import Wing
@@ -19,14 +19,9 @@ from csv_in_out import *
 class VTailWing(Base):
     # This class creates a vertical wing including rudder
 
-    # Read function from external file
-    read = ReadInput(file_name='vtail.csv')
-    # Create dict
-    variables = read.read_input
-
-    read_const = ReadInput(file_name='constants.csv')
-    # Create dict
-    constants = read_const.read_input
+    # Create dicts
+    constants = csvr.read_input("constants.csv")  # Fuselage Settings
+    variables = csvr.read_input("vtail.csv")  # Fuselage Settings
 
     #: length of the root chord [m]
     #: :type: float
