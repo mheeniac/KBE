@@ -16,6 +16,11 @@ import warnings
 class VTailWing(Base):
     # This class creates a vertical wing including rudder
 
+    # Read function from external file
+    read = ReadInput(file_name='vtail.csv')
+    # Create dict
+    variables = read.read_input
+
     #: length of the root chord [m]
     #: :type: float
     w_c_root = Input(5)
