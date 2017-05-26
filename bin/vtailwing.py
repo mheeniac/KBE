@@ -9,6 +9,8 @@ from csv_in_out import *
 
 # TODO:
 # what is /8 * 2 in r_actuator and how do we make this not hard coded?
+# Stijn Kan jij doen wat ik met input heb gedaan voor alles vanaf d_hing?
+# known bug, bij NaN taper ratio gaat hij kapot
 
 
 # from bay_analysis_tool.bay_analysis import BayAnalysis
