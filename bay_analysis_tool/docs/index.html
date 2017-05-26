@@ -1,0 +1,309 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to BayAnalysis documentation! &#8212; TU Delft KBE course 2017 1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/parapyapi.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/copybutton.js"></script>
+    <script type="text/javascript" src="_static/parapy.js"></script>
+    <script type="text/javascript" src="_static/sidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Class BayAnalysis" href="BayAnalysis.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="BayAnalysis.html" title="Class BayAnalysis"
+             accesskey="N">next</a> |</li>
+        <li><img src="_static/parapy.svg" alt="ParaPy Logo"
+                 id="ParaPyLogo" style="vertical-align: middle; margin-top: -1px"/>
+        </li>
+        <li>
+            <a href="#">Documentation</a> &#187;
+        </li>
+ 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="welcome-to-bayanalysis-documentation">
+<h1>Welcome to BayAnalysis documentation!<a class="headerlink" href="#welcome-to-bayanalysis-documentation" title="Permalink to this headline">¶</a></h1>
+<p>The structural analysis is done by using the BayAnalysis tool provided by Fokker. This tool
+determines the reserve factors w.r.t. buckling for all skin and spar panels in a bay. A bay is the
+section of the rudder between two consecutive ribs. A panel is the part of the skin faces and spar
+faces which lies within a bay. The tool executes the following steps:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Cut the provided skin and spar faces at each of the bay planes, creating a cross-section of the rudder at both ends of the bay (illustrated in blue below).</li>
+<li>Perform a 2-D section analysis for both resulting cross-sections. The provided forces and moments determine the acting normal and shear stresses.</li>
+<li>Perform a buckling analysis for compression and shear loads on each of the panels in the bay, using the earlier determined normal and shear stresses.</li>
+<li>Return the reserve factors for each of the panels.</li>
+</ol>
+</div></blockquote>
+<a class="reference internal image-reference" href="_images/rudder_terminology.png"><img alt="alternate text" class="align-center" src="_images/rudder_terminology.png" style="width: 585.0px; height: 335.0px;" /></a>
+</div>
+<div class="section" id="how-to-install-and-run-bayanalysis">
+<h1>How to install and run BayAnalysis<a class="headerlink" href="#how-to-install-and-run-bayanalysis" title="Permalink to this headline">¶</a></h1>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Copy the bay_analysis package into the root of your project directory. Placing the package in a subdirectory will lead to import errors.</li>
+<li>Run example_bay_analysis.py in bay_analysis/examples to see if BayAnalysis works. Check out the different inputs (and their order) in the GUI.</li>
+<li>To use the tool in your code, import the BayAnalysis class in your module:</li>
+</ol>
+</div></blockquote>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">bay_analysis</span> <span class="k">import</span> <span class="n">BayAnalysis</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="bayanalysis-inputs">
+<h1>BayAnalysis inputs<a class="headerlink" href="#bayanalysis-inputs" title="Permalink to this headline">¶</a></h1>
+<p>In order to perform an analysis, the BayAnalysis class requires the inputs listed in the table
+below. API information regarding these input can be found here:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="BayAnalysis.html">Class <code class="docutils literal"><span class="pre">BayAnalysis</span></code></a></li>
+</ul>
+</div>
+<p>General information regarding these inputs can be found after the table.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="27%" />
+<col width="73%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Input</th>
+<th class="head">Type</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>rhs_skin_faces</td>
+<td>[Face, Face, Face]</td>
+</tr>
+<tr class="row-odd"><td>lhs_skin_faces</td>
+<td>[Face, Face, Face]</td>
+</tr>
+<tr class="row-even"><td>spar_faces</td>
+<td>[Face, Face]</td>
+</tr>
+<tr class="row-odd"><td>bay_planes</td>
+<td>[Plane, Plane]</td>
+</tr>
+<tr class="row-even"><td>Vx</td>
+<td>[float, float]</td>
+</tr>
+<tr class="row-odd"><td>Vy</td>
+<td>[float, float]</td>
+</tr>
+<tr class="row-even"><td>Mx</td>
+<td>[float, float]</td>
+</tr>
+<tr class="row-odd"><td>My</td>
+<td>[float, float]</td>
+</tr>
+<tr class="row-even"><td>Mt</td>
+<td>[float, float]</td>
+</tr>
+<tr class="row-odd"><td>ref_x</td>
+<td>[float, float]</td>
+</tr>
+<tr class="row-even"><td>ref_y</td>
+<td>[float, float]</td>
+</tr>
+<tr class="row-odd"><td>rhs_skin_materials_t</td>
+<td>[float, float, float]</td>
+</tr>
+<tr class="row-even"><td>lhs_skin_materials_t</td>
+<td>[float, float, float]</td>
+</tr>
+<tr class="row-odd"><td>spar_materials_t</td>
+<td>[float, float]</td>
+</tr>
+<tr class="row-even"><td>rhs_skin_materials_E</td>
+<td>[float, float, float]</td>
+</tr>
+<tr class="row-odd"><td>lhs_skin_materials_E</td>
+<td>[float, float, float]</td>
+</tr>
+<tr class="row-even"><td>spar_materials_E</td>
+<td>[float, float]</td>
+</tr>
+<tr class="row-odd"><td>rhs_skin_materials_G</td>
+<td>[float, float, float]</td>
+</tr>
+<tr class="row-even"><td>lhs_skin_materials_G</td>
+<td>[float, float, float]</td>
+</tr>
+<tr class="row-odd"><td>spar_materials_G</td>
+<td>[float, float]</td>
+</tr>
+<tr class="row-even"><td>rhs_skin_materials_D</td>
+<td>[[D11,D22,D33,D12],[D11,D22,D33,D12],[D11,D22,D33,D12]] where D is float</td>
+</tr>
+<tr class="row-odd"><td>lhs_skin_materials_D</td>
+<td>[[D11,D22,D33,D12],[D11,D22,D33,D12],[D11,D22,D33,D12]] where D is float</td>
+</tr>
+<tr class="row-even"><td>spar_materials_D</td>
+<td>[[D11,D22,D33,D12],[D11,D22,D33,D12]] where D is float</td>
+</tr>
+<tr class="row-odd"><td>N</td>
+<td>integer</td>
+</tr>
+</tbody>
+</table>
+<p><strong>rhs_skin_faces, lhs_skin_faces, spar_faces, bay_planes</strong>
+The inputs related to skin and spar faces are split up into rhs_skin_faces, lhs_skin_faces, and
+spar_faces. The expected order of these inputs is from front to rear. The bay_planes define the
+start and end of a bay in spanwise direction. Compare order of slot names in code example with
+image below:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">BayAnalysis</span><span class="p">(</span><span class="n">rhs_skin_faces</span><span class="o">=</span><span class="p">[</span><span class="n">rhs_f1</span><span class="p">,</span> <span class="n">rhs_f2</span><span class="p">,</span> <span class="n">rhs_f3</span><span class="p">],</span>
+            <span class="n">lhs_skin_faces</span><span class="o">=</span><span class="p">[</span><span class="n">lhs_f1</span><span class="p">,</span> <span class="n">lhs_f2</span><span class="p">,</span> <span class="n">lhs_f3</span><span class="p">],</span>
+            <span class="n">spar_faces</span><span class="o">=</span><span class="p">[</span><span class="n">spar_f1</span><span class="p">,</span> <span class="n">spar_f2</span><span class="p">],</span>
+            <span class="n">bay_planes</span><span class="o">=</span><span class="p">[</span><span class="n">plane1</span><span class="p">,</span> <span class="n">plane2</span><span class="p">],</span>
+            <span class="c1"># Other slots</span>
+            <span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/bay_analysis_geometry.png"><img alt="alternate text" class="align-center" src="_images/bay_analysis_geometry.png" style="width: 544.5px; height: 368.0px;" /></a>
+<p>Make sure that both bay planes intersect with the rudder geometry. Do not position planes exactly
+on the root or tip edges of the rudder faces as geometry kernels have difficulties with
+intersecting exactly on the boundary of a face.</p>
+<a class="reference internal image-reference" href="_images/bay_analysis_bay_planes.png"><img alt="alternate text" class="align-center" src="_images/bay_analysis_bay_planes.png" style="width: 897.0px; height: 214.5px;" /></a>
+<p><strong>Vx, My, Vy, Mx, Mt</strong>
+The forces and moments acting on the hinge line at both bay planes. These need to be ordered
+consistently w.r.t. bay_planes. Hence, when the starting bay plane is the first entry in the
+bay_planes list, the forces and moments acting at the respective cross-section are also the first
+entry in their respective input lists. Compare order of slot names in code example with image
+below. See the reference material for information on determining the slopes and jumps.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">BayAnalysis</span><span class="p">(</span><span class="c1"># Other slots</span>
+            <span class="n">Vx</span><span class="o">=</span><span class="p">[</span><span class="n">vx1</span><span class="p">,</span> <span class="n">vx2</span><span class="p">],</span>
+            <span class="n">My</span><span class="o">=</span><span class="p">[</span><span class="n">my1</span><span class="p">,</span> <span class="n">my2</span><span class="p">],</span>
+            <span class="n">Vy</span><span class="o">=</span><span class="p">[</span><span class="n">vy1</span><span class="p">,</span> <span class="n">vy2</span><span class="p">],</span>
+            <span class="n">Mx</span><span class="o">=</span><span class="p">[</span><span class="n">mx1</span><span class="p">,</span> <span class="n">mx2</span><span class="p">],</span>
+            <span class="n">Mt</span><span class="o">=</span><span class="p">[</span><span class="n">mt1</span><span class="p">,</span> <span class="n">mt2</span><span class="p">],</span>
+            <span class="c1"># Other slots</span>
+            <span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/bay_analysis_shear_and_moments.png"><img alt="alternate text" class="align-center" src="_images/bay_analysis_shear_and_moments.png" style="width: 394.0px; height: 500.0px;" /></a>
+<p><strong>ref_x, ref_y</strong>
+The x- and y-coordinates of the locations where the torsion and shear forces are defined.
+Compare order of slot names in code example with image below:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">BayAnalysis</span><span class="p">(</span><span class="c1"># Other slots</span>
+            <span class="n">ref_x</span><span class="o">=</span><span class="p">[</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">],</span>
+            <span class="n">ref_y</span><span class="o">=</span><span class="p">[</span><span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">],</span>
+            <span class="c1"># Other slots</span>
+            <span class="p">)</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/bay_analysis_refx_refy.png"><img alt="alternate text" class="align-center" src="_images/bay_analysis_refx_refy.png" style="width: 1023.5px; height: 467.0px;" /></a>
+<p><strong>material properties</strong>
+The material properties E (Young modulus), G (shear modulus), t (laminate thickness) and D
+(bending stiffness matrix) associated with the rhs_skin_faces, lhs_skin_faces and spar_faces
+inside the bay. Material properties can be obtained from the csv files provided with the reference
+material. Again, these need to be ordered consistently w.r.t. the faces. Hence:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">BayAnalysis</span><span class="p">(</span><span class="c1"># Other slots</span>
+            <span class="n">spar_faces</span><span class="o">=</span><span class="p">[</span><span class="n">spar_f1</span><span class="p">,</span> <span class="n">spar_f2</span><span class="p">],</span>
+            <span class="n">spar_materials_E</span><span class="o">=</span><span class="p">[</span><span class="n">spar1_E</span><span class="p">,</span> <span class="n">spar2_E</span><span class="p">],</span>
+            <span class="c1"># Other slots</span>
+            <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to BayAnalysis documentation!</a></li>
+<li><a class="reference internal" href="#how-to-install-and-run-bayanalysis">How to install and run BayAnalysis</a></li>
+<li><a class="reference internal" href="#bayanalysis-inputs">BayAnalysis inputs</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="BayAnalysis.html"
+                        title="next chapter">Class <code class="docutils literal"><span class="pre">BayAnalysis</span></code></a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="BayAnalysis.html" title="Class BayAnalysis"
+             >next</a> |</li>
+        <li><img src="_static/parapy.svg" alt="ParaPy Logo"
+                 id="ParaPyLogo" style="vertical-align: middle; margin-top: -1px"/>
+        </li>
+        <li>
+            <a href="#">Documentation</a> &#187;
+        </li>
+ 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Fokker Aerostructures.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>

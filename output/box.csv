@@ -1,0 +1,4 @@
+var_name,Value,Unit,Comment
+width,2.0,[m],Width of the box
+height,27.0,[m],Height of the box
+length,24.0,[m],Length of the box

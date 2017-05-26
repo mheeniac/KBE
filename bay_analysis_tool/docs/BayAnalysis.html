@@ -1,0 +1,707 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Class BayAnalysis &#8212; TU Delft KBE course 2017 1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/parapyapi.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/copybutton.js"></script>
+    <script type="text/javascript" src="_static/parapy.js"></script>
+    <script type="text/javascript" src="_static/sidebar.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to BayAnalysis documentation!" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to BayAnalysis documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><img src="_static/parapy.svg" alt="ParaPy Logo"
+                 id="ParaPyLogo" style="vertical-align: middle; margin-top: -1px"/>
+        </li>
+        <li>
+            <a href="index.html">Documentation</a> &#187;
+        </li>
+ 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="module-bay_analysis"></span><div class="section" id="class-bayanalysis">
+<h1>Class <a class="reference internal" href="#bay_analysis.BayAnalysis" title="bay_analysis.BayAnalysis"><code class="xref py py-class docutils literal"><span class="pre">BayAnalysis</span></code></a><a class="headerlink" href="#class-bayanalysis" title="Permalink to this headline">¶</a></h1>
+<p class="graphviz">
+<img src="_images/inheritance-98799a593753227fc69781ace6201d7d1e620814.png" alt="Inheritance diagram of bay_analysis.BayAnalysis" usemap="#inheritancea7a409f21d" class="inheritance"/>
+<map id="inheritancea7a409f21d" name="inheritancea7a409f21d">
+<area shape="rect" id="node1" title="Abstract class for Base, BaseSequence, etc." alt="" coords="160,104,261,129"/>
+<area shape="rect" id="node7" title="The root class of all user&#45;defined classes. You **HAVE** to directly" alt="" coords="309,104,381,129"/>
+<area shape="rect" id="node2" title="The Abstract base class for all &quot;ParaPy classes&quot;, such as Base," alt="" coords="7,5,110,31"/>
+<area shape="rect" id="node3" title="Dependency information mixin" alt="" coords="5,55,112,80"/>
+<area shape="rect" id="node4" title="Sphinx Documentation Generation" alt="" coords="12,104,105,129"/>
+<area shape="rect" id="node5" title="Mixin containing search utilities for Base" alt="" coords="11,153,106,179"/>
+<area shape="rect" id="node6" title="Hooks into PyDev built_in xreload module. It handles slot updates." alt="" coords="9,203,109,228"/>
+<area shape="rect" id="node8" href="#bay_analysis.BayAnalysis" target="_top" title="BayAnalysis" alt="" coords="429,104,524,129"/>
+</map>
+</p>
+<dl class="class">
+<dt id="bay_analysis.BayAnalysis">
+<em class="property">class </em><code class="descclassname">bay_analysis.</code><code class="descname">BayAnalysis</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#bay_analysis.BayAnalysis" title="Permalink to this definition">¶</a></dt>
+<dd><h2 class='category'>Required Inputs</h2><dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.Vx">
+<code class="descname">Vx</code><a class="headerlink" href="#bay_analysis.BayAnalysis.Vx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shear in x-direction.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[float]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.Vy">
+<code class="descname">Vy</code><a class="headerlink" href="#bay_analysis.BayAnalysis.Vy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shear in y-direction.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[float]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.Mx">
+<code class="descname">Mx</code><a class="headerlink" href="#bay_analysis.BayAnalysis.Mx" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moment around x-axis</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[float]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.My">
+<code class="descname">My</code><a class="headerlink" href="#bay_analysis.BayAnalysis.My" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moment around y-axis</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[float]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.Mt">
+<code class="descname">Mt</code><a class="headerlink" href="#bay_analysis.BayAnalysis.Mt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Torsion moment</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[float]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.ref_x">
+<code class="descname">ref_x</code><a class="headerlink" href="#bay_analysis.BayAnalysis.ref_x" title="Permalink to this definition">¶</a></dt>
+<dd><p>x-coordinate of the position where the torsion and shear forces are defined.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[float]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.ref_y">
+<code class="descname">ref_y</code><a class="headerlink" href="#bay_analysis.BayAnalysis.ref_y" title="Permalink to this definition">¶</a></dt>
+<dd><p>y-coordinate of the position where the torsion and shear forces are defined.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[float]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.bay_planes">
+<code class="descname">bay_planes</code><a class="headerlink" href="#bay_analysis.BayAnalysis.bay_planes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Planes must be parallel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[parapy.geom.Plane]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.rhs_skin_faces">
+<code class="descname">rhs_skin_faces</code><a class="headerlink" href="#bay_analysis.BayAnalysis.rhs_skin_faces" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of the right hand side skin faces
+Order: LE, main, TE</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[parapy.geom.Face]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.lhs_skin_faces">
+<code class="descname">lhs_skin_faces</code><a class="headerlink" href="#bay_analysis.BayAnalysis.lhs_skin_faces" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of the left hand side skin faces,
+Order: LE, main, TE</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[parapy.geom.Face]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.spar_faces">
+<code class="descname">spar_faces</code><a class="headerlink" href="#bay_analysis.BayAnalysis.spar_faces" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of the spar faces
+Order: FWD, AFT</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[parapy.geom.Face]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.rhs_skin_materials_t">
+<code class="descname">rhs_skin_materials_t</code><a class="headerlink" href="#bay_analysis.BayAnalysis.rhs_skin_materials_t" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of the right hand side skin material thicknesses
+Order: LE, main, TE</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[float]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.lhs_skin_materials_t">
+<code class="descname">lhs_skin_materials_t</code><a class="headerlink" href="#bay_analysis.BayAnalysis.lhs_skin_materials_t" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of the left hand side skin material thicknesses
+Order: LE, main, TE</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[float]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.spar_materials_t">
+<code class="descname">spar_materials_t</code><a class="headerlink" href="#bay_analysis.BayAnalysis.spar_materials_t" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of the spar material thicknesses
+Order: FWD, AFT</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[float]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.rhs_skin_materials_E">
+<code class="descname">rhs_skin_materials_E</code><a class="headerlink" href="#bay_analysis.BayAnalysis.rhs_skin_materials_E" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of the right hand side skin material Young&#8217;s moduli
+Order: LE, main, TE</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[float]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.lhs_skin_materials_E">
+<code class="descname">lhs_skin_materials_E</code><a class="headerlink" href="#bay_analysis.BayAnalysis.lhs_skin_materials_E" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of the left hand side skin material Young&#8217;s moduli
+Order: LE, main, TE</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[float]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.spar_materials_E">
+<code class="descname">spar_materials_E</code><a class="headerlink" href="#bay_analysis.BayAnalysis.spar_materials_E" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of the spar material Young&#8217;s moduli
+Order: FWD, AFT</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[float]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.rhs_skin_materials_G">
+<code class="descname">rhs_skin_materials_G</code><a class="headerlink" href="#bay_analysis.BayAnalysis.rhs_skin_materials_G" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of the right hand side skin material shear moduli
+Order: LE, main, TE</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[float]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.lhs_skin_materials_G">
+<code class="descname">lhs_skin_materials_G</code><a class="headerlink" href="#bay_analysis.BayAnalysis.lhs_skin_materials_G" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of the left hand side skin material shear moduli
+Order: LE, main, TE</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[float]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.spar_materials_G">
+<code class="descname">spar_materials_G</code><a class="headerlink" href="#bay_analysis.BayAnalysis.spar_materials_G" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of the spar material shear moduli
+Order: LE, main, TE</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[float]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.rhs_skin_materials_D">
+<code class="descname">rhs_skin_materials_D</code><a class="headerlink" href="#bay_analysis.BayAnalysis.rhs_skin_materials_D" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of the right hand side skin material D-matrices (D11, D22, D33, D12)
+Order: LE, main, TE</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[float]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.lhs_skin_materials_D">
+<code class="descname">lhs_skin_materials_D</code><a class="headerlink" href="#bay_analysis.BayAnalysis.lhs_skin_materials_D" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of the left hand side skin material D-matrices (D11, D22, D33, D12)
+Order: LE, main, TE</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[float]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot input required attribute">
+<dt id="bay_analysis.BayAnalysis.spar_materials_D">
+<code class="descname">spar_materials_D</code><a class="headerlink" href="#bay_analysis.BayAnalysis.spar_materials_D" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of the spar material D-matrices (D11, D22, D33, D12)
+Order: FWD, AFT</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">list[float]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<h2 class='category'>Optional Inputs</h2><meta class="default" value="3"><dl class="slot input attribute">
+<dt id="bay_analysis.BayAnalysis.N">
+<code class="descname">N</code><a class="headerlink" href="#bay_analysis.BayAnalysis.N" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of tension points used as representation per face edge. Should be &gt;= 3</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">integer</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<meta class="default" value="False"><dl class="inherited slot input attribute">
+<dt>
+<code class="descclassname">Base.</code><code class="descname">hidden</code></dt>
+<dd><p>if True, this instance will not be shown in the GUI tree.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<meta class="default" value="None"><dl class="inherited slot input attribute">
+<dt>
+<code class="descclassname">Base.</code><code class="descname">label</code></dt>
+<dd><p>name to display in the tree or repr. If <code class="docutils literal"><span class="pre">None</span></code>, <em>role</em> (name of &#64;Part
+definition) is displayed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">str | None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<meta class="default" value="'yellow'"><dl class="inherited slot input attribute">
+<dt>
+<code class="descclassname">Base.</code><code class="descname">color</code></dt>
+<dd><p>Either a valid string from parapy.globals.X11_COLORS or a 3-integer
+iterable with RGB values. RGB ranges 0-255. For example [255,192,203] is
+a list.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">str | collections.Sequence[int, int, int]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<meta class="default" value="{}"><dl class="inherited slot input attribute">
+<dt>
+<code class="descclassname">Base.</code><code class="descname">tree_style</code></dt>
+<dd><p>User-settable dictionary with values that control the appearance of this
+node in the GUI tree. Valid options:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="nb">str</span> <span class="p">(</span><span class="n">defaults</span> <span class="n">to</span> <span class="n">label</span> <span class="n">slot</span><span class="p">),</span>
+ <span class="s2">&quot;color&quot;</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">/</span> <span class="nb">tuple</span> <span class="p">(</span><span class="n">defaults</span> <span class="n">to</span> <span class="kc">None</span><span class="p">),</span>
+ <span class="s2">&quot;background_color&quot;</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="p">(</span><span class="n">defaults</span> <span class="n">to</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)),</span>
+ <span class="s2">&quot;icon&quot;</span> <span class="p">:</span> <span class="n">path</span> <span class="p">(</span><span class="n">defaults</span> <span class="n">to</span> <span class="bp">self</span><span class="o">.</span><span class="n">__icon__</span><span class="p">),</span>
+ <span class="s2">&quot;bold&quot;</span> <span class="p">:</span> <span class="nb">bool</span> <span class="p">(</span><span class="n">defaults</span> <span class="n">to</span> <span class="kc">False</span><span class="p">)}</span>
+</pre></div>
+</div>
+<p>color values:</p>
+<ul class="simple">
+<li>None: don&#8217;t color tree node</li>
+<li>True: take on same color as self.color</li>
+<li>str: named color that will be converted to corresponding RGB tuple</li>
+<li>tuple: RGB color</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<h2 class='category'>Attributes</h2><dl class="slot attribute">
+<dt id="bay_analysis.BayAnalysis.faces">
+<code class="descname">faces</code><a class="headerlink" href="#bay_analysis.BayAnalysis.faces" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of all faces in the order expected by SectionAnalysis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list[paray.geom.Surfaces</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot attribute">
+<dt id="bay_analysis.BayAnalysis.edges">
+<code class="descname">edges</code><a class="headerlink" href="#bay_analysis.BayAnalysis.edges" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="slot attribute">
+<dt id="bay_analysis.BayAnalysis.t_lsts">
+<code class="descname">t_lsts</code><a class="headerlink" href="#bay_analysis.BayAnalysis.t_lsts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="slot attribute">
+<dt id="bay_analysis.BayAnalysis.E_lsts">
+<code class="descname">E_lsts</code><a class="headerlink" href="#bay_analysis.BayAnalysis.E_lsts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="slot attribute">
+<dt id="bay_analysis.BayAnalysis.G_lsts">
+<code class="descname">G_lsts</code><a class="headerlink" href="#bay_analysis.BayAnalysis.G_lsts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="slot attribute">
+<dt id="bay_analysis.BayAnalysis.D_lsts">
+<code class="descname">D_lsts</code><a class="headerlink" href="#bay_analysis.BayAnalysis.D_lsts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="slot attribute">
+<dt id="bay_analysis.BayAnalysis.panel_lengths">
+<code class="descname">panel_lengths</code><a class="headerlink" href="#bay_analysis.BayAnalysis.panel_lengths" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="slot attribute">
+<dt id="bay_analysis.BayAnalysis.panel_widths">
+<code class="descname">panel_widths</code><a class="headerlink" href="#bay_analysis.BayAnalysis.panel_widths" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="slot attribute">
+<dt id="bay_analysis.BayAnalysis.max_compression_lst">
+<code class="descname">max_compression_lst</code><a class="headerlink" href="#bay_analysis.BayAnalysis.max_compression_lst" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="slot attribute">
+<dt id="bay_analysis.BayAnalysis.max_shear_lst">
+<code class="descname">max_shear_lst</code><a class="headerlink" href="#bay_analysis.BayAnalysis.max_shear_lst" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="slot attribute">
+<dt id="bay_analysis.BayAnalysis.buckling_rf_combined">
+<code class="descname">buckling_rf_combined</code><a class="headerlink" href="#bay_analysis.BayAnalysis.buckling_rf_combined" title="Permalink to this definition">¶</a></dt>
+<dd><p>Buckling reserve factors for combined compression and shear loads.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list[float]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot attribute">
+<dt id="bay_analysis.BayAnalysis.rhs_skins_rfs">
+<code class="descname">rhs_skins_rfs</code><a class="headerlink" href="#bay_analysis.BayAnalysis.rhs_skins_rfs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="slot attribute">
+<dt id="bay_analysis.BayAnalysis.lhs_skins_rfs">
+<code class="descname">lhs_skins_rfs</code><a class="headerlink" href="#bay_analysis.BayAnalysis.lhs_skins_rfs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="slot attribute">
+<dt id="bay_analysis.BayAnalysis.spars_rfs">
+<code class="descname">spars_rfs</code><a class="headerlink" href="#bay_analysis.BayAnalysis.spars_rfs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="inherited slot attribute">
+<dt>
+<code class="descclassname">Base.</code><code class="descname">parts</code></dt>
+<dd><p>Returns a list of instances. Sequences are lists.</p>
+</dd></dl>
+
+<dl class="inherited slot attribute">
+<dt>
+<code class="descclassname">Base.</code><code class="descname">children</code></dt>
+<dd><p>Returns a list of instances. Hidden children are excluded and
+Sequences are not expanded. See <code class="xref py py-meth docutils literal"><span class="pre">get_children()</span></code> for more
+options.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<h2 class='category'>Parts</h2><dl class="slot part attribute">
+<dt id="bay_analysis.BayAnalysis.section_analysis">
+<code class="descname">section_analysis</code><a class="headerlink" href="#bay_analysis.BayAnalysis.section_analysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Section Analysis at each plane from :attr: &#8216;bay_planes&#8217;.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list[SectionAnalysis]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="slot part attribute">
+<dt id="bay_analysis.BayAnalysis.buckling_analysis">
+<code class="descname">buckling_analysis</code><a class="headerlink" href="#bay_analysis.BayAnalysis.buckling_analysis" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">parapy.core.Sequence[AnalyticPanelBucklingAnalysis]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<h2 class='category'>Methods</h2><dl class="inherited method">
+<dt>
+<code class="descclassname">Base.</code><code class="descname">get_children</code><span class="sig-paren">(</span><em>hidden=False</em>, <em>expand=False</em><span class="sig-paren">)</span></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to BayAnalysis documentation!</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/BayAnalysis.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to BayAnalysis documentation!"
+             >previous</a> |</li>
+        <li><img src="_static/parapy.svg" alt="ParaPy Logo"
+                 id="ParaPyLogo" style="vertical-align: middle; margin-top: -1px"/>
+        </li>
+        <li>
+            <a href="index.html">Documentation</a> &#187;
+        </li>
+ 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Fokker Aerostructures.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>

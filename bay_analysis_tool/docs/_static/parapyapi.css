@@ -1,0 +1,88 @@
+/*
+ * parapyapi.css
+ * ~~~~~~~~~~~
+ *
+ * ParaPy API CSS extension to Sphinx for all documentation
+ *
+ * :copyright: Copyright 2016 ParaPy B.V.
+ *
+ */
+
+@import url("parapy.css");
+
+h1 {
+    color: rgb(32,170,254) !important;
+}
+
+div#sidebarbutton {
+    background-color: rgb(32,170,254);
+}
+
+div.hwrap1 {
+    width: 100%;
+    display:table;
+    padding: 20px 0 10px 0;
+    border-bottom: 1px solid rgb(32,170,254);
+}
+
+div.hwrap2 {
+    display: table-cell;
+}
+
+div.hwrap2 h2 {
+    float: left;
+    margin: 0;
+    padding: 0;
+    color: rgb(32,170,254);
+}
+
+div.hwrap2 img {
+    float: right;
+    height: 20px;
+    background: transparent;
+    border: 1px solid #eaeaea;
+    border-right-color: #777;
+    border-bottom-color: #777;
+    padding: 2px;
+    margin: 0 0 0 10px;
+}
+
+div.hwrap2 img:hover {
+    -moz-box-shadow: 0 0 10px #ccc;
+    -webkit-box-shadow: 0 0 10px #ccc;
+    box-shadow: 0 0 10px #ccc; }
+
+div.hwrap2 img.down {
+    background: #bbb;
+    border: 2px solid #777;
+    border-right-color: #eaeaea;
+    border-bottom-color: #eaeaea;
+}
+
+img.memberSymbol {
+    float: left;
+    padding-right: 5px;
+    padding-top: 4px;
+    width: 16px;
+    height: 16px;
+    }
+
+dl.class dd dl dt code.descname {
+    cursor: help;
+}
+
+dl.class dd dl.inherited dt code {
+    color: #808080;
+}
+
+span.rtypeseparator {
+    padding: 8px 8px;
+}
+
+span.defaultvalueseparator {
+    padding: 8px 8px;
+}
+
+img#ParaPyLogo {
+    height: 32px;
+}

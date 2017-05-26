@@ -1,0 +1,15 @@
+/*
+ * parapy.css
+ * ~~~~~~~~~~~
+ *
+ * ParaPy CSS extension to Sphinx for all documentation
+ *
+ * :copyright: Copyright 2016 ParaPy B.V.
+ *
+ */
+
+@import url("pydoc.css");
+
+img#ParaPyLogo {
+    height: 32px;
+}

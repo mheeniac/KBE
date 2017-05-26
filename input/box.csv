@@ -1,0 +1,5 @@
+var_name,Value,Unit,Comment
+width,2,[m],Width of the box
+height,3,[m],Height of the box
+length,4,[m],Length of the box
+test,NaN,[],Test String

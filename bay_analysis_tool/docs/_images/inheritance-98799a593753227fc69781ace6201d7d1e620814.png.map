@@ -1,0 +1,10 @@
+<map id="inheritancea7a409f21d" name="inheritancea7a409f21d">
+<area shape="rect" id="node1" title="Abstract class for Base, BaseSequence, etc." alt="" coords="160,104,261,129"/>
+<area shape="rect" id="node7" title="The root class of all user&#45;defined classes. You **HAVE** to directly" alt="" coords="309,104,381,129"/>
+<area shape="rect" id="node2" title="The Abstract base class for all &quot;ParaPy classes&quot;, such as Base," alt="" coords="7,5,110,31"/>
+<area shape="rect" id="node3" title="Dependency information mixin" alt="" coords="5,55,112,80"/>
+<area shape="rect" id="node4" title="Sphinx Documentation Generation" alt="" coords="12,104,105,129"/>
+<area shape="rect" id="node5" title="Mixin containing search utilities for Base" alt="" coords="11,153,106,179"/>
+<area shape="rect" id="node6" title="Hooks into PyDev built_in xreload module. It handles slot updates." alt="" coords="9,203,109,228"/>
+<area shape="rect" id="node8" href="#bay_analysis.BayAnalysis" target="_top" title="BayAnalysis" alt="" coords="429,104,524,129"/>
+</map>
