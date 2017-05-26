@@ -4,6 +4,7 @@ from parapy.core import *
 from parapy.geom import *
 from wing import Wing
 import warnings
+from csv_in_out import *
 
 
 # TODO:
@@ -21,41 +22,45 @@ class VTailWing(Base):
     # Create dict
     variables = read.read_input
 
+    read_const = ReadInput(file_name='constants.csv')
+    # Create dict
+    constants = read_const.read_input
+
     #: length of the root chord [m]
     #: :type: float
-    w_c_root = Input(5)
+    w_c_root = Input(variables["w_c_root"])
 
     #: single wing span [m]
     #: :type: float
-    w_span = Input(4)
+    w_span = Input(variables["w_span"])
 
     #: wing sweep angle [degrees]
     #: :type: float or str
-    sweep_angle_user = Input('NaN')  # Overwrites default function if ~= 'NaN'
+    sweep_angle_user = Input(variables["sweep_angle"])  # Overwrites default function if ~= 'NaN'
 
     #: wing taper ratio []
     #: :type: float or str
-    taper_ratio_user = Input(0.3)  # Overwrites the default function if ~= 'NaN'
+    taper_ratio_user = Input(variables["taper_ratio"])  # Overwrites the default function if ~= 'NaN'
 
     #: wing dihedral angle [degrees]
     #: :type: float or str
-    dihedral_angle_user = Input('NaN')  # Overwrites the default function if ~= 'NaN'
+    dihedral_angle_user = Input(variables["dihedral_angle"])  # Overwrites the default function if ~= 'NaN'
 
     #: jet cruise speed [mach]
     #: :type: float
-    m_cruise = Input(0.8)  # Used to calculate the default sweep angle
+    m_cruise = Input(constants["m_cruise"])  # Used to calculate the default sweep angle
 
     #: airfoil technology factor []
     #: :type: float
-    TechFactor = Input(0.86)  # Technology factor is equal to 0.87 NACA 6 airfoil and 1 to other conventional airfoils
+    TechFactor = Input(variables["TechFactor"])  # Technology factor is equal to 0.87 NACA 6 airfoil and 1 to other conventional airfoils
 
     #: the name of the root airfoil file
     #: :type: string
-    airfoil_root = Input('airfoil.dat')
+    airfoil_root = Input(variables["airfoil_root"])
 
     #: the name of the tip airfoil file
     #: :type: string
-    airfoil_tip = Input('airfoil.dat')
+    airfoil_tip = Input(variables["airfoil_tip"])
 
     # Label for the tree
     label = 'Tail Wing'
