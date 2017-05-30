@@ -8,14 +8,13 @@ from csv_in_out import *
 
 
 # TODO:
-# what is /8 * 2 in r_actuator and how do we make this not hard coded?
 # known bug, bij NaN taper ratio gaat hij kapot
 
 
 # from bay_analysis_tool.bay_analysis import BayAnalysis
 
 
-class VTailWing(Base):
+class VTailWing(GeomBase):
     # This class creates a vertical wing including rudder
 
     # Label for the tree
@@ -118,6 +117,7 @@ class VTailWing(Base):
     rud_length_frac = Input(0.75)
 
     #: The fraction of the height of the actuator box from the bottom (box height/fin span)
+    #: If you want the actuator n ribs lower or higher just input 0.33 +/- p_rib*n
     #: :type: float
     actuator_frac = Input(0.33)
 
@@ -171,7 +171,7 @@ class VTailWing(Base):
         """ Returns height of the actuator box from the bottom of the fin [m]
         :rtype: float
         """
-        return self.actuator_frac / 8 * 2 * self.w_span
+        return self.actuator_frac * self.w_span
 
     @Attribute
     def p_zero(self):
@@ -683,7 +683,6 @@ class VTailWing(Base):
                                 self.te_skin_right],
                           transparency=0.6,
                           label = 'Rudder Skin')
-
     @Attribute
     def things_for_rotation(self):
         list = []
