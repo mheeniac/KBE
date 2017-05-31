@@ -8,16 +8,19 @@ from csv_in_out import *
 
 
 # TODO:
-# what is /8 * 2 in r_actuator and how do we make this not hard coded?
-# Stijn Kan jij doen wat ik met input heb gedaan voor alles vanaf d_hing?
 # known bug, bij NaN taper ratio gaat hij kapot
+# fix curvature at leading egde rudder
+# fix hingeline and actuator line
 
 
 # from bay_analysis_tool.bay_analysis import BayAnalysis
 
 
-class VTailWing(Base):
+class VTailWing(GeomBase):
     # This class creates a vertical wing including rudder
+
+    # Label for the tree
+    label = 'Tail Wing'
 
     # Create dicts
     constants = csvr.read_input("constants.csv")  # Fuselage Settings
@@ -59,23 +62,49 @@ class VTailWing(Base):
     #: :type: string
     airfoil_tip = Input(variables["airfoil_tip"])
 
-    # Label for the tree
-    label = 'Tail Wing'
+    #: Distance in x direction of hinge plane with respect to the trailing edge[m]
+    #: :type: float
+    d_hinge_user = Input('NaN') # Overwrites the default function if ~= 'NaN'
 
-    d_hinge = Input(0.5)
-    # p_zero = Input(0.25)
-    # p_rib = Input(0.5)
-    p_form_rib = Input(0.3)
-    number_hinges = Input(2)
-    dz_root_hinge_rib = Input(0.2)
-    dz_tip_hinge_rib = Input(0.2)
+    #: Distance in z direction of fist fin rib with respect to the root[m]
+    #: :type: float
+    p_zero_user = Input('NaN')  # Overwrites the default function if ~= 'NaN'
+
+    #: Distance in z direction of following fin ribs with respect to the previous one [m]
+    #: :type: float
+    p_rib_user = Input('NaN') # Overwrites the default function if ~= 'NaN'
+
+    #: Distance in z direction of the form rib with respect to the first form rib [m]
+    #: :type: float
+    p_form_rib_user = Input('NaN') # Overwrites the default function if ~= 'NaN'
+
+    #: Ratio of local width where the local hinge is located []
+    #: :type: float
     rhl_root = Input(0.25)
+
+    #: Ratio of local width where the local hinge is located []
+    #: :type: float
     rhl_tip = Input(0.25)
-    d_actuator = Input(0.125)
+
+    #: Ratio of local width where the local actuator hinge is located []
+    #: :type: float
     ahl_tip = Input(0.75)
+
+    #: Distance in z direction between the to actuator hinge planes [m]
+    #: :type: float
+    d_actuator = Input(0.125)
+
+    #: Distance of front spar with respect to the hinge plane [m]
+    #: :type: float
     d_front_spar = Input(0.07)
+
+    #: Distance of back spar with respect to the trailing edge [m]
+    #: :type: float
     d_back_spar = Input(0.025)
-    pick_hingeribs = Input([1, 2, 3, 5, 6])
+    
+    #: Select which ribs are the hinge ribs. Default value is [1,2,3,4,5,6] al hinges are used. []
+    #: :type: list of integers
+    pick_hinge_ribs = Input([1, 2, 3, 4, 5, 6])
 
     #: Rudder size fraction. Rudder width/Fin root chord []
     #: :type: float
@@ -90,6 +119,7 @@ class VTailWing(Base):
     rud_length_frac = Input(0.75)
 
     #: The fraction of the height of the actuator box from the bottom (box height/fin span)
+    #: If you want the actuator n ribs lower or higher just input 0.33 +/- p_rib*n
     #: :type: float
     actuator_frac = Input(0.33)
 
@@ -100,6 +130,10 @@ class VTailWing(Base):
     #: The fraction of the height of the ribs (rib height/fin span) []
     #: :type: float
     rib_frac = Input(0.125)
+
+    #: The fraction of the height of the form ribs (form rib height/fin span) []
+    #: :type: float
+    form_rib_frac = Input(0.075)
 
     #: Easy variable to offset all components along the x-axis [m]
     #: :type: float
@@ -114,7 +148,11 @@ class VTailWing(Base):
         """ Returns the distance from the trailing edge to the hinge plane [m]
         :rtype: float
         """
-        return self.rud_width_frac * self.w_span
+        if self.d_hinge_user == 'NaN':  # if not defined, use default formula
+            distance = self.rud_width_frac * self.w_span
+        else:
+            distance = self.d_hinge_user
+        return distance
 
     @Attribute
     def r_rudder(self):
@@ -135,21 +173,40 @@ class VTailWing(Base):
         """ Returns height of the actuator box from the bottom of the fin [m]
         :rtype: float
         """
-        return self.actuator_frac / 8 * 2 * self.w_span
+        return self.actuator_frac * self.w_span
 
     @Attribute
     def p_zero(self):
         """ Returns the height of the first rib (from bottom) [m]
         :rtype: float
         """
-        return  self.rib0_frac * self.w_span
+        if self.p_zero_user == 'NaN':  # if not defined, use default formula
+            distance = self.rib0_frac * self.w_span
+        else:
+            distance = self.p_zero_user
+        return  distance
 
     @Attribute
     def p_rib(self):
         """ Returns the height of the ribs (excluding the first one) [m]
         :rtype: float
         """
-        return self.rib_frac * self.w_span
+        if self.p_rib_user == 'NaN': # if not defined, use default formula
+            distance = self.rib_frac * self.w_span
+        else:
+            distance = self.p_rib_user
+        return distance    \
+
+    @Attribute
+    def p_form_rib(self):
+        """ Returns the height of the form ribs (excluding the first one) [m]
+        :rtype: float
+        """
+        if self.p_form_rib_user == 'NaN': # if not defined, use default formula
+            distance = self.form_rib_frac * self.w_span
+        else:
+            distance = self.p_form_rib_user
+        return distance
 
     @Attribute
     def calc_v_sweep_angle(self):
@@ -318,55 +375,55 @@ class VTailWing(Base):
     @Attribute
     def hinge_locs(self):
         List = []
-        number_hinges = len(self.pick_hingeribs)
-        y_pos_root_begin = self.fixed_part_with_ribs.vertices[25 - 2 * self.pick_hingeribs[0]].point.y
-        y_pos_root_end = self.fixed_part_with_ribs.vertices[24 - 2 * self.pick_hingeribs[0]].point.y
-        y_pos_tip_begin = self.fixed_part_with_ribs.vertices[25 - 2 * self.pick_hingeribs[number_hinges - 1]].point.y
-        y_pos_tip_end = self.fixed_part_with_ribs.vertices[24 - 2 * self.pick_hingeribs[number_hinges - 1]].point.y
+        number_hinges = len(self.pick_hinge_ribs)
+        y_pos_root_begin = self.fixed_part_with_ribs.vertices[25 - 2 * self.pick_hinge_ribs[0]].point.y
+        y_pos_root_end = self.fixed_part_with_ribs.vertices[24 - 2 * self.pick_hinge_ribs[0]].point.y
+        y_pos_tip_begin = self.fixed_part_with_ribs.vertices[25 - 2 * self.pick_hinge_ribs[number_hinges - 1]].point.y
+        y_pos_tip_end = self.fixed_part_with_ribs.vertices[24 - 2 * self.pick_hinge_ribs[number_hinges - 1]].point.y
 
-        y_pos_root_begin_p = self.fixed_part_with_ribs.vertices[25 - 2 * self.pick_hingeribs[0]].point
-        y_pos_root_end_p = self.fixed_part_with_ribs.vertices[24 - 2 * self.pick_hingeribs[0]].point
-        y_pos_tip_begin_p = self.fixed_part_with_ribs.vertices[25 - 2 * self.pick_hingeribs[number_hinges - 1]].point
-        y_pos_tip_end_p = self.fixed_part_with_ribs.vertices[24 - 2 * self.pick_hingeribs[number_hinges - 1]].point
+        y_pos_root_begin_p = self.fixed_part_with_ribs.vertices[25 - 2 * self.pick_hinge_ribs[0]].point
+        y_pos_root_end_p = self.fixed_part_with_ribs.vertices[24 - 2 * self.pick_hinge_ribs[0]].point
+        y_pos_tip_begin_p = self.fixed_part_with_ribs.vertices[25 - 2 * self.pick_hinge_ribs[number_hinges - 1]].point
+        y_pos_tip_end_p = self.fixed_part_with_ribs.vertices[24 - 2 * self.pick_hinge_ribs[number_hinges - 1]].point
         points_root = [y_pos_root_begin_p, y_pos_root_end_p]
         points_tip = [y_pos_tip_begin_p, y_pos_tip_end_p]
         root_distance = Point.distance(*points_root)
         tip_distance = Point.distance(*points_tip)
 
-        # if self.pick_hingeribs[0] == 1 or 2:
-        #     y_pos_root = self.fixed_part_with_ribs.vertices[4 + 5 * (self.pick_hingeribs[0] - 1)].point.y
+        # if self.pick_hinge_ribs[0] == 1 or 2:
+        #     y_pos_root = self.fixed_part_with_ribs.vertices[4 + 5 * (self.pick_hinge_ribs[0] - 1)].point.y
         # else:
         #     y_pos_root = self.fixed_part_with_ribs.vertices[10].point.y
         #
-        # if self.pick_hingeribs[number_hinges - 1] == 4 or 5:
-        #     y_pos_tip = self.fixed_part_with_ribs.vertices[self.pick_hingeribs[number_hinges - 1] * 3].point.y
+        # if self.pick_hinge_ribs[number_hinges - 1] == 4 or 5:
+        #     y_pos_tip = self.fixed_part_with_ribs.vertices[self.pick_hinge_ribs[number_hinges - 1] * 3].point.y
         # else:
         #     y_pos_tip = self.fixed_part_with_ribs.vertices[16].point.y
 
-        z_pos_tip = self.p_zero + self.p_rib * (self.pick_hingeribs[number_hinges - 1] - 1)
-        z_pos_root = self.p_zero + self.p_rib * (self.pick_hingeribs[0] - 1)
+        z_pos_tip = self.p_zero + self.p_rib * (self.pick_hinge_ribs[number_hinges - 1] - 1)
+        z_pos_root = self.p_zero + self.p_rib * (self.pick_hinge_ribs[0] - 1)
 
-        for i in xrange(len(self.pick_hingeribs)):
+        for i in xrange(len(self.pick_hinge_ribs)):
             # Pointlist = Point(self.w_c_root - self.d_hinge,
             #                   y_pos_root - self.rhl_root + (
             #                       (-(y_pos_root - self.rhl_root) + (y_pos_tip - self.rhl_tip)) /
             #                       (x_pos_tip - x_pos_root)) * ((
             #                                                        self.p_zero + self.p_rib * (
-            #                                                            self.pick_hingeribs[i] - 1)) - x_pos_root),
-            #                   ((self.p_zero + self.p_rib * (self.pick_hingeribs[i] - 1))))
+            #                                                            self.pick_hinge_ribs[i] - 1)) - x_pos_root),
+            #                   ((self.p_zero + self.p_rib * (self.pick_hinge_ribs[i] - 1))))
             PointList = Point(self.w_c_root - self.d_hinge,
                               y_pos_root_end + root_distance * self.rhl_root +
                               ((root_distance * self.rhl_root - tip_distance * self.rhl_tip) / (z_pos_root - z_pos_tip)) \
-                              * (self.p_zero + self.p_rib * (self.pick_hingeribs[i] - 1) - z_pos_root),
-                              self.p_zero + self.p_rib * (self.pick_hingeribs[i] - 1))
+                              * (self.p_zero + self.p_rib * (self.pick_hinge_ribs[i] - 1) - z_pos_root),
+                              self.p_zero + self.p_rib * (self.pick_hinge_ribs[i] - 1))
             List.append(PointList)
         return List
         # Pointlist = Point(self.w_c_root - self.d_hinge,
         #                   -root_distance * self.rhl_root - (
         #                       (-(root_distance) * self.rhl_root) + ((-tip_distance) * self.rhl_tip)) /
         #                   (x_pos_tip - x_pos_root)) * ((self.p_zero + self.p_rib * (
-        #     self.pick_hingeribs[i] - 1)) - x_pos_root),
-        # ((self.p_zero + self.p_rib * (self.pick_hingeribs[i] - 1))))
+        #     self.pick_hinge_ribs[i] - 1)) - x_pos_root),
+        # ((self.p_zero + self.p_rib * (self.pick_hinge_ribs[i] - 1))))
         # List.append(Pointlist)
 
     @Part(in_tree=False)
@@ -467,12 +524,12 @@ class VTailWing(Base):
 
     @Attribute
     def curves(self):
-        y_pos_root_begin = self.fixed_part_with_ribs.vertices[25 - 2 * self.pick_hingeribs[0]].point
-        y_pos_root_end = self.fixed_part_with_ribs.vertices[24 - 2 * self.pick_hingeribs[0]].point
+        y_pos_root_begin = self.fixed_part_with_ribs.vertices[25 - 2 * self.pick_hinge_ribs[0]].point
+        y_pos_root_end = self.fixed_part_with_ribs.vertices[24 - 2 * self.pick_hinge_ribs[0]].point
         points = [y_pos_root_begin, y_pos_root_end]
         distance = Point.distance(*points)
 
-        z_hinge = self.p_zero + self.p_rib * (self.pick_hingeribs[0] - 1)
+        z_hinge = self.p_zero + self.p_rib * (self.pick_hinge_ribs[0] - 1)
         z_bottom = self.rudder_shell.vertices[1].point.z
         y_bottom = points[1].y + distance * self.rhl_root + (
                                                                 self.hingerib_line.direction_vector.y / self.hingerib_line.direction_vector.z) * (
@@ -628,20 +685,33 @@ class VTailWing(Base):
                                 self.te_skin_right],
                           transparency=0.6,
                           label = 'Rudder Skin')
-
     @Attribute
     def things_for_rotation(self):
         list = []
-        list.append(self.skins_rudder)
-        # for i in xrange(len(self.rudder_ribs)):
-        #     list.append(self.rudder_ribs[i])
+        list.append(self.skins_rudder.shells[0])
+        for i in xrange(len(self.rudder_ribs)):
+             list.append(self.rudder_ribs[i].faces[0])
+        list.append(self.rudder_back_spar)
+        list.append(self.rudder_front_spar)
+        for i in xrange(len(self.actuator_hinges)):
+            list.append(self.actuator_hinges[i].solids[0])
 
         return list
 
-    @Part(in_tree=False)
+    @Attribute
+    def transparency_definer(self):
+        list=[]
+        list.append(0.6)
+        for i in xrange(len(self.things_for_rotation)-1):
+            list.append(0)
+        return list
+
+    @Part(in_tree=True)
     def turn_rudder(self):
-        return RotatedShape(shape_in=self.things_for_rotation, rotation_point=self.hingerib_line.start,
-                            vector=self.hingerib_line.direction_vector, angle=radians(30))
+        return RotatedShape(shape_in=self.things_for_rotation[child.index], rotation_point=self.hingerib_line.start,
+                            vector=self.hingerib_line.direction_vector, angle=radians(-30),quantify=len(self.things_for_rotation), transparency=self.transparency_definer[child.index])
+
+
 
 
 if __name__ == '__main__':
