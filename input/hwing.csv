@@ -1,0 +1,9 @@
+var_name,Value,Unit,Comment
+w_c_root,5,[m],Length of the vertical wing root chord
+sweep_angle,NaN,[degrees],Sweep angle of the vertical wing (NaN for auto)
+taper_ratio,0.3,[ratio],Taper ratio of the vertical wing (NaN for auto)
+dihedral_angle,NaN,[degrees],Dihedral angle of the main wing (NaN for auto)
+TechFactor,0.86,[],TechFactor of the vertical  wing
+w_span,4,[m],Span of the vertical wing (height)
+airfoil_root,airfoil.dat,[],root airfoil file name
+airfoil_tip,airfoil.dat,[],tip airfoil file name
