@@ -9,6 +9,8 @@ from csv_in_out import *
 
 # TODO:
 # known bug, bij NaN taper ratio gaat hij kapot
+# fix curvature at leading egde rudder
+# fix hingeline and actuator line
 
 
 # from bay_analysis_tool.bay_analysis import BayAnalysis
@@ -686,16 +688,30 @@ class VTailWing(GeomBase):
     @Attribute
     def things_for_rotation(self):
         list = []
-        list.append(self.skins_rudder)
-        # for i in xrange(len(self.rudder_ribs)):
-        #     list.append(self.rudder_ribs[i])
+        list.append(self.skins_rudder.shells[0])
+        for i in xrange(len(self.rudder_ribs)):
+             list.append(self.rudder_ribs[i].faces[0])
+        list.append(self.rudder_back_spar)
+        list.append(self.rudder_front_spar)
+        for i in xrange(len(self.actuator_hinges)):
+            list.append(self.actuator_hinges[i].solids[0])
 
         return list
 
-    @Part(in_tree=False)
+    @Attribute
+    def transparency_definer(self):
+        list=[]
+        list.append(0.6)
+        for i in xrange(len(self.things_for_rotation)-1):
+            list.append(0)
+        return list
+
+    @Part(in_tree=True)
     def turn_rudder(self):
-        return RotatedShape(shape_in=self.things_for_rotation, rotation_point=self.hingerib_line.start,
-                            vector=self.hingerib_line.direction_vector, angle=radians(30))
+        return RotatedShape(shape_in=self.things_for_rotation[child.index], rotation_point=self.hingerib_line.start,
+                            vector=self.hingerib_line.direction_vector, angle=radians(-30),quantify=len(self.things_for_rotation), transparency=self.transparency_definer[child.index])
+
+
 
 
 if __name__ == '__main__':
