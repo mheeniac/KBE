@@ -247,19 +247,20 @@ class VTailWing(GeomBase):
 
     @Attribute(in_tree=False)
     def rudder_pln_locs(self):
-        """ Converts the input sweep angle (trailing edge) to 0.25 sweep angle for use in wing class [degrees]
+        """ determines the location of the rudder plane
         :rtype: float
         """
-        return [Point(self.w_c_root, 0, self.r_rudder), Point(self.w_c_root, 0, self.r_rudder + self.b_rudder)]
+        return [Point(self.w_c_root + self.x_offset, 0, self.r_rudder+self.z_offset),
+                Point(self.w_c_root + self.x_offset, 0, self.r_rudder + self.b_rudder+self.z_offset)]
 
     @Part(in_tree=False)
     def hinge_pln(self):
         """ Creates a plane at a distance of d_hinge from the TE
         :rtype: part
         """
-        return Plane(reference=Point(self.w_c_root - self.d_hinge,  # point at d_hinge from TE in x direction
+        return Plane(reference=Point(self.w_c_root - self.d_hinge + self.x_offset,  # point at d_hinge from TE in x direction
                                      0,
-                                     0),
+                                     self.z_offset),
                      normal=Vector(1, 0, 0)  # normal vector of the plane in x direction
                      )
 
@@ -279,7 +280,7 @@ class VTailWing(GeomBase):
         """
         return Plane(
             reference=Point((((self.w_c_root - self.obj_vwing.w_c_tip) /  # Make sure that the origin of the plane...
-                              (self.w_span)) * (self.p_zero + self.p_rib * child.index)),  # follows the LE
+                              (self.w_span)) * (self.p_zero + self.p_rib * child.index)+self.x_offset),  # follows the LE
                             0,
                             self.p_zero + self.p_rib * child.index),
             normal=Vector(0, 0, 1),  # normal vector of the plane in z direction
