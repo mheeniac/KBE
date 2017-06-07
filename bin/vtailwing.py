@@ -533,65 +533,71 @@ class VTailWing(GeomBase):
 
     @Attribute
     def curves(self):
-        y_pos_root_begin = self.fixed_part_with_ribs.vertices[25 - 2 * self.pick_hinge_ribs[0]].point
-        y_pos_root_end = self.fixed_part_with_ribs.vertices[24 - 2 * self.pick_hinge_ribs[0]].point
-        points = [y_pos_root_begin, y_pos_root_end]
-        distance = Point.distance(*points)
+        x_pos = self.w_c_root - self.d_hinge
 
-        z_hinge = self.p_zero + self.p_rib * (self.pick_hinge_ribs[0] - 1)
-        z_bottom = self.rudder_shell.vertices[1].point.z
-        y_bottom = points[1].y + distance * self.rhl_root + (
-                                                                self.hingerib_line.direction_vector.y / self.hingerib_line.direction_vector.z) * (
-                                                                z_bottom - z_hinge)
-        z_up = self.rudder_shell.vertices[5].point.z
-        y_up = y_bottom - (self.hingerib_line.direction_vector.y / self.hingerib_line.direction_vector.z) * (
-            z_bottom - z_up)
+        pos_root_begin = self.rudder_shell.vertices[0].point
+        pos_root_end = self.rudder_shell.vertices[2].point
+        pos_tip_begin = self.rudder_shell.vertices[3].point
+        pos_tip_end = self.rudder_shell.vertices[5].point
 
-        return [Arc(radius=y_bottom - self.rudder_shell.vertices[1].point.y,
-                    angle=radians(90 + 32),
-                    position=Position(location=Point(self.w_c_root - self.d_hinge,
-                                                     y_bottom,
-                                                     self.rudder_shell.vertices[1].point.z),
-                                      orientation=Orientation(x=Vector(1, 0, 0),
-                                                              y=Vector(0, 1, 0),
-                                                              z=Vector(0, 0, -1))),
-                    start=self.rudder_shell.vertices[1].point),
-                Arc(radius=y_up - self.rudder_shell.vertices[4].point.y,
-                    angle=radians(90 + 32),
-                    position=Position(location=Point(self.w_c_root - self.d_hinge,
-                                                     y_up,
-                                                     self.rudder_shell.vertices[4].point.z),
-                                      orientation=Orientation(x=Vector(1, 0, 0),
-                                                              y=Vector(0, 1, 0),
-                                                              z=Vector(0, 0, -1))),
-                    start=self.rudder_shell.vertices[4].point),
-                Arc(radius=self.rudder_shell.vertices[5].point.y - y_up,
-                    angle=radians(90 + 32),
-                    position=Position(location=Point(self.w_c_root - self.d_hinge,
-                                                     y_up,
-                                                     self.rudder_shell.vertices[5].point.z),
+        y_pos_hingeline_root = self.hingerib_line.point1.y -(self.hingerib_line.direction_vector.y /
+                                                             self.hingerib_line.direction_vector.z) * \
+                                                            (pos_root_begin.z - self.hingerib_line.point1.z)
+        y_pos_hingeline_tip = self.hingerib_line.point2.y -(self.hingerib_line.direction_vector.y /
+                                                             self.hingerib_line.direction_vector.z) * \
+                                                            (pos_tip_begin.z - self.hingerib_line.point2.z)
+
+        point_origin_circ_root = Point(x_pos,y_pos_hingeline_root,pos_root_begin.z)
+        point_origin_circ_tip = Point(x_pos,y_pos_hingeline_tip,pos_tip_begin.z)
+
+        root_begin = (point_origin_circ_root,pos_root_begin)
+        root_end = (point_origin_circ_root,pos_root_end)
+        tip_begin = (point_origin_circ_tip,pos_tip_begin)
+        tip_end= (point_origin_circ_tip,pos_tip_end)
+
+        radius_root_begin = Point.distance(*root_begin)
+        radius_root_end = Point.distance(*root_end)
+        radius_tip_begin = Point.distance(*tip_begin)
+        radius_tip_end = Point.distance(*tip_end)
+
+
+        return [Arc(radius=radius_root_begin,
+                    angle=radians(90+32),
+                    position=Position(location=point_origin_circ_root,
                                       orientation=Orientation(x=Vector(1, 0, 0),
                                                               y=Vector(0, 1, 0),
                                                               z=Vector(0, 0, 1))),
-                    start=self.rudder_shell.vertices[5].point),
-                Arc(radius=self.rudder_shell.vertices[2].point.y - y_bottom,
+                    start=pos_root_begin),
+                Arc(radius=radius_root_end,
                     angle=radians(90 + 32),
-                    position=Position(location=Point(self.w_c_root - self.d_hinge,
-                                                     y_bottom,
-                                                     self.rudder_shell.vertices[2].point.z),
+                    position=Position(location=point_origin_circ_root,
+                                      orientation=Orientation(x=Vector(1, 0, 0),
+                                                              y=Vector(0, 1, 0),
+                                                              z=Vector(0, 0, -1))),
+                    start=pos_root_end),
+                Arc(radius=radius_tip_begin,
+                    angle=radians(90 + 32),
+                    position=Position(location=point_origin_circ_tip,
                                       orientation=Orientation(x=Vector(1, 0, 0),
                                                               y=Vector(0, 1, 0),
                                                               z=Vector(0, 0, 1))),
-                    start=self.rudder_shell.vertices[2].point)]
+                    start=pos_tip_begin),
+                Arc(radius=radius_tip_end,
+                    angle=radians(90 + 32),
+                    position=Position(location=point_origin_circ_tip,
+                                      orientation=Orientation(x=Vector(1, 0, 0),
+                                                              y=Vector(0, 1, 0),
+                                                              z=Vector(0, 0, -1))),
+                    start=pos_tip_end)]
 
     @Part(in_tree=False)
     def curve_surface1(self):
-        return MultiSectionSurface(profiles=[self.curves[0], self.curves[1]],
-                                   path=self.rudder_shell.edges[5])
+        return MultiSectionSurface(profiles=[self.curves[0], self.curves[2]],
+                                   path=self.rudder_shell.edges[3])
 
     @Part(in_tree=False)
     def curve_surface2(self):
-        return MultiSectionSurface(profiles=[self.curves[2], self.curves[3]],
+        return MultiSectionSurface(profiles=[self.curves[1], self.curves[3]],
                                    path=self.rudder_shell.edges[7])
 
     @Part(in_tree=False)
@@ -626,17 +632,17 @@ class VTailWing(GeomBase):
 
     @Attribute
     def fused_le_skin_left(self):
-        return FusedShell(shape_in=self.fused_spars.faces[4],
+        return FusedShell(shape_in=self.fused_spars.faces[1],
                           tool=[self.curve_surface1])
 
     @Attribute
     def fused_le_skin_right(self):
-        return FusedShell(shape_in=self.fused_spars.faces[1],
+        return FusedShell(shape_in=self.fused_spars.faces[4],
                           tool=[self.curve_surface2])
 
     @Attribute
     def main_skin_left(self):
-        return self.fused_spars.faces[12]
+        return self.fused_spars.faces[8]
 
     @Attribute
     def main_skin_right(self):
@@ -648,7 +654,7 @@ class VTailWing(GeomBase):
 
     @Attribute
     def te_skin_right(self):
-        return self.fused_spars.faces[8]
+        return self.fused_spars.faces[11]
 
     @Attribute(in_tree=True)
     def rudder_front_spar(self):
@@ -696,10 +702,10 @@ class VTailWing(GeomBase):
         """ Fuses all rudder skins
         :rtype: part
         """
-        return FusedShell(shape_in=self.te_skin_left,
-                          tool=[self.main_skin_left, self.main_skin_right,
+        return FusedShell(shape_in=self.main_skin_left,
+                          tool=[ self.main_skin_right,
                                 self.fused_le_skin_left, self.fused_le_skin_right,
-                                self.te_skin_right],
+                                self.te_skin_right,self.te_skin_left],
                           transparency=0.6,
                           label='Rudder Skin')
 
