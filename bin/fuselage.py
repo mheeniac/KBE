@@ -201,7 +201,6 @@ class Fuselage(GeomBase):
                             quantify=3,
                             label=['Tail', 'Cabin', 'Nose'][child.index],
                             color = 'White')  # Name in the tree
-
     @Attribute
     def save_vars(self):
         """ Saves the variables of current settings to an output file

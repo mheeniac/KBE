@@ -7,4 +7,3 @@ TechFactor,0.86,[],TechFactor of the main wing
 w_span,7,[m],W span of the main wing 
 airfoil_root,airfoil.dat,[],airfoil file name
 airfoil_tip,airfoil.dat,[],airfoil file name
-w_loc_perc,60,[%],Percentile location of the main wing aerodynamic center of the cabin length

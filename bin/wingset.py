@@ -1,8 +1,9 @@
 from math import *
-
+import csv_handle as csvr
 from parapy.core import *
 from parapy.geom import *
 from wing import Wing
+from csv_in_out import *
 
 
 # TODO:
@@ -25,15 +26,15 @@ class Wingset(GeomBase):
 
     #: wing sweep angle [degrees]
     #: :type: float or str
-    sweep_angle_user = Input('NaN')  # Overwrites default function if ~= 'NaN'
+    sweep_angle = Input('NaN')  # Overwrites default function if ~= 'NaN'
 
     #: wing taper ratio []
     #: :type: float or str
-    taper_ratio_user = Input('NaN')  # Overwrites the default function if ~= 'NaN'
+    taper_ratio = Input('NaN')  # Overwrites the default function if ~= 'NaN'
 
     #: wing dihedral angle [degrees]
     #: :type: float or str
-    dihedral_angle_user = Input('NaN')  # Overwrites the default function if ~= 'NaN'
+    dihedral_angle = Input('NaN')  # Overwrites the default function if ~= 'NaN'
 
     #: jet cruise speed [mach]
     #: :type: float
@@ -58,12 +59,12 @@ class Wingset(GeomBase):
     # object of class wing using local input
     def obj_wingset(self):
         return Wing(w_c_root=self.w_c_root,
-                    dihedral_angle_user=self.dihedral_angle_user,
+                    dihedral_angle_user=self.dihedral_angle,
                     w_span=self.w_span,
-                    taper_ratio_user=self.taper_ratio_user,
+                    taper_ratio_user=self.taper_ratio,
                     TechFactor=self.TechFactor,
                     m_cruise=self.m_cruise,
-                    sweep_angle_user=self.sweep_angle_user,
+                    sweep_angle_user=self.sweep_angle,
                     airfoil_root=self.airfoil_root,
                     airfoil_tip=self.airfoil_tip)
 
@@ -104,6 +105,45 @@ class Wingset(GeomBase):
         :rtype: float
         """
         return (self.w_c_root + self.obj_wingset.w_c_tip) * self.w_span
+
+    @Attribute
+    def calc_lowest_point(self):
+        """
+        This attribute calculates the location of the lowest point on the wing. This will be an offset to be used when
+        translating the main wing
+        :rtype: float
+        """
+        lowest_point = 0.
+        for points in self.wingset[0].edges[0].sample_points:
+            if points[1] >= lowest_point:
+                lowest_point = points[1]
+        return lowest_point
+    @Attribute
+    def save_vars(self):
+        """ Saves the variables of current settings to an output file
+
+        :rtype: string and csv
+        """
+        path = csvr.generate_path("mwing.csv")
+        first_row = True
+        with open(path[0], 'rb') as file:  # Open file
+            reader = csv.reader(file, delimiter=',', quotechar='|')  # Read into reader and section rows and columns
+            with open(path[1], 'wb') as outfile:
+                filewriter = csv.writer(outfile, delimiter=',', quotechar='|')
+                for row in reader:
+                    if first_row == True:
+                        filewriter.writerow(row)
+                        first_row = False
+                    else:
+                        # Find the name of the variable that we want to request and save
+                        var_name = row[0]
+
+                        value = getattr(self, var_name)
+                        # Update the value in row
+                        row[1] = value
+                        # Write the row to a new file
+                        filewriter.writerow(row)
+        return 'Saved'
 
 
 if __name__ == '__main__':
