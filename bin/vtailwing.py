@@ -326,7 +326,6 @@ class VTailWing(GeomBase):
                                 self.fused_rudder_and_hinge_plns.faces[10],
                                 self.fused_rudder_and_hinge_plns.faces[11],
                                 self.fused_rudder_and_hinge_plns.faces[13],
-                                self.fused_rudder_and_hinge_plns.faces[14],
                                 self.fused_rudder_and_hinge_plns.faces[17],
                                 ],
                           transparency=0.6,
@@ -742,7 +741,7 @@ class VTailWing(GeomBase):
         :rtype: part
         """
         return RotatedShape(shape_in=self.things_for_rotation[child.index], rotation_point=self.hingerib_line.start,
-                            vector=self.hingerib_line.direction_vector, angle=radians(-30),
+                            vector=self.hingerib_line.direction_vector, angle=radians(30),
                             quantify=len(self.things_for_rotation), transparency=self.transparency_definer[child.index])
 
 
