@@ -1,2 +1,3 @@
 var_name,Value,Unit,Comment
 m_cruise,0.8,[Mach],Cruise speed of the jet
+w_loc_perc,60,[%],lengthwise position of the wing MAC as percentage of the length of the cabin

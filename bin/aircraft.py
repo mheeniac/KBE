@@ -9,7 +9,7 @@ const = csvr.read_input("constants.csv") # Fuselage Settings
 mwing = csvr.read_input("mwing.csv")     # Fuselage Settings
 
 
-class Aircraft(Base):
+class Aircraft(GeomBase):
     # Name for the root object in the tree
     label  = 'Business Jet'
 
@@ -79,7 +79,7 @@ class Aircraft(Base):
 
     #: Percentile location of the main wing aerodynamic center of the cabin length
     #: :type: float
-    w_loc_perc = Input(mwing["w_loc_perc"])
+    w_loc_perc = Input(const["w_loc_perc"])
 
 
     @Part
@@ -98,9 +98,9 @@ class Aircraft(Base):
     def obj_main_wing(self):
         # Create a wing object for the main wings of the plane from the wingset class
         return Wingset(w_c_root=self.w_c_root,
-                       sweep_angle_user=self.sweep_angle,
-                       taper_ratio_user=self.taper_ratio,
-                       dihedral_angle_user=self.dihedral_angle,
+                       sweep_angle=self.sweep_angle,
+                       taper_ratio=self.taper_ratio,
+                       dihedral_angle=self.dihedral_angle,
                        m_cruise=self.m_cruise,
                        TechFactor=self.TechFactor,
                        w_span=self.w_span,
@@ -188,6 +188,15 @@ class Aircraft(Base):
                                                    0,
                                                    0.5 * self.cabin_diameter),
                                label='Main Wing Aerodynamic Centre')
+    @Attribute
+    def save_fuselage_vars(self):
+        """
+        This allows the user to save all variables of the current settings
+        :rtype: basestring
+        """
+        self.save_vars
+        self.obj_main_wing.save_vars
+        return self.fuselage_part.save_vars
 
 #     #
 #     # @Part(in_tree=True)
@@ -655,6 +664,31 @@ class Aircraft(Base):
 #                         filewriter.writerow(row)
 #         return 'Saved'
 #
+
+    @Attribute
+    def save_vars(self):
+        """ Saves the variables of current settings to an output file
+        :rtype: string and csv
+        """
+        path = csvr.generate_path("constants.csv")
+        first_row = True
+        with open(path[0], 'rb') as file:  # Open file
+            reader = csv.reader(file, delimiter=',', quotechar='|')  # Read into reader and section rows and columns
+            with open(path[1], 'wb') as outfile:
+                filewriter = csv.writer(outfile, delimiter=',', quotechar='|')
+                for row in reader:
+                    if first_row == True:
+                        filewriter.writerow(row)
+                        first_row = False
+                    else:
+                        # Find the name of the variable that we want to request and save
+                        var_name = row[0]
+                        value = getattr(self, var_name)
+                        # Update the value in row
+                        row[1] = value
+                        # Write the row to a new file
+                        filewriter.writerow(row)
+        return 'Saved'
 if __name__ == '__main__':
     from parapy.gui import display
 
