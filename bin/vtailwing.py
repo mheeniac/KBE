@@ -387,15 +387,15 @@ class VTailWing(GeomBase):
 
     @Attribute(in_tree=False)
     def mac_def(self):
+        """ Defines x location, z location and length of the mean aerodynamic chord """
+        sweep = radians(self.obj_vwing.sweep_angle)                             #sweep of vtailwing
+        taper = self.obj_vwing.calculate_taper_ratio                            #taper of vtailwing
+        span = self.w_span                                                      #span of vtailwing
+        cr = self.w_c_root                                                      #root chord of vtailwing
 
-        sweep = radians(self.obj_vwing.sweep_angle)
-        taper = self.obj_vwing.calculate_taper_ratio
-        span = self.w_span
-        cr = self.w_c_root
-
-        z_loc = (2 * span / 6) * ((1 + 2 * taper) / (1 + taper))
-        x_loc = z_loc / tan((0.5 * pi) - sweep)
-        length = (2 * cr / 3) * ((1 + taper + taper ** 2) / (1 + taper))
+        z_loc = (2 * span / 6) * ((1 + 2 * taper) / (1 + taper))                #calculate z location
+        x_loc = z_loc / tan((0.5 * pi) - sweep)                                 #calculate x location
+        length = (2 * cr / 3) * ((1 + taper + taper ** 2) / (1 + taper))        #calculate length
         return [x_loc, z_loc, length]
 
     @Attribute(in_tree=False)
