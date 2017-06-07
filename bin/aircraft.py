@@ -13,8 +13,6 @@ class Aircraft(Base):
     # Name for the root object in the tree
     label  = 'Business Jet'
 
-
-
     #: cabin diameter [m]
     #: :type: float
     cabin_diameter = Input(fuse["cabin_diameter"])
@@ -135,16 +133,52 @@ class Aircraft(Base):
 
     @Attribute(in_tree=False)
     def adc_diff(self):
-        # Calculate the distance between the ADC and the 60% fuselage length
+        """
+        Calculate the distance between the ADC and the 60% fuselage length
+        :rtype: float
+        """
         return self.cabin_length * (self.w_loc_perc / 100.) - self.adc_point[0] + self.fuselage_part.length_nose
 
     @Part(in_tree=False)
     def adc_point(self):
+        """
+        Create a point for the aerodynamic centre
+        :rtype: Point
+        """
         return Point(0.25 * self.w_c_root + self.obj_main_wing.mac_def[0],
                      0,
                      0)
+    @Part
+    def mac_line(self):
+        """
+        Create the line for the mean aerodynamic chord in the fuselage body
+        :rtype: LineSegment
+        """
+        return LineSegment(start=Point(0.25 * self.w_c_root + self.obj_main_wing.mac_def[0] - \
+                                       0.25 * self.obj_main_wing.mac_def[2],
+                                       0,
+                                       0),
+                           end=Point(0.25 * self.w_c_root + self.obj_main_wing.mac_def[0] + \
+                                     0.75 * self.obj_main_wing.mac_def[2],
+                                     0,
+                                     0),
+                           hidden=True)
 
-#             #
+    @Part
+    def trans_mac_line(self):
+        """
+        Translated the mean aerodynamic chord along the length of the fuselage
+        :rtype: TranslatedCurve
+        """
+        return TranslatedCurve(curve_in=self.mac_line,
+                               displacement=Vector(self.adc_diff,
+                                                   0,
+                                                   0.5 * self.cabin_diameter),
+                               color='black',
+                               line_thickness=3,
+                               label='Main Wing MAC')
+
+#     #
 #     # @Part(in_tree=True)
 #     # def def_v_tail_wing(self):
 #     #     return VTailWing(settings = '')
@@ -231,30 +265,7 @@ class Aircraft(Base):
 #     # def tail_wings(self):
 #     #     return self.translate_v_tail_wing, self.translate_h_tail_wing
 #     #
-#     # @Part
-#     # def mac_line(self):
-#     #     return LineSegment(start=Point(0.25 * self.main_root + self.obj_main_wing.mac_def[0] - \
-#     #                                    0.25 * self.obj_main_wing.mac_def[2],
-#     #                                    0,
-#     #                                    0),
-#     #                        end=Point(0.25 * self.main_root + self.obj_main_wing.mac_def[0] + \
-#     #                                  0.75 * self.obj_main_wing.mac_def[2],
-#     #                                  0,
-#     #                                  0),
-#     #                        hidden=True)
-#     #
-#
-#         #
-#     # @Part
-#     # def trans_mac_line(self):
-#     #     return TranslatedCurve(curve_in=self.mac_line,
-#     #                            displacement=Vector(self.adc_diff,
-#     #                                                0,
-#     #                                                0.5 * self.cabin_diameter),
-#     #                            color='black',
-#     #                            line_thickness=3,
-#     #                            label='Main Wing MAC')
-#     #
+
 #     # @Part
 #     # def trans_adc_point(self):
 #     #     return TranslatedShape(shape_in=self.adc_point,
