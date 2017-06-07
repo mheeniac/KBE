@@ -347,8 +347,36 @@ class Aircraft(GeomBase):
                          rib0_frac = self.rib0_frac,
                          rib_frac = self.rib_frac,
                          form_rib_frac = self.form_rib_frac,
-                         x_offset = self.x_offset,
+                         x_offset = 10,
                          z_offset = self.cabin_diameter)
+
+    @Part(in_tree = False)
+    def extr_tail(self):
+        """
+        This extends the tail so that it will protrude into the spacecraft fuselage
+        :rtype: ExtrudedShell
+        """
+        return ExtrudedShell(profile=self.def_v_tail_wing.trans_vwing.edges[0], distance = 1, direction=(0,0,-1))
+
+    @Part(in_tree=False)
+    def fused_tail_shell(self):
+        """
+        This connects the extension to the tail shell to make it one piece
+        :rtype: FusedShell
+        """
+        return FusedShell(shape_in = self.def_v_tail_wing.fixed_part,
+                          tool = self.extr_tail)
+
+    @Part(in_tree = True)
+    def sub_tail(self):
+        """
+        This deletes the non visible part of the extended vertical tail that is inside the fuselage
+        :rtype: SubtractedShell
+        """
+        return SubtractedShell(shape_in = self.fused_tail_shell,
+                               tool = [self.fuselage_part.fuselage_assembly[0],
+                                       self.fuselage_part.fuselage_assembly[1]],
+                               label = "Fixed Vertical Tail")
 
 #     # @Part(in_tree=False)
 #     # def translate_v_tail_wing(self):
@@ -360,38 +388,6 @@ class Aircraft(GeomBase):
 #     #                                 0,
 #     #                                 self.cabin_diameter)
 #     #                             )
-#     #
-#     # @Part(in_tree=False)
-#     # def translate_v_tail_fixed(self):
-#     #     return TransformedShape(shape_in=self.def_v_tail_wing.fixed_part,
-#     #                             from_position=Point(0, 0, 0),
-#     #                             to_position=Point(
-#     #                                 -self.h_adc_diff + (
-#     #                                     self.def_v_tail_wing.def_vwing.w_c_tip - self.def_v_tail_wing.def_vwing.w_c_root),
-#     #                                 0,
-#     #                                 self.cabin_diameter)
-#     #                             )
-#     #
-#     # @Part(in_tree=False)
-#     # def translate_v_tail_rudder_skin(self):
-#     #     return TransformedShape(shape_in=self.def_v_tail_wing.skins_rudder,
-#     #                             from_position=Point(0, 0, 0),
-#     #                             to_position=Point(
-#     #                                 -self.h_adc_diff + (
-#     #                                     self.def_v_tail_wing.def_vwing.w_c_tip - self.def_v_tail_wing.def_vwing.w_c_root),
-#     #                                 0,
-#     #                                 self.cabin_diameter)
-#     #                             )
-#     #
-#     # @Part(in_tree=False)
-#     # def rotated_v_tail_rudder(self):
-#     #     return RotatedShape(shape_in=self.translate_v_tail_rudder_skin,
-#     #                         rotation_point=Point(self.def_v_tail_wing.hingerib_line.point1.x + (-self.h_adc_diff + (
-#     #                                     self.def_v_tail_wing.def_vwing.w_c_tip - self.def_v_tail_wing.def_vwing.w_c_root)),
-#     #                                              self.def_v_tail_wing.hingerib_line.point1.y,
-#     #                                              self.def_v_tail_wing.hingerib_line.point1.z + self.cabin_diameter),
-#     #                         vector=self.def_v_tail_wing.hingerib_line.direction_vector,
-#     #                         angle=radians(30))
 #     #
 #     # @Attribute(in_tree=False)
 #     # def total_length(self):

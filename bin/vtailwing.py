@@ -244,6 +244,16 @@ class VTailWing(GeomBase):
                     airfoil_tip=self.airfoil_tip,
                     airfoil_root=self.airfoil_root
                     )
+    @Part(in_tree = False)
+    def trans_vwing(self):
+        """
+        Translate the wing solid to its correct position using the offsets
+        :rtype: TranslatedShape
+        """
+        return TranslatedShape(shape_in = self.obj_vwing.wing_part,
+                               displacement = Vector(self.x_offset,0,self.z_offset))
+
+
 
     @Attribute(in_tree=False)
     def rudder_pln_locs(self):
@@ -273,7 +283,7 @@ class VTailWing(GeomBase):
                      reference=self.rudder_pln_locs[child.index],  # locations of the rudder separation planes
                      normal=Vector(0, 0, 1))  # normal vector of the plane in z direction
 
-    @Part(in_tree=False)
+    @Part(in_tree=True)
     def rib_planes(self):
         """ Creates planes with the origin in the LE and with a normal in z direction
         :rtype: part
@@ -282,33 +292,24 @@ class VTailWing(GeomBase):
             reference=Point((((self.w_c_root - self.obj_vwing.w_c_tip) /  # Make sure that the origin of the plane...
                               (self.w_span)) * (self.p_zero + self.p_rib * child.index)+self.x_offset),  # follows the LE
                             0,
-                            self.p_zero + self.p_rib * child.index),
+                            self.p_zero + self.p_rib * child.index+self.z_offset),
             normal=Vector(0, 0, 1),  # normal vector of the plane in z direction
             quantify=8,
             label='Rib Plane'
         )
-
-    @Part(in_tree=True)
-    def trans_rib_planes(self):
-        """ Translated rib_planes in x_offset or z_offset direction
-        :rtype: part
-        """
-        return TranslatedPlane(built_from=self.rib_planes[child.index],
-                               displacement=Vector(self.x_offset, 0, self.z_offset),
-                               quantify=len(self.rib_planes))
 
     @Part(in_tree=False)
     def fused_rudder_and_hinge_plns(self):
         """ Fusion of fin_shell and rudder separation planes and hinges plane to cut out the rudder
         :rtype: part
         """
-        return FusedShell(shape_in=self.obj_vwing.wing_part.shells[0],
+        return FusedShell(shape_in=self.trans_vwing.shells[0],
                           tool=[self.rudder_separation_plns[0],
                                 self.rudder_separation_plns[1],
                                 self.hinge_pln])
 
 
-    @Part
+    @Part(in_tree=False)
     def fixed_part(self):
         """ Combine faces to make a fixed part without the rudder
         :rtype: part
@@ -428,11 +429,11 @@ class VTailWing(GeomBase):
 
         # Append hingeloc points
         for i in xrange(len(self.pick_hinge_ribs)):
-            PointList = Point(self.w_c_root - self.d_hinge,
+            PointList = Point(self.w_c_root - self.d_hinge + self.x_offset,
                               y_pos_root_begin_p.y - root_distance * self.rhl_root +
                               (((y_pos_root_begin_p.y-root_distance * self.rhl_root) - (y_pos_tip_begin_p.y-tip_distance * self.rhl_tip)) / (z_pos_root - z_pos_tip)) \
                               * (self.p_zero + self.p_rib * (self.pick_hinge_ribs[i] - 1) - z_pos_root),
-                              self.p_zero + self.p_rib * (self.pick_hinge_ribs[i] - 1))
+                              self.p_zero + self.p_rib * (self.pick_hinge_ribs[i] - 1) + self.z_offset)
             List.append(PointList)
         return List
 
@@ -452,9 +453,9 @@ class VTailWing(GeomBase):
     @Part
     def actuator_planes(self):
         return Plane(quantify=2,
-                     reference=Point(self.w_c_root - self.d_hinge,
+                     reference=Point(self.w_c_root - self.d_hinge + self.x_offset,
                                      0,
-                                     self.r_actuator + self.r_rudder + (self.d_actuator / 2) * (-1 + 2 * child.index)),
+                                     self.r_actuator + self.r_rudder + (self.d_actuator / 2) * (-1 + 2 * child.index) + self.z_offset),
                      normal=Vector(0, 0, 1),
                      label='Actuator Rib Plane')
 
@@ -492,7 +493,7 @@ class VTailWing(GeomBase):
         y_pos1 = y_pos2 + self.hingerib_line.direction_vector.y / self.hingerib_line.direction_vector.z * \
                           (z_pos1 - z_pos2)
 
-        return Point(x_pos, y_pos1, z_pos1), Point(x_pos, y_pos2, z_pos2)
+        return Point(x_pos+self.x_offset, y_pos1, z_pos1+self.z_offset), Point(x_pos+self.x_offset, y_pos2, z_pos2+self.z_offset)
 
     @Part
     def actuator_hinge_line(self):
@@ -503,9 +504,9 @@ class VTailWing(GeomBase):
     @Part
     def actuator(self):
         return Box(0.1, 0.1, 0.2,
-                   position=Position(location=Point(self.w_c_root - self.d_hinge - 0.25,
+                   position=Position(location=Point(self.w_c_root - self.d_hinge - 0.25 + self.x_offset,
                                                     self.actuator_hinge_locs[0].y - 0.1 / 2,
-                                                    self.r_actuator + self.r_rudder - 0.2 / 2),
+                                                    self.r_actuator + self.r_rudder - 0.2 / 2 + self.z_offset),
                                      orientation=Orientation(x=Vector(1, 0, 0), y=Vector(0, 1, 0),
                                                              z=self.hingerib_line.direction_vector)),
                    label='Actuator Box')
@@ -595,14 +596,16 @@ class VTailWing(GeomBase):
 
     @Part(in_tree=False)
     def pln_front_spar(self):
-        return Plane(reference=Point(self.w_c_root - self.d_hinge + self.d_front_spar,
+        return Plane(reference=Point(self.w_c_root - self.d_hinge + self.d_front_spar + self.x_offset,
                                      0,
-                                     0),
+                                     self.z_offset),
                      normal=Vector(1, 0, 0))
 
     @Part(in_tree=False)
     def pln_back_spar(self):
-        return Plane(reference=Point(self.w_c_root - self.d_back_spar),
+        return Plane(reference=Point(self.w_c_root - self.d_back_spar + self.x_offset,
+                                     0,
+                                     self.z_offset),
                      normal=Vector(1, 0, 0))
 
     @Part(in_tree=False)
