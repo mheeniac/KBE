@@ -186,7 +186,7 @@ class Wing(GeomBase):
         return TransformedCurve(self.scaled_tip, self.scaled_tip.position,
                                 translate(self.scaled_tip.position,
                                           'z', self.w_span,
-                                          'y', -1*self.w_span*sin(radians(self.dihedral_angle)),
+                                          'y', 1*self.w_span*sin(radians(self.dihedral_angle)),
                                           'x', self.w_sweep), hidden=True)
 
     @Part

@@ -1,4 +1,3 @@
-import csv_handle as csvr
 from fuselage import Fuselage
 from wingset import *
 #TODO:
@@ -110,11 +109,11 @@ class Aircraft(GeomBase):
 
     @Part(in_tree=False)
     def rotate_main_wing(self):
-        # Rotate the wing solids so tha tit is aligned with the fuselage
+        # Rotate the wing solids so that it is aligned with the fuselage
         return RotatedShape(shape_in=self.obj_main_wing.wingset[child.index],
                             rotation_point=Point(0, 0, 0),
                             vector=Vector(1, 0, 0),
-                            angle=radians(-90),
+                            angle=radians(90),
                             quantify=2
                             )
 
@@ -125,7 +124,7 @@ class Aircraft(GeomBase):
                                displacement=Vector(
                                    self.adc_diff, # Translate along fuselage length with calculated difference
                                    0,
-                                   self.fuselage_part.cabin_diameter / 7), # Translate down so that it is bottom wing
+                                   self.obj_main_wing.calc_lowest_point), # Translate down so that it is bottom wing
                                quantify=2,
                                color = 'red',
                                label = ['Left Wing', 'Right Wing'][child.index]

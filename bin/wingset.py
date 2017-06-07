@@ -107,6 +107,18 @@ class Wingset(GeomBase):
         return (self.w_c_root + self.obj_wingset.w_c_tip) * self.w_span
 
     @Attribute
+    def calc_lowest_point(self):
+        """
+        This attribute calculates the location of the lowest point on the wing. This will be an offset to be used when
+        translating the main wing
+        :rtype: float
+        """
+        lowest_point = 0.
+        for points in self.wingset[0].edges[0].sample_points:
+            if points[1] >= lowest_point:
+                lowest_point = points[1]
+        return lowest_point
+    @Attribute
     def save_vars(self):
         """ Saves the variables of current settings to an output file
 
