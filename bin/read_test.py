@@ -1,5 +1,3 @@
-import json
-from parapy.core import *
 from parapy.geom import *
 from csv_in_out import *
 

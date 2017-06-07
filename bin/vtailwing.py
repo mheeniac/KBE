@@ -1,11 +1,9 @@
 from math import *
 import csv_handle as csvr
-from parapy.core import *
 from parapy.geom import *
 from wing import Wing
 import warnings
 from csv_in_out import *
-
 
 # TODO:
 # known bug, bij NaN taper ratio gaat hij kapot
@@ -200,10 +198,9 @@ class VTailWing(GeomBase):
             distance = self.rib_frac * self.w_span
         else:
             distance = self.p_rib_user
-        return distance \
- \
-               @ Attribute
+        return distance
 
+    @Attribute
     def p_form_rib(self):
         """ Returns the height of the form ribs (excluding the first one) [m]
         :rtype: float
@@ -264,6 +261,7 @@ class VTailWing(GeomBase):
     @Part(in_tree=False)
     def hinge_pln(self):
         """ Creates a plane at a distance of d_hinge from the TE
+        :rtype: part
         """
         return Plane(reference=Point(self.w_c_root - self.d_hinge,  # point at d_hinge from TE in x direction
                                      0,
@@ -274,6 +272,7 @@ class VTailWing(GeomBase):
     @Part(in_tree=False)
     def rudder_separation_plns(self):
         """ Creates planes at the locations defined in rudder_separation_pln_locs
+        :rtype: part
         """
         return Plane(quantify=2,
                      reference=self.rudder_pln_locs[child.index],  # locations of the rudder separation planes
@@ -282,6 +281,7 @@ class VTailWing(GeomBase):
     @Part(in_tree=False)
     def rib_planes(self):
         """ Creates planes with the origin in the LE and with a normal in z direction
+        :rtype: part
         """
         return Plane(
             reference=Point((((self.w_c_root - self.obj_vwing.w_c_tip) /  # Make sure that the origin of the plane...
@@ -296,6 +296,7 @@ class VTailWing(GeomBase):
     @Part(in_tree=True)
     def trans_rib_planes(self):
         """ Translated rib_planes in x_offset or z_offset direction
+        :rtype: part
         """
         return TranslatedPlane(built_from=self.rib_planes[child.index],
                                displacement=Vector(self.x_offset, 0, self.z_offset),
@@ -304,6 +305,7 @@ class VTailWing(GeomBase):
     @Part(in_tree=False)
     def fused_rudder_and_hinge_plns(self):
         """ Fusion of fin_shell and rudder separation planes and hinges plane to cut out the rudder
+        :rtype: part
         """
         return FusedShell(shape_in=self.fin_shell,
                           tool=[self.rudder_separation_plns[0],
@@ -346,7 +348,7 @@ class VTailWing(GeomBase):
     @Part(in_tree=False)
     def translate_rudder_closure_ribs_planes(self):
         """ Translate closure ribs of the rudder to make sure it doesn't interfere with the fixed part
-\       """
+        """
         return TranslatedPlane(built_from=self.rudder_separation_plns[child.index],
                                displacement=Vector(0, 0, (1 - 2 * child.index) * 0.01),
                                quantify=2
@@ -385,7 +387,7 @@ class VTailWing(GeomBase):
 
     @Attribute(in_tree=False)
     def mac_def(self):
-        
+
         sweep = radians(self.obj_vwing.sweep_angle)
         taper = self.obj_vwing.calculate_taper_ratio
         span = self.w_span

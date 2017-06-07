@@ -8,6 +8,7 @@ fuse = csvr.read_input("fuselage.csv")   # Fuselage Settings
 const = csvr.read_input("constants.csv") # Fuselage Settings
 mwing = csvr.read_input("mwing.csv")     # Fuselage Settings
 
+
 class Aircraft(Base):
     # Name for the root object in the tree
     label  = 'Business Jet'

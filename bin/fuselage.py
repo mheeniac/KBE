@@ -1,7 +1,5 @@
 import csv_handle as csvr
 from math import *
-import os
-from parapy.core import *
 from parapy.geom import *
 import warnings
 from csv_in_out import *
