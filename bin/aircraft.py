@@ -175,8 +175,19 @@ class Aircraft(Base):
                                                    0,
                                                    0.5 * self.cabin_diameter),
                                color='black',
-                               line_thickness=3,
+                               line_thickness=6,
                                label='Main Wing MAC')
+    @Part
+    def trans_adc_point(self):
+        """
+        Translate the aerodynamic centre point along the length of the fuselage to its correct position
+        :rtype: TranslatedShape
+        """
+        return TranslatedShape(shape_in=self.adc_point,
+                               displacement=Vector(self.adc_diff,
+                                                   0,
+                                                   0.5 * self.cabin_diameter),
+                               label='Main Wing Aerodynamic Centre')
 
 #     #
 #     # @Part(in_tree=True)
@@ -266,13 +277,7 @@ class Aircraft(Base):
 #     #     return self.translate_v_tail_wing, self.translate_h_tail_wing
 #     #
 
-#     # @Part
-#     # def trans_adc_point(self):
-#     #     return TranslatedShape(shape_in=self.adc_point,
-#     #                            displacement=Vector(self.adc_diff,
-#     #                                                0,
-#     #                                                0.5 * self.cabin_diameter),
-#     #                            label='Main Wing Aerodynamic Centre')
+
 #     #
 #     # @Part
 #     # def h_mac_line(self):
