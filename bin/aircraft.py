@@ -1,16 +1,22 @@
 from fuselage import Fuselage
 from wingset import *
+from vtailwing import *
 #TODO:
 
 # Read function from external file to read the .csv files
 fuse = csvr.read_input("fuselage.csv")   # Fuselage Settings
-const = csvr.read_input("constants.csv") # Fuselage Settings
-mwing = csvr.read_input("mwing.csv")     # Fuselage Settings
+const = csvr.read_input("constants.csv") # constants Settings
+mwing = csvr.read_input("mwing.csv")     # Main wing Settings
+vtail = csvr.read_input("vtail.csv")     # Vertical tail settings
 
 
 class Aircraft(GeomBase):
     # Name for the root object in the tree
     label  = 'Business Jet'
+
+    # -------------------
+    ## FUSELAGE VARIABLES
+    # -------------------
 
     #: cabin diameter [m]
     #: :type: float
@@ -39,6 +45,10 @@ class Aircraft(GeomBase):
     #: number circular of sections that make up the nose []
     #: :type: integer
     n_section = Input(fuse["n_section"])
+
+    # --------------------
+    ## MAIN WING VARIABLES
+    # --------------------
 
     #: length of the root chord [m]
     #: :type: float
@@ -79,6 +89,116 @@ class Aircraft(GeomBase):
     #: Percentile location of the main wing aerodynamic center of the cabin length
     #: :type: float
     w_loc_perc = Input(const["w_loc_perc"])
+
+    # ----------------
+    ## VTAIL VARIABLES
+    # ----------------
+
+    #: length of the root chord [m]
+    #: :type: float
+    vert_w_c_root = Input(vtail["w_c_root"])
+
+    #: single wing span [m]
+    #: :type: float
+    vert_w_span = Input(vtail["w_span"])
+
+    #: wing sweep angle [degrees]
+    #: :type: float or str
+    vert_sweep_angle_user = Input(vtail["sweep_angle"])  # Overwrites default function if ~= 'NaN'
+
+    #: wing taper ratio []
+    #: :type: float or str
+    vert_taper_ratio_user = Input(vtail["taper_ratio"])  # Overwrites the default function if ~= 'NaN'
+
+    #: wing dihedral angle [degrees]
+    #: :type: float or str
+    vert_dihedral_angle_user = Input(vtail["dihedral_angle"])  # Overwrites the default function if ~= 'NaN'
+
+    #: airfoil technology factor []
+    #: :type: float
+    vert_TechFactor = Input(vtail[
+                           "TechFactor"])  # Technology factor is equal to 0.87 NACA 6 airfoil and 1 to other conventional airfoils
+
+    #: the name of the root airfoil file
+    #: :type: string
+    vert_airfoil_root = Input(vtail["airfoil_root"])
+
+    #: the name of the tip airfoil file
+    #: :type: string
+    vert_airfoil_tip = Input(vtail["airfoil_tip"])
+
+    #: Distance in x direction of hinge plane with respect to the trailing edge[m]
+    #: :type: float
+    d_hinge_user = Input('NaN')  # Overwrites the default function if ~= 'NaN'
+
+    #: Distance in z direction of fist fin rib with respect to the root[m]
+    #: :type: float
+    p_zero_user = Input('NaN')  # Overwrites the default function if ~= 'NaN'
+
+    #: Distance in z direction of following fin ribs with respect to the previous one [m]
+    #: :type: float
+    p_rib_user = Input('NaN')  # Overwrites the default function if ~= 'NaN'
+
+    #: Distance in z direction of the form rib with respect to the first form rib [m]
+    #: :type: float
+    p_form_rib_user = Input('NaN')  # Overwrites the default function if ~= 'NaN'
+
+    #: Ratio of local width where the local hinge is located []
+    #: :type: float
+    rhl_root = Input(0.25)
+
+    #: Ratio of local width where the local hinge is located []
+    #: :type: float
+    rhl_tip = Input(0.25)
+
+    #: Ratio of local width where the local actuator hinge is located []
+    #: :type: float
+    ahl_tip = Input(0.75)
+
+    #: Distance in z direction between the to actuator hinge planes [m]
+    #: :type: float
+    d_actuator = Input(0.125)
+
+    #: Distance of front spar with respect to the hinge plane [m]
+    #: :type: float
+    d_front_spar = Input(0.07)
+
+    #: Distance of back spar with respect to the trailing edge [m]
+    #: :type: float
+    d_back_spar = Input(0.025)
+
+    #: Select which ribs are the hinge ribs. Default value is [1,2,3,4,5,6] al hinges are used. []
+    #: :type: list of integers
+    pick_hinge_ribs = Input([1, 2, 3, 4, 5, 6])
+
+    #: Rudder size fraction. Rudder width/Fin root chord []
+    #: :type: float
+    rud_width_frac = Input(0.125)
+
+    #: The height offset of the rudder from the bottom of the fin (height offset/first rib height) []
+    #: :type: float
+    rud_height_frac = Input(0.8)
+
+    #: The fraction of the length of the rudder (rudder length/fin span) []
+    #: :type: float
+    rud_length_frac = Input(0.75)
+
+    #: The fraction of the height of the actuator box from the bottom (box height/fin span)
+    #: If you want the actuator n ribs lower or higher just input 0.33 +/- p_rib*n
+    #: :type: float
+    actuator_frac = Input(0.33)
+
+    #: The fraction of the height of the first rib from the bottom (rib height/fin span) []
+    #: :type: float
+    rib0_frac = Input(0.0625)
+
+    #: The fraction of the height of the ribs (rib height/fin span) []
+    #: :type: float
+    rib_frac = Input(0.125)
+
+    #: The fraction of the height of the form ribs (form rib height/fin span) []
+    #: :type: float
+    form_rib_frac = Input(0.075)
 
 
     @Part
@@ -197,11 +317,39 @@ class Aircraft(GeomBase):
         self.obj_main_wing.save_vars
         return self.fuselage_part.save_vars
 
-#     #
-#     # @Part(in_tree=True)
-#     # def def_v_tail_wing(self):
-#     #     return VTailWing(settings = '')
-#     #
+
+    @Part(in_tree=True)
+    def def_v_tail_wing(self):
+        return VTailWing(w_c_root=self.vert_w_c_root,
+                         w_span = self.vert_w_span,
+                         sweep_angle_user = self.vert_sweep_angle_user,
+                         taper_ratio_user = self.vert_taper_ratio_user,
+                         dihedral_angle_user = self.vert_dihedral_angle_user,
+                         m_cruise = self.m_cruise,
+                         TechFactor = self.vert_TechFactor,
+                         airfoil_root = self.vert_airfoil_root,
+                         airfoil_tip = self.vert_airfoil_tip,
+                         d_hinge_user = self.d_hinge_user,
+                         p_zero_user = self.p_zero_user,
+                         p_rib_user = self.p_rib_user,
+                         p_form_rib_user = self.p_form_rib_user,
+                         rhl_root = self.rhl_root,
+                         rhl_tip = self.rhl_tip,
+                         ahl_tip = self.ahl_tip,
+                         d_actuator = self.d_actuator,
+                         d_front_spar = self.d_front_spar,
+                         d_back_spar = self.d_back_spar,
+                         pick_hinge_ribs = self.pick_hinge_ribs,
+                         rud_width_frac = self.rud_width_frac,
+                         rud_height_frac = self.rud_height_frac,
+                         rud_length_frac = self.rud_length_frac,
+                         actuator_frac = self.actuator_frac,
+                         rib0_frac = self.rib0_frac,
+                         rib_frac = self.rib_frac,
+                         form_rib_frac = self.form_rib_frac,
+                         x_offset = self.x_offset,
+                         z_offset = self.cabin_diameter)
+
 #     # @Part(in_tree=False)
 #     # def translate_v_tail_wing(self):
 #     #     return TransformedShape(shape_in=self.def_v_tail_wing.def_vwing.sld3,
