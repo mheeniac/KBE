@@ -136,6 +136,7 @@ class VTailWing(GeomBase):
     #: Fraction to determine root chord size in relation to the span length
     #: :type: float
     root_frac = Input(variables["root_frac"])
+
     @Input
     def w_c_root(self):
         """
