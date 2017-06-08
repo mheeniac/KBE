@@ -82,7 +82,7 @@ class VTailWing(GeomBase):
 
     #: Ratio of local width where the local hinge is located []
     #: :type: float
-    rhl_root = Input(0.25)
+    rhl_root = Input(0.5)
 
     #: Ratio of local width where the local hinge is located []
     #: :type: float
@@ -423,15 +423,15 @@ class VTailWing(GeomBase):
         tip_distance = Point.distance(*points_tip)
 
         # Define z position
-        z_pos_tip = self.p_zero + self.p_rib * (self.pick_hinge_ribs[number_hinges - 1] - 1)
-        z_pos_root = self.p_zero + self.p_rib * (self.pick_hinge_ribs[0] - 1)
+        z_pos_tip = self.p_zero + self.p_rib * (self.pick_hinge_ribs[number_hinges - 1] - 1)+ self.z_offset
+        z_pos_root = self.p_zero + self.p_rib * (self.pick_hinge_ribs[0] - 1)+ self.z_offset
 
         # Append hingeloc points
         for i in xrange(len(self.pick_hinge_ribs)):
             PointList = Point(self.w_c_root - self.d_hinge + self.x_offset,
-                              y_pos_root_begin_p.y - root_distance * self.rhl_root +
-                              (((y_pos_root_begin_p.y-root_distance * self.rhl_root) - (y_pos_tip_begin_p.y-tip_distance * self.rhl_tip)) / (z_pos_root - z_pos_tip)) \
-                              * (self.p_zero + self.p_rib * (self.pick_hinge_ribs[i] - 1) - z_pos_root),
+                              y_pos_root_end_p.y - root_distance * self.rhl_root +
+                              (((y_pos_root_end_p.y - root_distance * self.rhl_root) - (y_pos_tip_end_p.y-tip_distance * self.rhl_tip)) / (z_pos_root - z_pos_tip)) \
+                              * (self.z_offset+self.p_zero + self.p_rib * (self.pick_hinge_ribs[i] - 1) - z_pos_root),
                               self.p_zero + self.p_rib * (self.pick_hinge_ribs[i] - 1) + self.z_offset)
             List.append(PointList)
         return List
