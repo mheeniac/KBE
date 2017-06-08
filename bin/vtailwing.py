@@ -532,7 +532,7 @@ class VTailWing(GeomBase):
 
     @Attribute
     def curves(self):
-        x_pos = self.w_c_root - self.d_hinge
+        x_pos = self.w_c_root - self.d_hinge + self.x_offset
 
         pos_root_begin = self.rudder_shell.vertices[0].point
         pos_root_end = self.rudder_shell.vertices[2].point
