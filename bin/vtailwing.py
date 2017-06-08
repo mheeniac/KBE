@@ -7,14 +7,6 @@ from csv_in_out import *
 
 # TODO:
 # known bug, bij NaN taper ratio gaat hij kapot
-# fix curvature at leading egde rudder
-# fix hingeline and actuator line
-# sander kan je me uitleggen wat x-offset en z-offset doet?
-# investigate if rudder_separation_plns_fused can be determinated
-# investigate rudder_shell determination
-
-
-# from bay_analysis_tool.bay_analysis import BayAnalysis
 
 
 class VTailWing(GeomBase):
@@ -623,17 +615,6 @@ class VTailWing(GeomBase):
                      normal=Vector(1, 0, 0))
 
     @Part(in_tree=False)
-    def fuse_back_spar(self):
-        return FusedShell(shape_in=self.fin_shell,
-                          tool=self.pln_back_spar)
-
-    @Attribute
-    def d_back_spar_warning(self):
-        if (self.fuse_back_spar.edges[5].point1.y - self.fuse_back_spar.edges[6].point1.y) < 0.04:
-            print 'warning d_back_spar = too small'
-        return
-
-    @Part(in_tree=False)
     def fused_spars(self):
         return FusedShell(shape_in=self.rudder_shell,
                           tool=[self.pln_back_spar, self.pln_front_spar])
@@ -672,6 +653,12 @@ class VTailWing(GeomBase):
 
     @Attribute(in_tree=True)
     def rudder_back_spar(self):
+        """ Collects the rudder back spar face
+        :rtype: list
+        """
+        if Point.distance(self.fused_spars.faces[14].vertices[1].point,self.fused_spars.faces[14].vertices[2].point) < 0.04:
+            warnings.showwarning(message='d_back_spar = too small', category=UserWarning, filename='vtailwing', lineno=735)
+
         spar = self.fused_spars.faces[14]
         spar.label = 'Back Spar'
         return spar
