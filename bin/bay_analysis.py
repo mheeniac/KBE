@@ -10,9 +10,7 @@
 
 from parapy.geom import *
 
-
 from bay_analysis_tool.bay_analysis import BayAnalysis
-
 
 
 def planes(obj):
@@ -23,13 +21,13 @@ def planes(obj):
     return plane1,plane2
 
 def rhs_skin_faces(obj):
-    return obj.def_v_tail_wing.fused_le_skin_right.faces[0], obj.def_v_tail_wing.main_skin_right, obj.def_v_tail_wing.te_skin_right
+    return obj.def_v_tail_wing.fused_le_skin_right.faces[0], obj.def_v_tail_wing.main_skin_right.faces[0], obj.def_v_tail_wing.te_skin_right.faces[0]
 
 def lhs_skin_faces(obj):
-    return obj.def_v_tail_wing.fused_le_skin_left.faces[0], obj.def_v_tail_wing.main_skin_left, obj.def_v_tail_wing.te_skin_left
+    return obj.def_v_tail_wing.fused_le_skin_left.faces[0], obj.def_v_tail_wing.main_skin_left.faces[0], obj.def_v_tail_wing.te_skin_left.faces[0]
 
 def spar_faces(obj):
-    return obj.def_v_tail_wing.rudder_front_spar, obj.def_v_tail_wing.rudder_back_spar
+    return obj.def_v_tail_wing.rudder_front_spar.faces[0], obj.def_v_tail_wing.rudder_back_spar.faces[0]
 
 def bay_planes(obj):
     return planes.plane1, planes.plane2
