@@ -55,6 +55,10 @@ class Wingset(GeomBase):
     # Label for the tree
     label = 'Wing Set'
 
+    #: Name of the save file (must end in .csv)
+    #: :type: str
+    save_name = Input()
+
     @Part(in_tree=False)
     # object of class wing using local input
     def obj_wingset(self):
@@ -124,7 +128,8 @@ class Wingset(GeomBase):
 
         :rtype: string and csv
         """
-        path = csvr.generate_path("mwing.csv")
+        name = self.save_name
+        path = csvr.generate_path(name)
         first_row = True
         with open(path[0], 'rb') as file:  # Open file
             reader = csv.reader(file, delimiter=',', quotechar='|')  # Read into reader and section rows and columns

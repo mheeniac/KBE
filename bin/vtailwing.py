@@ -25,15 +25,15 @@ class VTailWing(GeomBase):
 
     #: wing sweep angle [degrees]
     #: :type: float or str
-    sweep_angle_user = Input(variables["sweep_angle"])  # Overwrites default function if ~= 'NaN'
+    sweep_angle_user = Input(variables["sweep_angle_user"])  # Overwrites default function if ~= 'NaN'
 
     #: wing taper ratio []
     #: :type: float or str
-    taper_ratio_user = Input(variables["taper_ratio"])  # Overwrites the default function if ~= 'NaN'
+    taper_ratio_user = Input(variables["taper_ratio_user"])  # Overwrites the default function if ~= 'NaN'
 
     #: wing dihedral angle [degrees]
     #: :type: float or str
-    dihedral_angle_user = Input(variables["dihedral_angle"])  # Overwrites the default function if ~= 'NaN'
+    dihedral_angle_user = Input(variables["dihedral_angle_user"])  # Overwrites the default function if ~= 'NaN'
 
     #: jet cruise speed [mach]
     #: :type: float
@@ -756,6 +756,32 @@ class VTailWing(GeomBase):
                             vector=self.hingerib_line.direction_vector, angle=radians(30),
                             quantify=len(self.things_for_rotation), transparency=self.transparency_definer[child.index],label= self.label_definer[child.index])
 
+    @Attribute
+    def save_vars(self):
+        """ Saves the variables of current settings to an output file
+
+        :rtype: string and csv
+        """
+        path = csvr.generate_path("vtail.csv")
+        first_row = True
+        with open(path[0], 'rb') as file:  # Open file
+            reader = csv.reader(file, delimiter=',', quotechar='|')  # Read into reader and section rows and columns
+            with open(path[1], 'wb') as outfile:
+                filewriter = csv.writer(outfile, delimiter=',', quotechar='|') # Create the writer
+                for row in reader:  # Go over the rows in the file
+                    if first_row == True:   # Skip the first row
+                        filewriter.writerow(row)
+                        first_row = False
+                    else:
+                        # Find the name of the variable that we want to request and save
+                        var_name = row[0]
+
+                        value = getattr(self, var_name)
+                        # Update the value in row
+                        row[1] = value
+                        # Write the row to a new file
+                        filewriter.writerow(row)
+        return 'Saved'
 
 if __name__ == '__main__':
     from parapy.gui import display

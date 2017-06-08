@@ -8,6 +8,7 @@ fuse = csvr.read_input("fuselage.csv")   # Fuselage Settings
 const = csvr.read_input("constants.csv") # constants Settings
 mwing = csvr.read_input("mwing.csv")     # Main wing Settings
 vtail = csvr.read_input("vtail.csv")     # Vertical tail settings
+htail = csvr.read_input("htail.csv")     # Vertical tail settings
 
 
 class Aircraft(GeomBase):
@@ -96,19 +97,19 @@ class Aircraft(GeomBase):
 
     #: Tail volume coefficient
     #: :type: float
-    Vv = Input(vtail["Vv"])
+    Vv = Input(const["Vv"])
 
     #: wing sweep angle [degrees]
     #: :type: float or str
-    vert_sweep_angle_user = Input(vtail["sweep_angle"])  # Overwrites default function if ~= 'NaN'
+    vert_sweep_angle_user = Input(vtail["sweep_angle_user"])  # Overwrites default function if ~= 'NaN'
 
     #: wing taper ratio []
     #: :type: float or str
-    vert_taper_ratio_user = Input(vtail["taper_ratio"])  # Overwrites the default function if ~= 'NaN'
+    vert_taper_ratio_user = Input(vtail["taper_ratio_user"])  # Overwrites the default function if ~= 'NaN'
 
     #: wing dihedral angle [degrees]
     #: :type: float or str
-    vert_dihedral_angle_user = Input(vtail["dihedral_angle"])  # Overwrites the default function if ~= 'NaN'
+    vert_dihedral_angle_user = Input(vtail["dihedral_angle_user"])  # Overwrites the default function if ~= 'NaN'
 
     #: airfoil technology factor []
     #: :type: float
@@ -204,6 +205,43 @@ class Aircraft(GeomBase):
     #: :type: float
     root_frac = Input(vtail["root_frac"])
 
+    #-----------------
+    ## HTail variables
+    # ----------------
+
+    #: wing sweep angle [degrees]
+    #: :type: float or str
+    hor_sweep_angle_user = Input(htail["sweep_angle"])  # Overwrites default function if ~= 'NaN'
+
+    #: wing taper ratio []
+    #: :type: float or str
+    hor_taper_ratio_user = Input(htail["taper_ratio"])  # Overwrites the default function if ~= 'NaN'
+
+    #: wing dihedral angle [degrees]
+    #: :type: float or str
+    hor_dihedral_angle_user = Input(htail["dihedral_angle"])  # Overwrites the default function if ~= 'NaN'
+
+    #: airfoil technology factor []
+    #: :type: float
+    hor_TechFactor = Input(htail[
+                           "TechFactor"])  # Technology factor is equal to 0.87 NACA 6 airfoil and 1 to other conventional airfoils
+
+    #: the name of the root airfoil file
+    #: :type: string
+    hor_airfoil_root = Input(htail["airfoil_root"])
+
+    #: the name of the tip airfoil file
+    #: :type: string
+    hor_airfoil_tip = Input(htail["airfoil_tip"])
+
+    #: Span of a single horizontal tail wing [m]
+    #: :type: float
+    hor_w_span = Input(htail["w_span"])
+
+    #: Root chord length [m]
+    #: :type: float
+    h_w_c_root = Input(htail["w_c_root"])
+
 
     @Part
     def fuselage_part(self):
@@ -214,7 +252,8 @@ class Aircraft(GeomBase):
                         tail_slenderness=self.tail_slenderness,
                         upsweep_angle=self.upsweep_angle,
                         tail_taper = self.tail_taper,
-                        n_section=self.n_section)
+                        n_section=self.n_section
+                        )
 
 
     #-----------------------
@@ -232,7 +271,7 @@ class Aircraft(GeomBase):
                        w_span=self.w_span,
                        airfoil_root=self.airfoil_root,
                        airfoil_tip=self.airfoil_tip,
-                       )
+                       save_name='mwing.csv')
 
     @Part(in_tree=False)
     def rotate_main_wing(self):
@@ -314,6 +353,15 @@ class Aircraft(GeomBase):
                                                    0,
                                                    0.5 * self.cabin_diameter),
                                label='Main Wing Aerodynamic Centre')
+
+    @Attribute
+    def sweep_angle_calc(self):
+        return self.obj_main_wing.obj_wingset.sweep_angle
+
+    #----------
+    ## SAVING
+    #----------
+
     @Attribute
     def save_fuselage_vars(self):
         """
@@ -322,6 +370,8 @@ class Aircraft(GeomBase):
         """
         self.save_vars
         self.obj_main_wing.save_vars
+        self.def_h_tail_wing.save_vars
+        self.def_v_tail_wing.save_vars
         return self.fuselage_part.save_vars
 
     # --------------------------
@@ -483,13 +533,102 @@ class Aircraft(GeomBase):
                                      self.def_v_tail_wing.mac_def[1]),
                            hidden=False)
 
+    @Attribute
+    def ver_aspect_ratio(self):
+        return self.vert_w_span**2/self.def_v_tail_wing.ref_area
+    #-----------------
+    ## HTail Wing part
+    #-----------------
+
+    @Attribute
+    def l_h(self):
+        """
+        Calculate the distance between the ADC of the horizontal wing and the main wing ADC
+        :rtype: float
+        """
+        return self.trans_h_adc_point.bbox.center.x - self.trans_adc_point.bbox.center.x
+
+    @Attribute
+    def hor_aspect_ratio(self):
+        return (2*self.hor_w_span)**2/self.def_h_tail_wing.ref_area
+
+    @Attribute
+    def Vh(self):
+        main_area = self.obj_main_wing.ref_area
+        hor_area = self.def_h_tail_wing.ref_area
+        main_MAC = self.trans_mac_line.length
+        Vh =  (hor_area*self.l_h)/(main_area*main_MAC)
+        return Vh
+
+    @Part(in_tree=False)
+    def def_h_tail_wing(self):
+        return Wingset(w_c_root=self.h_w_c_root,
+                       sweep_angle=self.hor_sweep_angle_user,
+                       taper_ratio=self.hor_taper_ratio_user,
+                       dihedral_angle=self.hor_dihedral_angle_user,
+                       m_cruise=self.m_cruise,
+                       TechFactor=self.hor_TechFactor,
+                       w_span=self.hor_w_span,
+                       airfoil_root=self.hor_airfoil_root,
+                       airfoil_tip=self.hor_airfoil_tip,
+                       save_name="htail.csv")
+    @Part(in_tree=False)
+    def rotate_h_tail_wing(self):
+        return RotatedShape(shape_in=self.def_h_tail_wing.wingset[child.index],
+                            rotation_point=Point(0, 0, 0),
+                            vector=Vector(1, 0, 0),
+                            angle=radians(90),
+                            quantify=2
+                            )
+    @Part(in_tree=True)
+    def translate_h_tail_wing(self):
+        return TranslatedShape(shape_in=self.rotate_h_tail_wing[child.index],
+                               displacement=Vector(
+                                   self.fixed_v_wing[1].edges[8].midpoint.x,
+                                   0,
+                                   self.fixed_v_wing[1].edges[8].midpoint.z),
+                               quantify=2)
 
 
-    # @Part(in_tree=False)
-    # def h_adc_point(self):
-    #     return Point(0.25 * self.h_root + self.def_h_tail_wing.mac_def[0],
-    #                  0,
-    #                  0)
+    @Part(in_tree=False)
+    def h_adc_point(self):
+        return Point(0.25 * self.h_w_c_root + self.def_h_tail_wing.mac_def[0],
+                     0,
+                     0)
+
+    @Part
+    def h_mac_line(self):
+        return LineSegment(start=Point(0.25 * self.h_w_c_root + self.def_h_tail_wing.mac_def[0] - \
+                                       0.25 * self.def_h_tail_wing.mac_def[2],
+                                       0,
+                                       0),
+                           end=Point(0.25 * self.h_w_c_root + self.def_h_tail_wing.mac_def[0] + \
+                                     0.75 * self.def_h_tail_wing.mac_def[2],
+                                     0,
+                                     0),
+                           hidden=True)
+
+    @Part
+    def trans_h_mac_line(self):
+        return TranslatedCurve(curve_in=self.h_mac_line,
+                               displacement=Vector(
+                                   self.fixed_v_wing[1].edges[8].midpoint.x,
+                                   0,
+                                   self.fixed_v_wing[1].edges[8].midpoint.z),
+                               color='blue',
+                               line_thickness=3,
+                               label='Horizontal Tail MAC')
+
+    @Part
+    def trans_h_adc_point(self):
+        return TranslatedShape(shape_in=self.h_adc_point,
+                               displacement=Vector(
+                                   self.fixed_v_wing[1].edges[8].midpoint.x,
+                                   0,
+                                   self.fixed_v_wing[1].edges[8].midpoint.z),
+                               label='Horizontal Tail Aerodynamic Centre')
+
+
 
 #     # @Attribute(in_tree=False)
 #     # def total_length(self):
@@ -502,38 +641,8 @@ class Aircraft(GeomBase):
 #     #
 
 
-#     #
-#     # @Part
-#     # def h_mac_line(self):
-#     #     return LineSegment(start=Point(0.25 * self.h_root + self.def_h_tail_wing.mac_def[0] - \
-#     #                                    0.25 * self.def_h_tail_wing.mac_def[2],
-#     #                                    0,
-#     #                                    0),
-#     #                        end=Point(0.25 * self.h_root + self.def_h_tail_wing.mac_def[0] + \
-#     #                                  0.75 * self.def_h_tail_wing.mac_def[2],
-#     #                                  0,
-#     #                                  0),
-#     #                        hidden=True)
-#     #
 
-#     #
-#     # @Part
-#     # def trans_h_mac_line(self):
-#     #     return TranslatedCurve(curve_in=self.h_mac_line,
-#     #                            displacement=Vector(-self.h_adc_diff,
-#     #                                                0,
-#     #                                                0.5 * self.cabin_diameter),
-#     #                            color='red',
-#     #                            line_thickness=3,
-#     #                            label='Horizontal Tail MAC')
-#     #
-#     # @Part
-#     # def trans_h_adc_point(self):
-#     #     return TranslatedShape(shape_in=self.h_adc_point,
-#     #                            displacement=Vector(-self.h_adc_diff,
-#     #                                                0,
-#     #                                                0.5 * self.cabin_diameter),
-#     #                            label='Horizontal Tail Aerodynamic Centre')
+
 #     #
 #     # @Attribute(in_tree=True)
 #     # def tail_wing(self):

@@ -4,6 +4,6 @@ sweep_angle,NaN,[degrees],Sweep angle of the main wing (NaN for auto)
 taper_ratio,0.3,[ratio],Taper ratio of the main wing (NaN for auto)
 dihedral_angle,NaN,[degrees],Dihedral angle of the main wing (NaN for auto)
 TechFactor,0.86,[],TechFactor of the main wing
-w_span,7,[m],W span of the main wing 
+w_span,7.0,[m],W span of the main wing 
 airfoil_root,airfoil.dat,[],airfoil file name
 airfoil_tip,airfoil.dat,[],airfoil file name
