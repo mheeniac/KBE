@@ -200,6 +200,10 @@ class Aircraft(GeomBase):
     #: :type: float
     form_rib_frac = Input(0.075)
 
+    #: The desired distance between the vertical tail aerodynamic centre and the main wing aerodynamic centre
+    #: :type: float
+    l_v = Input(6.)
+
 
     @Part
     def fuselage_part(self):
@@ -213,6 +217,9 @@ class Aircraft(GeomBase):
                         n_section=self.n_section)
 
 
+    #-----------------------
+    ## This is the main wing
+    #-----------------------
     @Part(in_tree=False)
     def obj_main_wing(self):
         # Create a wing object for the main wings of the plane from the wingset class
@@ -317,6 +324,9 @@ class Aircraft(GeomBase):
         self.obj_main_wing.save_vars
         return self.fuselage_part.save_vars
 
+    # --------------------------
+    ## This is the vertical wing
+    # --------------------------
 
     @Part(in_tree=True)
     def def_v_tail_wing(self):
@@ -347,7 +357,7 @@ class Aircraft(GeomBase):
                          rib0_frac = self.rib0_frac,
                          rib_frac = self.rib_frac,
                          form_rib_frac = self.form_rib_frac,
-                         x_offset = 10,
+                         x_offset = self.v_shift,
                          z_offset = self.cabin_diameter)
 
     @Part(in_tree = False)
@@ -356,7 +366,9 @@ class Aircraft(GeomBase):
         This extends the tail so that it will protrude into the spacecraft fuselage
         :rtype: ExtrudedShell
         """
-        return ExtrudedShell(profile=self.def_v_tail_wing.trans_vwing.edges[0], distance = 1, direction=(0,0,-1))
+        return ExtrudedShell(profile=self.def_v_tail_wing.trans_vwing.edges[0],
+                             distance = 1,
+                             direction=(0,0,-1))
 
     @Part(in_tree=False)
     def fused_tail_shell(self):
@@ -377,6 +389,58 @@ class Aircraft(GeomBase):
                                tool = [self.fuselage_part.fuselage_assembly[0],
                                        self.fuselage_part.fuselage_assembly[1]],
                                label = "Fixed Vertical Tail")
+
+    @Part(in_tree=True)
+    def v_adc_point(self):
+        return Point(0.25 * self.def_v_tail_wing.w_c_root + self.def_v_tail_wing.mac_def[0],
+                     0,
+                     self.def_v_tail_wing.mac_def[1])
+    @Attribute
+    def v_shift(self):
+        """
+        This attribute calculates the distance over which the vertical tail should be shifted in lengthwise direction
+        to achieve the desired l_h distance
+        :rtype: float
+        """
+        x_main2 = self.trans_adc_point.bbox.location.x  # Get the x position of the main wing point
+        shift = x_main2 - self.v_adc_point.x + self.l_v # The shift is the difference between the points + desired l_h
+        return shift
+
+    @Part
+    def trans_v_mac_line(self):
+        return TranslatedCurve(curve_in=self.v_mac_line,
+                               displacement=Vector(self.v_shift,
+                                                   0,
+                                                   self.cabin_diameter),
+                               color='blue',
+                               line_thickness=3,
+                               label='Vertical Tail MAC')
+
+    @Part
+    def trans_v_adc_point(self):
+        return TranslatedShape(shape_in=self.v_adc_point,
+                               displacement=Vector(self.v_shift,
+                                                   0,
+                                                   self.cabin_diameter),
+                               label='Vertical Tail Aerodynamic Centre')
+    @Part(in_tree=False)
+    def v_mac_line(self):
+        return LineSegment(start=Point(0.25 * self.def_v_tail_wing.w_c_root + self.def_v_tail_wing.mac_def[0] - \
+                                       0.25 * self.def_v_tail_wing.mac_def[2],
+                                       0,
+                                       self.def_v_tail_wing.mac_def[1]),
+                           end=Point(0.25 * self.def_v_tail_wing.w_c_root + self.def_v_tail_wing.mac_def[0] + \
+                                     0.75 * self.def_v_tail_wing.mac_def[2],
+                                     0,
+                                     self.def_v_tail_wing.mac_def[1]),
+                           hidden=False)
+    # @Part(in_tree=False)
+    # def h_adc_point(self):
+    #     return Point(0.25 * self.h_root + self.def_h_tail_wing.mac_def[0],
+    #                  0,
+    #                  0)
+
+
 
 #     # @Part(in_tree=False)
 #     # def translate_v_tail_wing(self):
@@ -443,16 +507,7 @@ class Aircraft(GeomBase):
 #     #                                  0),
 #     #                        hidden=True)
 #     #
-#     # @Part(in_tree=False)
-#     # def h_adc_point(self):
-#     #     return Point(0.25 * self.h_root + self.def_h_tail_wing.mac_def[0],
-#     #                  0,
-#     #                  0)
-#     #
-#     # @Attribute(in_tree=False)
-#     # def h_adc_diff(self):
-#     #     # Calculate the distance between the v ADC and the main wing ADC
-#     #     return self.h_adc_point[0] - self.adc_diff - self.l_h  # 15 = tail arm distance tbd from volume ratio thing
+
 #     #
 #     # @Part
 #     # def trans_h_mac_line(self):
@@ -472,52 +527,11 @@ class Aircraft(GeomBase):
 #     #                                                0.5 * self.cabin_diameter),
 #     #                            label='Horizontal Tail Aerodynamic Centre')
 #     #
-#     # @Part(in_tree=False)
-#     # def v_mac_line(self):
-#     #     return LineSegment(start=Point(0.25 * self.def_v_tail_wing.w_c_root + self.def_v_tail_wing.mac_def[0] - \
-#     #                                    0.25 * self.def_v_tail_wing.mac_def[2],
-#     #                                    0,
-#     #                                    self.def_v_tail_wing.mac_def[1]),
-#     #                        end=Point(0.25 * self.def_v_tail_wing.w_c_root + self.def_v_tail_wing.mac_def[0] + \
-#     #                                  0.75 * self.def_v_tail_wing.mac_def[2],
-#     #                                  0,
-#     #                                  self.def_v_tail_wing.mac_def[1]),
-#     #                        hidden=False)
-#     #
 #     # @Attribute(in_tree=True)
 #     # def tail_wing(self):
 #     #     return self.translate_v_tail_fixed, self.rotated_v_tail_rudder, self.translate_h_tail_wing
 #     #
-#     # @Part(in_tree=False)
-#     # def v_adc_point(self):
-#     #     return Point(0.25 * self.def_v_tail_wing.w_c_root + self.def_v_tail_wing.mac_def[0],
-#     #                  0,
-#     #                  self.def_v_tail_wing.mac_def[1])
-#     #
-#     # @Attribute(in_tree=False)
-#     # def l_h(self):
-#     #     l_h = (self.Vh * self.obj_main_wing.ref_area * self.obj_main_wing.mac_def[2]) / self.def_h_tail_wing.ref_area
-#     #     return l_h
-#     #
-#     # @Part
-#     # def trans_v_mac_line(self):
-#     #     return TranslatedCurve(curve_in=self.v_mac_line,
-#     #                            displacement=Vector(-self.h_adc_diff + (
-#     #                                self.def_v_tail_wing.def_vwing.w_c_tip - self.def_v_tail_wing.def_vwing.w_c_root),
-#     #                                                0,
-#     #                                                self.cabin_diameter),
-#     #                            color='blue',
-#     #                            line_thickness=3,
-#     #                            label='Vertical Tail MAC')
-#     #
-#     # @Part
-#     # def trans_v_adc_point(self):
-#     #     return TranslatedShape(shape_in=self.v_adc_point,
-#     #                            displacement=Vector(-self.h_adc_diff + (
-#     #                                self.def_v_tail_wing.def_vwing.w_c_tip - self.def_v_tail_wing.def_vwing.w_c_root),
-#     #                                                0,
-#     #                                                self.cabin_diameter),
-#     #                            label='Vertical Tail Aerodynamic Centre')
+
 #     #
 #     # @Attribute
 #     # def saving_it(self):

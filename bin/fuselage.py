@@ -177,7 +177,7 @@ class Fuselage(GeomBase):
             x_pos = self.length_tail * tan(radians(45))
         return x_pos
 
-    @Part(in_tree=True)
+    @Part(in_tree=False)
     def tail_circles(self):
         """ Creates the circles for the tail using the taper ratio for the tip diameter and the length of the tail
             for the positioning

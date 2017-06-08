@@ -389,7 +389,7 @@ class VTailWing(GeomBase):
         :rtype: tuple
         """
         sweep = radians(self.obj_vwing.sweep_angle)                             #sweep of vtailwing
-        taper = self.obj_vwing.calculate_taper_ratio                            #taper of vtailwing
+        taper = self.obj_vwing.taper_ratio                            #taper of vtailwing
         span = self.w_span                                                      #span of vtailwing
         cr = self.w_c_root                                                      #root chord of vtailwing
 
