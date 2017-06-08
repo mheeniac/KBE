@@ -310,7 +310,7 @@ class VTailWing(GeomBase):
                                 self.hinge_pln])
 
 
-    @Part(in_tree=True)
+    @Part(in_tree=False)
     def fixed_part(self):
         """ Combine faces to make a fixed part without the rudder
         :rtype: part
@@ -361,7 +361,7 @@ class VTailWing(GeomBase):
                                 ]
                           )
 
-    @Attribute(in_tree=True)
+    @Attribute(in_tree=False)
     def closure_ribs(self):
         """ Define closure_ribs
         :rtype: tuple
@@ -463,9 +463,9 @@ class VTailWing(GeomBase):
     @Part(in_tree=False)
     def formrib_plns(self):
         return Plane(quantify=(int(self.b_rudder / self.p_form_rib) - 1),
-                     reference=Point(self.w_c_root - self.d_hinge,
+                     reference=Point(self.w_c_root - self.d_hinge + self.x_offset,
                                      0,
-                                     self.r_rudder + (self.p_form_rib * (child.index + 1)))
+                                     self.r_rudder + (self.p_form_rib * (child.index + 1))+self.z_offset)
                      )
 
     @Attribute
@@ -496,7 +496,7 @@ class VTailWing(GeomBase):
 
         return Point(x_pos+self.x_offset, y_pos1, z_pos1+self.z_offset), Point(x_pos+self.x_offset, y_pos2, z_pos2+self.z_offset)
 
-    @Part
+    @Part(in_tree=False)
     def actuator_hinge_line(self):
         return LineSegment(self.actuator_hinge_locs[0],
                            self.actuator_hinge_locs[len(self.actuator_hinge_locs) - 1],
@@ -512,7 +512,7 @@ class VTailWing(GeomBase):
                                                              z=self.hingerib_line.direction_vector)),
                    label='Actuator Box')
 
-    @Part
+    @Part(in_tree=False)
     def actuator_hinges(self):
         return Cylinder(0.02, 0.05,
                         position=translate(Position(location=self.actuator_hinge_locs[child.index],
@@ -693,7 +693,7 @@ class VTailWing(GeomBase):
             list[x].label = 'Rib'
         return list
 
-    @Part(in_tree=True)
+    @Part(in_tree=False)
     def skins_rudder(self):
         """ Fuses all rudder skins
         :rtype: part
@@ -718,7 +718,9 @@ class VTailWing(GeomBase):
         list.append(self.rudder_front_spar)
         for i in xrange(len(self.actuator_hinges)):
             list.append(self.actuator_hinges[i].solids[0])
-
+        for i in xrange(len(self.closure_ribs)):
+            list.append(self.closure_ribs[i].faces[0])
+        list.append(self.actuator_hinge_line)
         return list
 
     @Attribute
@@ -732,14 +734,27 @@ class VTailWing(GeomBase):
             list.append(0)
         return list
 
+    @Attribute
+    def label_definer(self):
+        """ Gives a list of names
+        :rtype: list
+        """
+        list = ['Rudder Shell','Hinge Rib','Form Rib','Hinge Rib','Form Rib',
+                'Form Rib','Hinge Rib','Form Rib','Actuator Hinge Rib',
+                'Actuator Hinge Rib','Form Rib','Hinge Rib','Form Rib',
+                'Hinge Rib','Form Rib','Form Rib','Hinge Rib','Form Rib',
+                'Back Spar','Front Spar','Actuator Hinge','Actuator Hinge',
+                'Closure Rib','Closure Rib','Actuator Hinge Line']
+        return list
+
     @Part(in_tree=True)
-    def turn_rudder(self):
+    def turned_rudder(self):
         """ Turnes all defined faces/skins/shells in things_for_rotation
         :rtype: part
         """
         return RotatedShape(shape_in=self.things_for_rotation[child.index], rotation_point=self.hingerib_line.start,
                             vector=self.hingerib_line.direction_vector, angle=radians(30),
-                            quantify=len(self.things_for_rotation), transparency=self.transparency_definer[child.index])
+                            quantify=len(self.things_for_rotation), transparency=self.transparency_definer[child.index],label= self.label_definer[child.index])
 
 
 if __name__ == '__main__':
