@@ -47,6 +47,25 @@ class Fuselage(GeomBase):
     label = 'Fuselage'
 
     @Attribute
+    def upsweep_angle_func(self):
+        """
+        This attribute is used to check if the upsweep angle is not too large (tail is not pointing upwards)
+        :rtype: float
+        """
+        angle = self.upsweep_angle
+        radius = (self.cabin_diameter / 2) * self.tail_taper # Radius of the outer tail circle
+        max_height = self.cabin_diameter/2 - radius          # The maximum height possible
+        max_angle = degrees(atan(max_height/self.length_tail))  # The angle corresponding to this height
+        if angle > max_angle:
+            # The angle is not possible, warn and set to max angle
+            warn_str = "Upsweep angle too large, max is: {0}".format(max_angle)
+            warnings.warn(warn_str)
+            return max_angle
+        else:
+            # All is fine
+            return angle
+
+    @Attribute
     def fuselage_length(self):
         """ This computes the total length of the fuselage (tail + cabin + nose)
 
@@ -152,13 +171,13 @@ class Fuselage(GeomBase):
         :rtype: float
         """
         if abs(self.upsweep_angle) <= 45:
-            x_pos = self.length_tail * tan(radians(self.upsweep_angle))
+            x_pos = self.length_tail * tan(radians(self.upsweep_angle_func))
         else:
             warnings.warn("The upsweep angle should be lower than 45! Set to standard 45")
             x_pos = self.length_tail * tan(radians(45))
         return x_pos
 
-    @Part(in_tree=False)
+    @Part(in_tree=True)
     def tail_circles(self):
         """ Creates the circles for the tail using the taper ratio for the tip diameter and the length of the tail
             for the positioning
@@ -227,7 +246,6 @@ class Fuselage(GeomBase):
                         # Write the row to a new file
                         filewriter.writerow(row)
         return 'Saved'
-
 
 
 if __name__ == '__main__':
