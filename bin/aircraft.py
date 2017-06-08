@@ -1,7 +1,6 @@
 from fuselage import Fuselage
 from wingset import *
 from vtailwing import *
-from bay_analysis_tool.bay_analysis import BayAnalysis
 #TODO:
 
 # Read function from external file to read the .csv files
@@ -95,13 +94,9 @@ class Aircraft(GeomBase):
     ## VTAIL VARIABLES
     # ----------------
 
-    #: length of the root chord [m]
+    #: Tail volume coefficient
     #: :type: float
-    vert_w_c_root = Input(vtail["w_c_root"])
-
-    #: single wing span [m]
-    #: :type: float
-    vert_w_span = Input(vtail["w_span"])
+    Vv = Input(vtail["Vv"])
 
     #: wing sweep angle [degrees]
     #: :type: float or str
@@ -204,6 +199,10 @@ class Aircraft(GeomBase):
     #: The desired distance between the vertical tail aerodynamic centre and the main wing aerodynamic centre
     #: :type: float
     l_v = Input(6.)
+
+    #: Fraction to determine root chord size in relation to the span length
+    #: :type: float
+    root_frac = Input(vtail["root_frac"])
 
 
     @Part
@@ -329,10 +328,40 @@ class Aircraft(GeomBase):
     ## This is the vertical wing
     # --------------------------
 
+    @Attribute
+    def vert_w_span(self):
+        """
+        This attribute calculates the desired span of the vertical wing
+        :rtype: float
+        """
+        main_area = self.obj_main_wing.ref_area
+        main_span = 2 * self.w_span
+        f1 = self.root_frac
+        f2 = self.vert_taper_ratio_user
+        span = sqrt((2*main_area*main_span*self.Vv)/(self.l_v*(f1+f1*f2)))
+        return span
+
+    @Attribute
+    def z_offset(self):
+        """
+        Calculates the z_offset for the vertical tail such that the tip will be flush with the tail cone
+        :rtype: float
+        """
+        x_pos = self.v_shift - (self.cabin_length + self.fuselage_part.length_nose) # x-position position from start tail
+        if x_pos > 0:
+            x_len = self.fuselage_part.length_tail - x_pos  # X position from the back of the tail
+            dv = self.fuselage_part.fuselage_assembly[0].edges[0].point1.z - \
+                 self.fuselage_part.fuselage_assembly[0].edges[2].point1.z  # Calculate the diff between tops of tail circles
+            z_pos = ((dv/self.fuselage_part.length_tail)*x_len) + \
+                    self.fuselage_part.fuselage_assembly[0].edges[2].point1.z # Simple triangle calculation
+            print x_len
+            return z_pos
+        else:
+            return self.cabin_diameter
+
     @Part(in_tree=True)
     def def_v_tail_wing(self):
-        return VTailWing(w_c_root=self.vert_w_c_root,
-                         w_span = self.vert_w_span,
+        return VTailWing(w_span = self.vert_w_span,
                          sweep_angle_user = self.vert_sweep_angle_user,
                          taper_ratio_user = self.vert_taper_ratio_user,
                          dihedral_angle_user = self.vert_dihedral_angle_user,
@@ -359,7 +388,7 @@ class Aircraft(GeomBase):
                          rib_frac = self.rib_frac,
                          form_rib_frac = self.form_rib_frac,
                          x_offset = self.v_shift,
-                         z_offset = self.cabin_diameter)
+                         z_offset = self.z_offset)
 
     @Part(in_tree = False)
     def extr_tail(self):
@@ -368,30 +397,26 @@ class Aircraft(GeomBase):
         :rtype: ExtrudedShell
         """
         return ExtrudedShell(profile=self.def_v_tail_wing.trans_vwing.edges[0],
-                             distance = 1,
+                             distance = self.z_offset - self.fuselage_part.fuselage_assembly[0].edges[2].point1.z + 0.05,
                              direction=(0,0,-1))
 
-    @Part(in_tree=False)
-    def fused_tail_shell(self):
-        """
-        This connects the extension to the tail shell to make it one piece
-        :rtype: FusedShell
-        """
-        return FusedShell(shape_in = self.def_v_tail_wing.fixed_part,
-                          tool = self.extr_tail)
-
-    @Part(in_tree = True)
+    @Part(in_tree = False)
     def sub_tail(self):
         """
         This deletes the non visible part of the extended vertical tail that is inside the fuselage
         :rtype: SubtractedShell
         """
-        return SubtractedShell(shape_in = self.fused_tail_shell,
-                               tool = [self.fuselage_part.fuselage_assembly[0],
-                                       self.fuselage_part.fuselage_assembly[1]],
-                               label = "Fixed Vertical Tail")
+        return SubtractedShell(shape_in = self.extr_tail,
+                               tool = self.fuselage_part.fuselage_assembly[0],
+                                label = "Fit Piece",
+                               transparency = 0.6,
+                               color = 'red')
 
-    @Part(in_tree=True)
+    @Attribute(in_tree = True, label="Fixed Vertical Tail")
+    def fixed_v_wing(self):
+        return [self.sub_tail, self.def_v_tail_wing.fixed_part]
+
+    @Part(in_tree=False)
     def v_adc_point(self):
         return Point(0.25 * self.def_v_tail_wing.w_c_root + self.def_v_tail_wing.mac_def[0],
                      0,
@@ -710,82 +735,36 @@ class Aircraft(GeomBase):
 #     #     MY = [0, 0]
 #     #     MZ = [0, q * (p2_z - p1_z)]
 #     #     return FX, FY, MX, MY, MZ
-    @Attribute
-    def planes(self):
-        plane1 = TranslatedPlane(built_from=self.def_v_tail_wing.rudder_ribs[0].u_reversed,
-                                 displacement=Vector(0, 0, 0.02))
-        plane2 = TranslatedPlane(built_from=self.def_v_tail_wing.rudder_ribs[1].u_reversed,
-                                 displacement=Vector(10, 0, -0.02))
-        return plane1, plane2
-
-    @Attribute
-    def rhs_skin_faces(self):
-        return [self.def_v_tail_wing.fused_le_skin_right.shells[0], self.def_v_tail_wing.main_skin_right.faces[0], \
-               self.def_v_tail_wing.te_skin_right.faces[0]]
-
-    @Attribute
-    def lhs_skin_faces(self):
-        return [self.def_v_tail_wing.fused_le_skin_left.shells[0], self.def_v_tail_wing.main_skin_left.faces[0], \
-               self.def_v_tail_wing.te_skin_left.faces[0]]
-
-    @Attribute
-    def spar_faces(self):
-        return [self.def_v_tail_wing.rudder_front_spar.faces[0], self.def_v_tail_wing.rudder_back_spar.faces[0]]
-
-    @Attribute
-    def bay_analysis(self):
-        analysis = BayAnalysis(Vx=[10000] * 2,
-                               Vy=[10000] * 2,
-                               Mx=[100000000] * 2,
-                               My=[100000000] * 2,
-                               Mt=[100000000] * 2,
-                               ref_x=[0] * 2,
-                               ref_y=[0] * 2,
-                               bay_planes=self.planes,
-                               rhs_skin_faces=self.lhs_skin_faces,
-                               lhs_skin_faces=self.rhs_skin_faces,
-                               spar_faces=self.spar_faces,
-                               rhs_skin_materials_t=[1.0] * 3,
-                               lhs_skin_materials_t=[1.0] * 3,
-                               spar_materials_t=[1.0] * 2,
-                               rhs_skin_materials_E=[72000] * 3,
-                               lhs_skin_materials_E=[72000] * 3,
-                               spar_materials_E=[72000] * 2,
-                               rhs_skin_materials_G=[28000] * 3,
-                               lhs_skin_materials_G=[28000] * 3,
-                               spar_materials_G=[28000] * 2,
-                               rhs_skin_materials_D=[[3069022, 3069022, 1051600.3, 965821.3]] * 3,
-                               lhs_skin_materials_D=[[3069022, 3069022, 1051600.3, 965821.3]] * 3,
-                               spar_materials_D=[[3069022, 3069022, 1051600.3, 965821.3]] * 2,
-                               N=3)
-        return analysis
-        # skin_1 = ReadMaterial(ply_file=self.ply_file_s1, n_layers=self.n_layers_s1)
-        # skin_1 = skin_1.read
-        # bay_ana = BayAnalysis(Vx=self.forces[0],
-        #                       Vy=self.forces[1],
-        #                       Mx=self.forces[2],
-        #                       My=self.forces[3],
-        #                       Mt=self.forces[4],
-        #                       ref_x=[0] * 2,
-        #                       ref_y=[0] * 2,
-        #                       bay_planes=self.planes,
-        #                       rhs_skin_faces=self.rhs_skin_faces,
-        #                       lhs_skin_faces=self.lhs_skin_faces,
-        #                       spar_faces=self.spar_faces,
-        #                       rhs_skin_materials_t=[skin_1['t']] * 3,
-        #                       lhs_skin_materials_t=[skin_1['t']] * 3,
-        #                       spar_materials_t=[skin_1['t']] * 2,
-        #                       rhs_skin_materials_E=[skin_1['E']] * 3,
-        #                       lhs_skin_materials_E=[skin_1['E']] * 3,
-        #                       spar_materials_E=[skin_1['E']] * 2,
-        #                       rhs_skin_materials_G=[skin_1['G']] * 3,
-        #                       lhs_skin_materials_G=[skin_1['G']] * 3,
-        #                       spar_materials_G=[skin_1['G']] * 2,
-        #                       rhs_skin_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 3,
-        #                       lhs_skin_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 3,
-        #                       spar_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 2,
-        #                       N=3)
-        # return bay_ana
+#     #
+#     # @Attribute
+#     # def bay_analysis(self):
+#     #     skin_1 = ReadMaterial(ply_file=self.ply_file_s1, n_layers=self.n_layers_s1)
+#     #     skin_1 = skin_1.read
+#     #     bay_ana = BayAnalysis(Vx=self.forces[0],
+#     #                           Vy=self.forces[1],
+#     #                           Mx=self.forces[2],
+#     #                           My=self.forces[3],
+#     #                           Mt=self.forces[4],
+#     #                           ref_x=[0] * 2,
+#     #                           ref_y=[0] * 2,
+#     #                           bay_planes=self.planes,
+#     #                           rhs_skin_faces=self.rhs_skin_faces,
+#     #                           lhs_skin_faces=self.lhs_skin_faces,
+#     #                           spar_faces=self.spar_faces,
+#     #                           rhs_skin_materials_t=[skin_1['t']] * 3,
+#     #                           lhs_skin_materials_t=[skin_1['t']] * 3,
+#     #                           spar_materials_t=[skin_1['t']] * 2,
+#     #                           rhs_skin_materials_E=[skin_1['E']] * 3,
+#     #                           lhs_skin_materials_E=[skin_1['E']] * 3,
+#     #                           spar_materials_E=[skin_1['E']] * 2,
+#     #                           rhs_skin_materials_G=[skin_1['G']] * 3,
+#     #                           lhs_skin_materials_G=[skin_1['G']] * 3,
+#     #                           spar_materials_G=[skin_1['G']] * 2,
+#     #                           rhs_skin_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 3,
+#     #                           lhs_skin_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 3,
+#     #                           spar_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 2,
+#     #                           N=3)
+#     #     return bay_ana
 #     #
 #     # @Part(in_tree=False)
 #     # def fuse_fuselage(self):
