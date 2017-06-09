@@ -2,7 +2,7 @@ LOAD output\FullAircraft.avl
 OPER
 M
 D
-0.4
+1.225
 
 X
 fs output\FullAircraft.fs

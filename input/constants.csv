@@ -2,6 +2,6 @@ var_name,Value,Unit,Comment
 m_cruise,0.8,[Mach],Cruise speed of the jet (float)
 w_loc_perc,60,[%],lengthwise position of the wing MAC as percentage of the length of the cabin (float)
 Vv,0.083,[],Volume coefficient (float)
-rho,0.4,[kg/m^3],Density of air at flight altitude (float)
+rho,1.225,[kg/m^3],Density of air at flight altitude (float)
 FoS,2,[],Factor of safety for the AVL analysis (float)
 x_fc,0.2,[],Rudder force width offset fraction of total rudder width (float)

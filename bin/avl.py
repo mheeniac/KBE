@@ -343,9 +343,9 @@ def geometry(obj):
                                   ],
                         density=obj.rho,
                         mach_number=obj.m_cruise,
-                        ref_area=obj.obj_main_wing.ref_area,
+                        ref_area=obj.w_c_root*obj.w_span,
                         ref_chord=obj.w_c_root,
-                        ref_span=obj.w_span,
+                        ref_span=obj.w_span * 2,
                         ref_pt=Point(0, 0, 0))
 
 
