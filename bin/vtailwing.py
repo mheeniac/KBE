@@ -137,6 +137,10 @@ class VTailWing(GeomBase):
     #: :type: float
     root_frac = Input(variables["root_frac"])
 
+    #: The angle at which the rudder is rotated [degrees]
+    #: :type: float
+    rud_angle = Input(variables["rud_angle"])
+
     @Input
     def w_c_root(self):
         """
@@ -245,7 +249,7 @@ class VTailWing(GeomBase):
                     airfoil_tip=self.airfoil_tip,
                     airfoil_root=self.airfoil_root
                     )
-    @Part(in_tree = False)
+    @Part(in_tree = True)
     def trans_vwing(self):
         """
         Translate the wing solid to its correct position using the offsets
@@ -563,28 +567,28 @@ class VTailWing(GeomBase):
 
 
         return [Arc(radius=radius_root_begin,
-                    angle=radians(90+32),
+                    angle=radians(90+ self.rud_angle),
                     position=Position(location=point_origin_circ_root,
                                       orientation=Orientation(x=Vector(1, 0, 0),
                                                               y=Vector(0, 1, 0),
                                                               z=Vector(0, 0, 1))),
                     start=pos_root_begin),
                 Arc(radius=radius_root_end,
-                    angle=radians(90 + 32),
+                    angle=radians(90 + self.rud_angle),
                     position=Position(location=point_origin_circ_root,
                                       orientation=Orientation(x=Vector(1, 0, 0),
                                                               y=Vector(0, 1, 0),
                                                               z=Vector(0, 0, -1))),
                     start=pos_root_end),
                 Arc(radius=radius_tip_begin,
-                    angle=radians(90 + 32),
+                    angle=radians(90 + self.rud_angle),
                     position=Position(location=point_origin_circ_tip,
                                       orientation=Orientation(x=Vector(1, 0, 0),
                                                               y=Vector(0, 1, 0),
                                                               z=Vector(0, 0, 1))),
                     start=pos_tip_begin),
                 Arc(radius=radius_tip_end,
-                    angle=radians(90 + 32),
+                    angle=radians(90 + self.rud_angle),
                     position=Position(location=point_origin_circ_tip,
                                       orientation=Orientation(x=Vector(1, 0, 0),
                                                               y=Vector(0, 1, 0),

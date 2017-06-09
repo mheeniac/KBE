@@ -3,6 +3,7 @@ from wingset import *
 from vtailwing import *
 from bay_analysis_tool.bay_analysis import BayAnalysis
 from csv_read import *
+from avl import *
 #TODO:
 
 # Read function from external file to read the .csv files
@@ -96,6 +97,17 @@ class Aircraft(GeomBase):
     # ----------------
     ## VTAIL VARIABLES
     # ----------------
+    #: The angle at which the rudder is rotated [degrees]
+    #: :type: float
+    rud_angle = Input(vtail["rud_angle"])
+
+    #: The desired distance between the vertical tail aerodynamic centre and the main wing aerodynamic centre
+    #: :type: float
+    l_v = Input(6.)
+
+    #: Fraction to determine root chord size in relation to the span length
+    #: :type: float
+    root_frac = Input(vtail["root_frac"])
 
     #: Tail volume coefficient
     #: :type: float
@@ -199,13 +211,6 @@ class Aircraft(GeomBase):
     #: :type: float
     form_rib_frac = Input(0.075)
 
-    #: The desired distance between the vertical tail aerodynamic centre and the main wing aerodynamic centre
-    #: :type: float
-    l_v = Input(6.)
-
-    #: Fraction to determine root chord size in relation to the span length
-    #: :type: float
-    root_frac = Input(vtail["root_frac"])
 
     #-----------------
     ## HTail variables
@@ -256,6 +261,14 @@ class Aircraft(GeomBase):
                         tail_taper = self.tail_taper,
                         n_section=self.n_section
                         )
+
+    #-------------
+    ## Constants
+    #-------------
+
+    #: The air density at flight altitude [kg/m^3]
+    #: :type: float
+    rho = Input(const["rho"])
 
 
     #-----------------------
@@ -552,18 +565,30 @@ class Aircraft(GeomBase):
 
     @Attribute
     def hor_aspect_ratio(self):
+        """
+        Calculate the aspect ratio for the horizontal tail wing. Not for calculation but for reference for user
+        :rype: float
+        """
         return (2*self.hor_w_span)**2/self.def_h_tail_wing.ref_area
 
     @Attribute
     def Vh(self):
-        main_area = self.obj_main_wing.ref_area
-        hor_area = self.def_h_tail_wing.ref_area
-        main_MAC = self.trans_mac_line.length
-        Vh =  (hor_area*self.l_h)/(main_area*main_MAC)
+        """
+        Calculate the the horizontal tail volume coefficient. Not for computations but for reference for the user.
+        :rtype: float
+        """
+        main_area = self.obj_main_wing.ref_area         # Reference area of the main wing
+        hor_area = self.def_h_tail_wing.ref_area        # Reference area of the horizontal tail wing
+        main_MAC = self.trans_mac_line.length           # The length of the main wing MAC line
+        Vh =  (hor_area*self.l_h)/(main_area*main_MAC)  # The volume coefficient
         return Vh
 
     @Part(in_tree=False)
     def def_h_tail_wing(self):
+        """
+        Create the object for the horizontal tail wing
+        :rtype: Wingset
+        """
         return Wingset(w_c_root=self.h_w_c_root,
                        sweep_angle=self.hor_sweep_angle_user,
                        taper_ratio=self.hor_taper_ratio_user,
@@ -576,6 +601,10 @@ class Aircraft(GeomBase):
                        save_name="htail.csv")
     @Part(in_tree=False)
     def rotate_h_tail_wing(self):
+        """
+        Rotate the wing from a vertical position to a horizontal position
+        :rtype: RotatedShape
+        """
         return RotatedShape(shape_in=self.def_h_tail_wing.wingset[child.index],
                             rotation_point=Point(0, 0, 0),
                             vector=Vector(1, 0, 0),
@@ -584,6 +613,10 @@ class Aircraft(GeomBase):
                             )
     @Part(in_tree=True)
     def translate_h_tail_wing(self):
+        """
+        Translate the wing so that its front aligns with the front of the vertical tail and that it fits on top
+        :rtype: TranslatedShape
+        """
         return TranslatedShape(shape_in=self.rotate_h_tail_wing[child.index],
                                displacement=Vector(
                                    self.fixed_v_wing[1].edges[8].midpoint.x,
@@ -594,12 +627,20 @@ class Aircraft(GeomBase):
 
     @Part(in_tree=False)
     def h_adc_point(self):
+        """
+        Create the horizontal tail wing aerodynamic centre point at ref position (0,0,0)
+        :rtype: Point
+        """
         return Point(0.25 * self.h_w_c_root + self.def_h_tail_wing.mac_def[0],
                      0,
                      0)
 
     @Part
     def h_mac_line(self):
+        """
+        Create the horizontal tail wing mean aerodynamic chord line at ref position (0,0,0)
+        :rtype: LineSegment
+        """
         return LineSegment(start=Point(0.25 * self.h_w_c_root + self.def_h_tail_wing.mac_def[0] - \
                                        0.25 * self.def_h_tail_wing.mac_def[2],
                                        0,
@@ -612,6 +653,10 @@ class Aircraft(GeomBase):
 
     @Part
     def trans_h_mac_line(self):
+        """
+          Create the horizontal tail wing MAC line to the correct position
+          :rtype: TranslatedCurve
+          """
         return TranslatedCurve(curve_in=self.h_mac_line,
                                displacement=Vector(
                                    self.fixed_v_wing[1].edges[8].midpoint.x,
@@ -623,6 +668,10 @@ class Aircraft(GeomBase):
 
     @Part
     def trans_h_adc_point(self):
+        """
+          Translate the horizontal tail wing aerodynamic centre point to the correct position
+          :rtype: TranslatedShape
+          """
         return TranslatedShape(shape_in=self.h_adc_point,
                                displacement=Vector(
                                    self.fixed_v_wing[1].edges[8].midpoint.x,
@@ -630,6 +679,20 @@ class Aircraft(GeomBase):
                                    self.fixed_v_wing[1].edges[8].midpoint.z),
                                label='Horizontal Tail Aerodynamic Centre')
 
+
+    #--------------------
+    ## AVL and Force Part
+    #--------------------
+
+    @Part
+    def interface(self):
+        return avl.Interface(filename="FullAircraft",
+                             directory="output",
+                             geometry=geometry(self),
+                             outputs=["fs", "fn", "fe"],
+                             close_when_done=True,
+                             if_exists="overwrite"
+                             )
 
 
 #     # @Attribute(in_tree=False)
@@ -657,15 +720,6 @@ class Aircraft(GeomBase):
 #     #     save_data(self)
 #     #     return 'SaveData'
 #     #
-#     # @Part
-#     # def interface(self):
-#     #     return avl.Interface(filename="FullAircraft",
-#     #                          directory="output",
-#     #                          geometry=geometry(self),
-#     #                          outputs=["fs", "fn", "fe"],
-#     #                          close_when_done=True,
-#     #                          if_exists="overwrite"
-#     #                          )
 #     #
 #     # @Attribute
 #     # def hinge_side_force(self):
