@@ -1,6 +1,8 @@
 from fuselage import Fuselage
 from wingset import *
 from vtailwing import *
+from bay_analysis_tool.bay_analysis import BayAnalysis
+from csv_read import *
 #TODO:
 
 # Read function from external file to read the .csv files
@@ -828,6 +830,61 @@ class Aircraft(GeomBase):
 #     #     return FX, FY, MX, MY, MZ
 #     #
 #     # @Attribute
+
+
+    @Attribute
+    def planes(self):
+        plane1 = TranslatedPlane(built_from=self.def_v_tail_wing.rudder_ribs[0].u_reversed,
+                                 displacement=Vector(0, 0, 0.02))
+        plane2 = TranslatedPlane(built_from=self.def_v_tail_wing.rudder_ribs[1].u_reversed,
+                                 displacement=Vector(10, 0, -0.02))
+        return plane1, plane2
+
+    @Attribute
+    def rhs_skin_faces(self):
+        return [self.def_v_tail_wing.fused_le_skin_right.shells[0], self.def_v_tail_wing.main_skin_right.faces[0], \
+                self.def_v_tail_wing.te_skin_right.faces[0]]
+
+    @Attribute
+    def lhs_skin_faces(self):
+        return [self.def_v_tail_wing.fused_le_skin_left.shells[0], self.def_v_tail_wing.main_skin_left.faces[0], \
+                self.def_v_tail_wing.te_skin_left.faces[0]]
+
+    @Attribute
+    def spar_faces(self):
+        return [self.def_v_tail_wing.rudder_front_spar.faces[0], self.def_v_tail_wing.rudder_back_spar.faces[0]]
+
+    @Attribute
+    def bay_analysis(self):
+        ply_file_s1 = "forty_five.csv"
+        n_layers_s1 = 4
+        skin_1 = ReadMaterial(ply_file=ply_file_s1, n_layers=n_layers_s1)
+        skin_1 = skin_1.read
+        analysis = BayAnalysis(Vx=[10000] * 2,
+                               Vy=[10000] * 2,
+                               Mx=[100000000] * 2,
+                               My=[100000000] * 2,
+                               Mt=[100000000] * 2,
+                               ref_x=[0] * 2,
+                               ref_y=[0] * 2,
+                               bay_planes=self.planes,
+                               rhs_skin_faces=self.lhs_skin_faces,
+                               lhs_skin_faces=self.rhs_skin_faces,
+                               spar_faces=self.spar_faces,
+                               rhs_skin_materials_t=[skin_1['t']] * 3,
+                               lhs_skin_materials_t=[skin_1['t']] * 3,
+                               spar_materials_t=[skin_1['t']] * 2,
+                               rhs_skin_materials_E=[skin_1['E']] * 3,
+                               lhs_skin_materials_E=[skin_1['E']] * 3,
+                               spar_materials_E=[skin_1['E']] * 2,
+                               rhs_skin_materials_G=[skin_1['G']] * 3,
+                               lhs_skin_materials_G=[skin_1['G']] * 3,
+                               spar_materials_G=[skin_1['G']] * 2,
+                               rhs_skin_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 3,
+                               lhs_skin_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 3,
+                               spar_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 2,
+                               N=3)
+        return analysis
 #     # def bay_analysis(self):
 #     #     skin_1 = ReadMaterial(ply_file=self.ply_file_s1, n_layers=self.n_layers_s1)
 #     #     skin_1 = skin_1.read
