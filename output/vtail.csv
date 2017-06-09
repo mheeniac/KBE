@@ -6,3 +6,4 @@ dihedral_angle_user,0.0,[degrees],Dihedral angle of the main wing (NaN for auto)
 TechFactor,0.86,[],TechFactor of the vertical  wing
 airfoil_root,airfoil.dat,[],root airfoil file name
 airfoil_tip,airfoil.dat,[],tip airfoil file name
+rud_angle,32.0,[degrees],The rotation angle of the rudder

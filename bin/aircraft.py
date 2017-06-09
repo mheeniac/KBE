@@ -249,6 +249,21 @@ class Aircraft(GeomBase):
     #: :type: float
     h_w_c_root = Input(htail["w_c_root"])
 
+    # -------------
+    ## Constants
+    # -------------
+
+    #: The air density at flight altitude [kg/m^3]
+    #: :type: float
+    rho = Input(const["rho"])
+
+    #: Factor of safety for the AVL calculations
+    #: :type: float
+    FoS = Input(const["FoS"])
+
+    # Rudder force width offset fraction of total rudder width (float)
+    #: :type: float
+    x_fc = Input(const["x_fc"])
 
     @Part
     def fuselage_part(self):
@@ -261,14 +276,6 @@ class Aircraft(GeomBase):
                         tail_taper = self.tail_taper,
                         n_section=self.n_section
                         )
-
-    #-------------
-    ## Constants
-    #-------------
-
-    #: The air density at flight altitude [kg/m^3]
-    #: :type: float
-    rho = Input(const["rho"])
 
 
     #-----------------------
@@ -377,7 +384,7 @@ class Aircraft(GeomBase):
     ## SAVING
     #----------
 
-    @Attribute
+    @gui_callable(label="Save Input Vars",icon="clone.png")
     def save_fuselage_vars(self):
         """
         This allows the user to save all variables of the current settings
@@ -693,6 +700,139 @@ class Aircraft(GeomBase):
                              close_when_done=True,
                              if_exists="overwrite"
                              )
+    @Attribute
+    def hinge_side_force(self):
+        """
+        calculate the side force and distributed load due to the aerodynamic load
+        :rtype: tuple[float]
+        """
+        Cy_dict = self.interface.surface_forces  # Create dictionary from AVL
+        Cy = Cy_dict["surfaces"]["Rudder"]["CY"]  # Side force coefficient
+        S_ref = Cy_dict["surfaces"]["Rudder"]["Ssurf"]  # Reference area
+        print S_ref
+        q_dyn = 0.5 * self.rho * (self.m_cruise * 340) ** 2  # Dynamic pressure
+        Fy = Cy * q_dyn * S_ref * self.FoS  # Side Force
+        q = Fy / self.def_v_tail_wing.b_rudder  # Distributed Load
+        return Fy, q
+
+    @Attribute
+    def hinge_reaction_forces(self):
+        """
+        calculates the reaction forces per hinge [N]
+        Note that this DOES NOT include the forces due to the actuators yet
+        :rtype: list
+        """
+        q = self.hinge_side_force[1]  # The distributed load
+        R = []  # An empty list
+        l = []  # An empty list
+        for x in range(0, len(self.def_v_tail_wing.hinges)):
+            # The below loop determines the midpoints between each hinge and then the lengths between them.
+            # It uses these lengths to calculate the hinge reaction forces due to aerodynamic pressure
+            if x == 0: # For the first hinge the distance is between the edge and midpoint
+                p2_z = self.def_v_tail_wing.hinges[x].position.z
+                p1_z = self.def_v_tail_wing.fixed_part.position.z
+                p3_z = self.def_v_tail_wing.hinges[x + 1].position.z
+                pmid_z = p3_z - 0.5 * (p3_z - p2_z)
+                length = pmid_z - p1_z
+                l.append(length)
+                force = q * length
+                R.append(force)
+            elif x > 0 and x < (len(self.def_v_tail_wing.hinges) - 1):  # All the middle hinges
+                p1_z = pmid_z  # Take the previous midpoint and set it as bottom
+                p2_z = self.def_v_tail_wing.hinges[x].position.z  # Take the position of current hinge
+                p3_z = self.def_v_tail_wing.hinges[x + 1].position.z  # Take position of the next hinge
+                pmid_z = p3_z - 0.5 * (p3_z - p2_z)  # Position middle of current and next hinge
+                length = pmid_z - p1_z  # Length is current middle - last middle
+                l.append(length)  # Append length list
+                force = q * length
+                R.append(force)
+            elif x == (len(self.def_v_tail_wing.hinges) - 1): # For the last hinge the distance is between midpoint and edge
+                length = self.def_v_tail_wing.b_rudder - pmid_z  # The length of the last part, total - last mid
+                l.append(length)  # Append lengths
+                force = q * length  # Calculate force
+                R.append(force)  # Append force
+        check = (sum(l) - self.def_v_tail_wing.b_rudder == 0)  # Checks if the calculations of l are valid
+
+        return R, check
+
+
+    @Attribute
+    def actuator_forces(self):
+        """
+        Calculates the actuator force [N] and moment [Nm]
+        :rtype: float
+        """
+        d_hl = self.def_v_tail_wing.d_hinge * self.x_fc  # arm over which force F acts
+        M_f = self.hinge_side_force[0] * d_hl  # Moment due to side force
+        point_act = self.def_v_tail_wing.actuator_hinge_line.midpoint  # Point on act line
+        point_hinge = self.def_v_tail_wing.hingerib_line.midpoint  # point on hinge line
+        point_act = Point(point_act.x, point_act.y, 0)  # Strip z location
+        point_hinge = Point(point_hinge.x, point_hinge.y, 0)  # Strip z location
+        da = point_act.distance(point_hinge)  # Distance between lines
+        Fa = M_f / da  # The actuator Force [N]
+        Fa_x = Fa * cos(radians(self.rud_angle))
+        Fa_y = Fa * sin(radians(self.rud_angle))
+        distance = self.force_distances
+        F1 = Fa * distance[0][1] / sum(distance[0])  # Force on nearest hinge
+        F1_x = F1 * cos(radians(self.rud_angle))
+        F1_y = F1 * sin(radians(self.rud_angle))
+        F2 = Fa * distance[0][0] / sum(distance[0])  # Force on second nearest hinge
+        F2_x = F2 * cos(radians(self.rud_angle))
+        F2_y = F2 * sin(radians(self.rud_angle))
+        Fh = [[F1_x, F1_y], [F2_x, F2_y], distance[1]]  # Forces and their corresponding hinge numbers
+        return [Fa_x, Fa_y], Fh, M_f
+
+    @Attribute
+    def force_distances(self):
+        """
+        Calculates the distance between the actuator force and the nearest two hinges
+        :rtype: float
+        """
+        force_point = self.def_v_tail_wing.actuator_hinge_line.midpoint
+        distances = []
+        for x in range(0, len(self.def_v_tail_wing.hinges)):
+            dist = force_point.distance(self.def_v_tail_wing.hinges[x].position)
+            distances.append(dist)
+        shortest = sorted(distances)[0:2]  # Finds the shortest two distances
+        hinge_number = []
+        hinge_number.append(distances.index(shortest[0]))  # Find the hinge number of the first distance
+        hinge_number.append(distances.index(shortest[1]))  # Find the hinge number of the second distance
+        return shortest, hinge_number
+
+    @Attribute
+    def total_hinge_force(self):
+        """
+        This computes the total forces per hinge. This is the aerodynamic forces per hinge and the forces on
+        two hinges due to the actuators. The actuator attribute also outputs the hinge numbers on which it acts
+        so this makes it easy to compute
+        :rtype: tuple[float]
+        """
+        aero_force = self. hinge_reaction_forces    # The forces on all hinges due to aerodynamic load
+        act_force = self.actuator_forces            # The forces on some actuators due to actuator force
+        tot_force = aero_force[0]
+        f1 = sqrt(act_force[1][0][0]**2 + act_force[1][0][1]**2) # Force on the first hinge
+        f2 = sqrt(act_force[1][1][0]**2 + act_force[1][1][1]**2) # Force on the second  hinge
+        f1 = f1 + tot_force[act_force[1][2][0]] # Add the hinge reaction force to the actuator force
+        f2 = f2 + tot_force[act_force[1][2][1]] # Add the hinge reaction force to the actuator force
+        tot_force[act_force[1][2][0]] = f1      # Update correct hinge
+        tot_force[act_force[1][2][1]] = f2      # Update correct hinge
+        return tot_force
+
+    @Attribute
+    def hinge_mass(self):
+        """
+        Compute the hinge masses for a single load path hinge
+        :rtype: tuple[float]
+        """
+        h = self.def_v_tail_wing.d_front_spar * 1000  # in mm
+        weight = []
+        for x in range(0,len(self.total_hinge_force)):
+            mass = 0.110 * (1 + (abs(self.total_hinge_force[x]) / 30000)) * ((h/100) + 1)
+            weight.append(mass)
+        return weight
+
+
+
 
 
 #     # @Attribute(in_tree=False)
@@ -700,122 +840,10 @@ class Aircraft(GeomBase):
 #     #     return self.fuselage_part.fuselage_length
 #     #
 
-#     # @Attribute(in_tree=False)
-#     # def tail_wings(self):
-#     #     return self.translate_v_tail_wing, self.translate_h_tail_wing
+
 #     #
 
 
-
-
-#     #
-#     # @Attribute(in_tree=True)
-#     # def tail_wing(self):
-#     #     return self.translate_v_tail_fixed, self.rotated_v_tail_rudder, self.translate_h_tail_wing
-#     #
-
-#     #
-#     # @Attribute
-#     # def saving_it(self):
-#     #     save_data(self)
-#     #     return 'SaveData'
-#     #
-#     #
-#     # @Attribute
-#     # def hinge_side_force(self):
-#     #     Cy_dict = self.interface.surface_forces  # Create dictionary from AVL
-#     #     Cy = Cy_dict["surfaces"]["Rudder"]["CY"]  # Side force coefficient
-#     #     S_ref = Cy_dict["surfaces"]["Rudder"]["Ssurf"]  # Reference area
-#     #     q_dyn = 0.5 * self.rho * (self.m_cruise * 340) ** 2  # Dynamic pressure
-#     #     Fy = Cy * q_dyn * self.obj_main_wing.ref_area * self.FoS  # Side Force
-#     #     q = Fy / self.def_v_tail_wing.b_rudder  # Distributed Load
-#     #     return Fy, q
-#     #
-#     # @Attribute
-#     # def hinge_mass(self):
-#     #     h = self.def_v_tail_wing.d_front_spar * 1000  # in mm
-#     #     weight = []
-#     #     for x in range(0,len(self.hinge_reaction_forces[0])):
-#     #         mass = 0.110 * (1 + (abs(self.hinge_reaction_forces[0][x]) / 30000)) * ((h/100) + 1)
-#     #         weight.append(mass)
-#     #     return weight
-#     #
-#     # @Attribute
-#     # def hinge_reaction_forces(self):
-#     #     """calculates the reaction forces per hinge [N]
-#     #            :rtype: list
-#     #     """
-#     #     q = self.hinge_side_force[1]  # The distributed load
-#     #     R = []  # An empty list
-#     #     l = []  # An empty list
-#     #     for x in range(0, len(self.def_v_tail_wing.hinges)):
-#     #         if x == 0:
-#     #             p2_z = self.def_v_tail_wing.hinges[x].position.z
-#     #             p1_z = self.def_v_tail_wing.fixed_part.position.z
-#     #             p3_z = self.def_v_tail_wing.hinges[x + 1].position.z
-#     #             pmid_z = p3_z - 0.5 * (p3_z - p2_z)
-#     #             length = pmid_z - p1_z
-#     #             l.append(length)
-#     #             force = q * length
-#     #             R.append(force)
-#     #         elif x > 0 and x < (len(self.def_v_tail_wing.hinges) - 1):  # All the middle hinges
-#     #             p1_z = pmid_z  # Take the previous midpoint and set it as bottom
-#     #             p2_z = self.def_v_tail_wing.hinges[x].position.z  # Take the position of current hinge
-#     #             p3_z = self.def_v_tail_wing.hinges[x + 1].position.z  # Take position of the next hinge
-#     #             pmid_z = p3_z - 0.5 * (p3_z - p2_z)  # Position middle of current and next hinge
-#     #             length = pmid_z - p1_z  # Length is current middle - last middle
-#     #             l.append(length)  # Append length list
-#     #             force = q * length
-#     #             R.append(force)
-#     #         elif x == (len(self.def_v_tail_wing.hinges) - 1):
-#     #             length = self.def_v_tail_wing.b_rudder - pmid_z  # The length of the last part, total - last mid
-#     #             l.append(length)  # Append lengths
-#     #             force = q * length  # Calculate force
-#     #             R.append(force)  # Append force
-#     #     check = (sum(l) - self.def_v_tail_wing.b_rudder == 0)  # Checks if the calculations of l are valid
-#     #
-#     #     return R, check, q, force
-#     #
-#     # @Attribute
-#     # def actuator_forces(self):
-#     #     """ Calculates the actuator force [N]
-#     #                   :rtype: float
-#     #     """
-#     #     d_hl = self.def_v_tail_wing.d_hinge * self.x_fc  # arm over which force F acts
-#     #     M_f = self.hinge_side_force[0] * d_hl  # Moment due to side force
-#     #     point_act = self.def_v_tail_wing.actuator_hinge_line.midpoint  # Point on act line
-#     #     point_hinge = self.def_v_tail_wing.hingerib_line.midpoint  # point on hinge line
-#     #     point_act = Point(point_act.x, point_act.y, 0)  # Strip z location
-#     #     point_hinge = Point(point_hinge.x, point_hinge.y, 0)  # Strip z location
-#     #     da = point_act.distance(point_hinge)  # Distance between lines
-#     #     Fa = M_f / da  # The actuator Force [N]
-#     #     Fa_x = Fa * cos(radians(self.rud_angle))
-#     #     Fa_y = Fa * sin(radians(self.rud_angle))
-#     #     distance = self.force_distances
-#     #     F1 = Fa * distance[0][1] / sum(distance[0])  # Force on nearest hinge
-#     #     F1_x = F1 * cos(radians(self.rud_angle))
-#     #     F1_y = F1 * sin(radians(self.rud_angle))
-#     #     F2 = Fa * distance[0][0] / sum(distance[0])  # Force on second nearest hinge
-#     #     F2_x = F2 * cos(radians(self.rud_angle))
-#     #     F2_y = F2 * sin(radians(self.rud_angle))
-#     #     Fh = [[F1_x, F1_y], [F2_x, F2_y], distance[1]]  # Forces and their corresponding hinge numbers
-#     #     return [Fa_x, Fa_y], Fh, M_f
-#     #
-#     # @Attribute
-#     # def force_distances(self):
-#     #     """ Calculates the distance between the actuator force and the nearest two hinges
-#     #                   :rtype: float
-#     #     """
-#     #     force_point = self.def_v_tail_wing.actuator_hinge_line.midpoint
-#     #     distances = []
-#     #     for x in range(0, len(self.def_v_tail_wing.hinges)):
-#     #         dist = force_point.distance(self.def_v_tail_wing.hinges[x].position)
-#     #         distances.append(dist)
-#     #     shortest = sorted(distances)[0:2]  # Finds the shortest two distances
-#     #     hinge_number = []
-#     #     hinge_number.append(distances.index(shortest[0]))  # Find the hinge number of the first distance
-#     #     hinge_number.append(distances.index(shortest[1]))  # Find the hinge number of the second distance
-#     #     return shortest, hinge_number
 #     #
 #     # @Attribute
 #     # def gen_material(self):

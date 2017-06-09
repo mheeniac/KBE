@@ -2,3 +2,5 @@ var_name,Value,Unit,Comment
 m_cruise,0.8,[Mach],Cruise speed of the jet
 w_loc_perc,60.0,[%],lengthwise position of the wing MAC as percentage of the length of the cabin
 Vv,0.083,[],Volume coefficient
+rho,0.4,[kg/m^3],Density of air at flight altitude
+FoS,2.0,[],Factor of safety for the AVL analysis
