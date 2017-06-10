@@ -758,7 +758,8 @@ class VTailWing(GeomBase):
         """
         return RotatedShape(shape_in=self.things_for_rotation[child.index], rotation_point=self.hingerib_line.start,
                             vector=self.hingerib_line.direction_vector, angle=radians(30),
-                            quantify=len(self.things_for_rotation), transparency=self.transparency_definer[child.index],label= self.label_definer[child.index])
+                            quantify=len(self.things_for_rotation), transparency=self.transparency_definer[child.index],
+                            label= self.label_definer[child.index])
 
     @Attribute
     def save_vars(self):
