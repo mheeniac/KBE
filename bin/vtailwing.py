@@ -464,7 +464,7 @@ class VTailWing(GeomBase):
                      normal=Vector(0, 0, 1),
                      label='Actuator Rib Plane')
 
-    @Part(in_tree=False)
+    @Part(in_tree=True)
     def formrib_plns(self):
         return Plane(quantify=(int(self.b_rudder / self.p_form_rib) - 1),
                      reference=Point(self.w_c_root - self.d_hinge + self.x_offset,
