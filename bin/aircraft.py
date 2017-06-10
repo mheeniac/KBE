@@ -4,6 +4,7 @@ from vtailwing import *
 from bay_analysis_tool.bay_analysis import BayAnalysis
 from csv_read import *
 from avl import *
+from material_allocation import *
 #TODO:
 
 # Read function from external file to read the .csv files
@@ -821,7 +822,7 @@ class Aircraft(GeomBase):
     @Attribute
     def hinge_mass(self):
         """
-        Compute the hinge masses for a single load path hinge
+        Compute the hinge masses for a single load path hinge [kg]
         :rtype: tuple[float]
         """
         h = self.def_v_tail_wing.d_front_spar * 1000  # in mm
@@ -831,8 +832,12 @@ class Aircraft(GeomBase):
             weight.append(mass)
         return weight
 
-
-
+    @Attribute
+    def rudder_weight(self):
+        obj = ApplyMat(is_default = True,
+                       hinge_forces = self.total_hinge_force,
+                       obj = self)
+        return obj.weights
 
 
 #     # @Attribute(in_tree=False)
@@ -845,12 +850,7 @@ class Aircraft(GeomBase):
 
 
 #     #
-#     # @Attribute
-#     # def gen_material(self):
-#     #     generate = ReadMaterial(ply_file=self.ply_file,
-#     #                             n_layers=self.n_layers)
-#     #     dict_mat = generate.read
-#     #     return dict_mat
+
 #     #
 #     # @Attribute
 #     # def planes(self):
@@ -1055,29 +1055,6 @@ class Aircraft(GeomBase):
 #     # def wetted_writer(self):
 #     #     return STEPWriter(nodes=self.wetted_nodes,
 #     #                       default_directory='../output/CAD')
-#     @Attribute
-#     def save_vars(self):
-#         path = self.read.generate_path
-#         first_row = True
-#         with open(path[0], 'rb') as file:  # Open file
-#             reader = csv.reader(file, delimiter=',', quotechar='|')  # Read into reader and section rows and columns
-#             with open(path[1], 'wb') as outfile:
-#                 filewriter = csv.writer(outfile, delimiter=',', quotechar='|')
-#                 for row in reader:
-#                     if first_row == True:
-#                         filewriter.writerow(row)
-#                         first_row = False
-#                     else:
-#                         # Find the name of the variable that we want to request and save
-#                         var_name = row[0]
-#                         value = getattr(self, var_name)
-#                         # Update the value in row
-#                         row[1] = value
-#                         # Write the row to a new file
-#                         filewriter.writerow(row)
-#         return 'Saved'
-#
-
     @Attribute
     def save_vars(self):
         """ Saves the variables of current settings to an output file
