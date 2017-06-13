@@ -782,9 +782,11 @@ class Aircraft(GeomBase):
         M_f = self.hinge_side_force[0] * d_hl  # Moment due to side force
         point_act = self.def_v_tail_wing.actuator_hinge_line.midpoint  # Point on act line
         point_hinge = self.def_v_tail_wing.hingerib_line.midpoint  # point on hinge line
-        point_act = Point(point_act.x, point_act.y, 0)  # Strip z location
-        point_hinge = Point(point_hinge.x, point_hinge.y, 0)  # Strip z location
-        da = point_act.distance(point_hinge)  # Distance between lines
+        min_1 = point_act - self.def_v_tail_wing.hingerib_line.start
+        min_2 = point_act - self.def_v_tail_wing.hingerib_line.end
+        d1 = self.def_v_tail_wing.hingerib_line.start.distance(self.def_v_tail_wing.hingerib_line.end)
+        d = numpy.cross(min_1,min_2)/d1
+        da = d[0]
         Fa = M_f / da  # The actuator Force [N]
         Fa_x = - Fa * cos(radians(self.rud_angle))
         Fa_y = Fa * sin(radians(self.rud_angle))
@@ -798,7 +800,7 @@ class Aircraft(GeomBase):
         F2_x = - Fa_x * distance[0][1] / sum(distance[0])
         F2_y = F2 * sin(radians(self.rud_angle))
         Fh = [[F1_x, F1_y], [F2_x, F2_y], distance[1]]  # Forces and their corresponding hinge numbers
-        check_x = (F1_x + F2_x) - Fa_x
+        check_x = (F1_x + F2_x) + Fa_x
         print check_x
         return [Fa_x, Fa_y], Fh, M_f
 
