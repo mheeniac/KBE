@@ -5,19 +5,20 @@ from bay_analysis_tool.bay_analysis import BayAnalysis
 from csv_read import *
 from avl import *
 from material_allocation import *
-#TODO:
+
+# TODO:
 
 # Read function from external file to read the .csv files
-fuse = csvr.read_input("fuselage.csv")   # Fuselage Settings
-const = csvr.read_input("constants.csv") # constants Settings
-mwing = csvr.read_input("mwing.csv")     # Main wing Settings
-vtail = csvr.read_input("vtail.csv")     # Vertical tail settings
-htail = csvr.read_input("htail.csv")     # Vertical tail settings
+fuse = csvr.read_input("fuselage.csv")  # Fuselage Settings
+const = csvr.read_input("constants.csv")  # constants Settings
+mwing = csvr.read_input("mwing.csv")  # Main wing Settings
+vtail = csvr.read_input("vtail.csv")  # Vertical tail settings
+htail = csvr.read_input("htail.csv")  # Vertical tail settings
 
 
 class Aircraft(GeomBase):
     # Name for the root object in the tree
-    label  = 'Business Jet'
+    label = 'Business Jet'
 
     # -------------------
     ## FUSELAGE VARIABLES
@@ -81,7 +82,8 @@ class Aircraft(GeomBase):
 
     #: airfoil technology factor []
     #: :type: float
-    TechFactor = Input(mwing["TechFactor"])  # Technology factor is equal to 0.87 NACA 6 airfoil and 1 to other conventional airfoils
+    TechFactor = Input(
+        mwing["TechFactor"])  # Technology factor is equal to 0.87 NACA 6 airfoil and 1 to other conventional airfoils
 
     #: the name of the root airfoil file
     #: :type: string
@@ -129,7 +131,7 @@ class Aircraft(GeomBase):
     #: airfoil technology factor []
     #: :type: float
     vert_TechFactor = Input(vtail[
-                           "TechFactor"])  # Technology factor is equal to 0.87 NACA 6 airfoil and 1 to other conventional airfoils
+                                "TechFactor"])  # Technology factor is equal to 0.87 NACA 6 airfoil and 1 to other conventional airfoils
 
     #: the name of the root airfoil file
     #: :type: string
@@ -212,8 +214,7 @@ class Aircraft(GeomBase):
     #: :type: float
     form_rib_frac = Input(0.075)
 
-
-    #-----------------
+    # -----------------
     ## HTail variables
     # ----------------
 
@@ -232,7 +233,7 @@ class Aircraft(GeomBase):
     #: airfoil technology factor []
     #: :type: float
     hor_TechFactor = Input(htail[
-                           "TechFactor"])  # Technology factor is equal to 0.87 NACA 6 airfoil and 1 to other conventional airfoils
+                               "TechFactor"])  # Technology factor is equal to 0.87 NACA 6 airfoil and 1 to other conventional airfoils
 
     #: the name of the root airfoil file
     #: :type: string
@@ -274,14 +275,13 @@ class Aircraft(GeomBase):
                         nose_slenderness=self.nose_slenderness,
                         tail_slenderness=self.tail_slenderness,
                         upsweep_angle=self.upsweep_angle,
-                        tail_taper = self.tail_taper,
+                        tail_taper=self.tail_taper,
                         n_section=self.n_section
                         )
 
-
-    #-----------------------
+    # -----------------------
     ## This is the main wing
-    #-----------------------
+    # -----------------------
     @Part(in_tree=False)
     def obj_main_wing(self):
         # Create a wing object for the main wings of the plane from the wingset class
@@ -311,12 +311,12 @@ class Aircraft(GeomBase):
         # Translate the wings such that the aerodynamic center is at 60% of the cabin length
         return TranslatedShape(shape_in=self.rotate_main_wing[child.index],
                                displacement=Vector(
-                                   self.adc_diff, # Translate along fuselage length with calculated difference
+                                   self.adc_diff,  # Translate along fuselage length with calculated difference
                                    0,
-                                   self.obj_main_wing.calc_lowest_point), # Translate down so that it is bottom wing
+                                   self.obj_main_wing.calc_lowest_point),  # Translate down so that it is bottom wing
                                quantify=2,
-                               color = 'red',
-                               label = ['Left Wing', 'Right Wing'][child.index]
+                               color='red',
+                               label=['Left Wing', 'Right Wing'][child.index]
                                )
 
     @Attribute(in_tree=False)
@@ -336,17 +336,18 @@ class Aircraft(GeomBase):
         return Point(0.25 * self.w_c_root + self.obj_main_wing.mac_def[0],
                      0,
                      0)
+
     @Part
     def mac_line(self):
         """
         Create the line for the mean aerodynamic chord in the fuselage body
         :rtype: LineSegment
         """
-        return LineSegment(start=Point(0.25 * self.w_c_root + self.obj_main_wing.mac_def[0] - \
+        return LineSegment(start=Point(0.25 * self.w_c_root + self.obj_main_wing.mac_def[0] - 
                                        0.25 * self.obj_main_wing.mac_def[2],
                                        0,
                                        0),
-                           end=Point(0.25 * self.w_c_root + self.obj_main_wing.mac_def[0] + \
+                           end=Point(0.25 * self.w_c_root + self.obj_main_wing.mac_def[0] + 
                                      0.75 * self.obj_main_wing.mac_def[2],
                                      0,
                                      0),
@@ -365,6 +366,7 @@ class Aircraft(GeomBase):
                                color='black',
                                line_thickness=6,
                                label='Main Wing MAC')
+
     @Part
     def trans_adc_point(self):
         """
@@ -381,11 +383,11 @@ class Aircraft(GeomBase):
     def sweep_angle_calc(self):
         return self.obj_main_wing.obj_wingset.sweep_angle
 
-    #----------
+    # ----------
     ## SAVING
-    #----------
+    # ----------
 
-    @gui_callable(label="Save Input Vars",icon="clone.png")
+    @gui_callable(label="Save Input Vars", icon="clone.png")
     def save_fuselage_vars(self):
         """
         This allows the user to save all variables of the current settings
@@ -411,7 +413,7 @@ class Aircraft(GeomBase):
         main_span = 2 * self.w_span
         f1 = self.root_frac
         f2 = self.vert_taper_ratio_user
-        span = sqrt((2*main_area*main_span*self.Vv)/(self.l_v*(f1+f1*f2)))
+        span = sqrt((2 * main_area * main_span * self.Vv) / (self.l_v * (f1 + f1 * f2)))
         return span
 
     @Attribute
@@ -420,13 +422,15 @@ class Aircraft(GeomBase):
         Calculates the z_offset for the vertical tail such that the tip will be flush with the tail cone
         :rtype: float
         """
-        x_pos = self.v_shift - (self.cabin_length + self.fuselage_part.length_nose) # x-position position from start tail
+        x_pos = self.v_shift - (
+        self.cabin_length + self.fuselage_part.length_nose)  # x-position position from start tail
         if x_pos > 0:
             x_len = self.fuselage_part.length_tail - x_pos  # X position from the back of the tail
+            # Calculate the diff between tops of tail circles
             dv = self.fuselage_part.fuselage_assembly[0].edges[0].point1.z - \
-                 self.fuselage_part.fuselage_assembly[0].edges[2].point1.z  # Calculate the diff between tops of tail circles
-            z_pos = ((dv/self.fuselage_part.length_tail)*x_len) + \
-                    self.fuselage_part.fuselage_assembly[0].edges[2].point1.z # Simple triangle calculation
+                 self.fuselage_part.fuselage_assembly[0].edges[2].point1.z
+            z_pos = ((dv / self.fuselage_part.length_tail) * x_len) + \
+                    self.fuselage_part.fuselage_assembly[0].edges[2].point1.z  # Simple triangle calculation
             print x_len
             return z_pos
         else:
@@ -434,60 +438,60 @@ class Aircraft(GeomBase):
 
     @Part(in_tree=True)
     def def_v_tail_wing(self):
-        return VTailWing(w_span = self.vert_w_span,
-                         sweep_angle_user = self.vert_sweep_angle_user,
-                         taper_ratio_user = self.vert_taper_ratio_user,
-                         dihedral_angle_user = self.vert_dihedral_angle_user,
-                         m_cruise = self.m_cruise,
-                         TechFactor = self.vert_TechFactor,
-                         airfoil_root = self.vert_airfoil_root,
-                         airfoil_tip = self.vert_airfoil_tip,
-                         d_hinge_user = self.d_hinge_user,
-                         p_zero_user = self.p_zero_user,
-                         p_rib_user = self.p_rib_user,
-                         p_form_rib_user = self.p_form_rib_user,
-                         rhl_root = self.rhl_root,
-                         rhl_tip = self.rhl_tip,
-                         ahl_tip = self.ahl_tip,
-                         d_actuator = self.d_actuator,
-                         d_front_spar = self.d_front_spar,
-                         d_back_spar = self.d_back_spar,
-                         pick_hinge_ribs = self.pick_hinge_ribs,
-                         rud_width_frac = self.rud_width_frac,
-                         rud_height_frac = self.rud_height_frac,
-                         rud_length_frac = self.rud_length_frac,
-                         actuator_frac = self.actuator_frac,
-                         rib0_frac = self.rib0_frac,
-                         rib_frac = self.rib_frac,
-                         form_rib_frac = self.form_rib_frac,
-                         x_offset = self.v_shift,
-                         z_offset = self.z_offset,
-                         root_frac = self.root_frac)
+        return VTailWing(w_span=self.vert_w_span,
+                         sweep_angle_user=self.vert_sweep_angle_user,
+                         taper_ratio_user=self.vert_taper_ratio_user,
+                         dihedral_angle_user=self.vert_dihedral_angle_user,
+                         m_cruise=self.m_cruise,
+                         TechFactor=self.vert_TechFactor,
+                         airfoil_root=self.vert_airfoil_root,
+                         airfoil_tip=self.vert_airfoil_tip,
+                         d_hinge_user=self.d_hinge_user,
+                         p_zero_user=self.p_zero_user,
+                         p_rib_user=self.p_rib_user,
+                         p_form_rib_user=self.p_form_rib_user,
+                         rhl_root=self.rhl_root,
+                         rhl_tip=self.rhl_tip,
+                         ahl_tip=self.ahl_tip,
+                         d_actuator=self.d_actuator,
+                         d_front_spar=self.d_front_spar,
+                         d_back_spar=self.d_back_spar,
+                         pick_hinge_ribs=self.pick_hinge_ribs,
+                         rud_width_frac=self.rud_width_frac,
+                         rud_height_frac=self.rud_height_frac,
+                         rud_length_frac=self.rud_length_frac,
+                         actuator_frac=self.actuator_frac,
+                         rib0_frac=self.rib0_frac,
+                         rib_frac=self.rib_frac,
+                         form_rib_frac=self.form_rib_frac,
+                         x_offset=self.v_shift,
+                         z_offset=self.z_offset,
+                         root_frac=self.root_frac)
 
-    @Part(in_tree = False)
+    @Part(in_tree=False)
     def extr_tail(self):
         """
         This extends the tail so that it will protrude into the spacecraft fuselage
         :rtype: ExtrudedShell
         """
         return ExtrudedShell(profile=self.def_v_tail_wing.trans_vwing.edges[0],
-                             distance = self.z_offset - self.fuselage_part.fuselage_assembly[0].edges[2].point1.z + 0.05,
-                             direction=(0,0,-1))
+                             distance=self.z_offset - self.fuselage_part.fuselage_assembly[0].edges[2].point1.z + 0.05,
+                             direction=(0, 0, -1))
 
-    @Part(in_tree = False)
+    @Part(in_tree=False)
     def sub_tail(self):
         """
         This deletes the non visible part of the extended vertical tail that is inside the fuselage
         :rtype: SubtractedShell
         """
-        return SubtractedShell(shape_in = self.extr_tail,
-                               tool = [self.fuselage_part.fuselage_assembly[0],
-                                       self.fuselage_part.fuselage_assembly[1]],
-                                label = "Fit Piece",
-                               transparency = 0.6,
-                               color = 'red')
+        return SubtractedShell(shape_in=self.extr_tail,
+                               tool=[self.fuselage_part.fuselage_assembly[0],
+                                     self.fuselage_part.fuselage_assembly[1]],
+                               label="Fit Piece",
+                               transparency=0.6,
+                               color='red')
 
-    @Attribute(in_tree = True, label="Fixed Vertical Tail")
+    @Attribute(in_tree=True, label="Fixed Vertical Tail")
     def fixed_v_wing(self):
         """
         Collects the two shells for the fixed tail. Prevents the use of fuse and thus making it a lot quicker
@@ -504,6 +508,7 @@ class Aircraft(GeomBase):
         return Point(0.25 * self.def_v_tail_wing.w_c_root + self.def_v_tail_wing.mac_def[0],
                      0,
                      self.def_v_tail_wing.mac_def[1])
+
     @Attribute
     def v_shift(self):
         """
@@ -512,7 +517,7 @@ class Aircraft(GeomBase):
         :rtype: float
         """
         x_main2 = self.trans_adc_point.bbox.location.x  # Get the x position of the main wing point
-        shift = x_main2 - self.v_adc_point.x + self.l_v # The shift is the difference between the points + desired l_h
+        shift = x_main2 - self.v_adc_point.x + self.l_v  # The shift is the difference between the points + desired l_h
         return shift
 
     @Part
@@ -540,6 +545,7 @@ class Aircraft(GeomBase):
                                                    0,
                                                    self.cabin_diameter),
                                label='Vertical Tail Aerodynamic Centre')
+
     @Part(in_tree=False)
     def v_mac_line(self):
         """
@@ -558,10 +564,11 @@ class Aircraft(GeomBase):
 
     @Attribute
     def ver_aspect_ratio(self):
-        return self.vert_w_span**2/self.def_v_tail_wing.ref_area
-    #-----------------
+        return self.vert_w_span ** 2 / self.def_v_tail_wing.ref_area
+
+    # -----------------
     ## HTail Wing part
-    #-----------------
+    # -----------------
 
     @Attribute
     def l_h(self):
@@ -577,7 +584,7 @@ class Aircraft(GeomBase):
         Calculate the aspect ratio for the horizontal tail wing. Not for calculation but for reference for user
         :rype: float
         """
-        return (2*self.hor_w_span)**2/self.def_h_tail_wing.ref_area
+        return (2 * self.hor_w_span) ** 2 / self.def_h_tail_wing.ref_area
 
     @Attribute
     def Vh(self):
@@ -585,10 +592,10 @@ class Aircraft(GeomBase):
         Calculate the the horizontal tail volume coefficient. Not for computations but for reference for the user.
         :rtype: float
         """
-        main_area = self.obj_main_wing.ref_area         # Reference area of the main wing
-        hor_area = self.def_h_tail_wing.ref_area        # Reference area of the horizontal tail wing
-        main_MAC = self.trans_mac_line.length           # The length of the main wing MAC line
-        Vh =  (hor_area*self.l_h)/(main_area*main_MAC)  # The volume coefficient
+        main_area = self.obj_main_wing.ref_area  # Reference area of the main wing
+        hor_area = self.def_h_tail_wing.ref_area  # Reference area of the horizontal tail wing
+        main_MAC = self.trans_mac_line.length  # The length of the main wing MAC line
+        Vh = (hor_area * self.l_h) / (main_area * main_MAC)  # The volume coefficient
         return Vh
 
     @Part(in_tree=False)
@@ -607,6 +614,7 @@ class Aircraft(GeomBase):
                        airfoil_root=self.hor_airfoil_root,
                        airfoil_tip=self.hor_airfoil_tip,
                        save_name="htail.csv")
+
     @Part(in_tree=False)
     def rotate_h_tail_wing(self):
         """
@@ -619,6 +627,7 @@ class Aircraft(GeomBase):
                             angle=radians(90),
                             quantify=2
                             )
+
     @Part(in_tree=True)
     def translate_h_tail_wing(self):
         """
@@ -631,8 +640,7 @@ class Aircraft(GeomBase):
                                    0,
                                    self.fixed_v_wing[1].edges[8].midpoint.z),
                                quantify=2,
-                               label = ['Right Side', 'Left Side'][child.index])
-
+                               label=['Right Side', 'Left Side'][child.index])
 
     @Part(in_tree=False)
     def h_adc_point(self):
@@ -650,11 +658,11 @@ class Aircraft(GeomBase):
         Create the horizontal tail wing mean aerodynamic chord line at ref position (0,0,0)
         :rtype: LineSegment
         """
-        return LineSegment(start=Point(0.25 * self.h_w_c_root + self.def_h_tail_wing.mac_def[0] - \
+        return LineSegment(start=Point(0.25 * self.h_w_c_root + self.def_h_tail_wing.mac_def[0] - 
                                        0.25 * self.def_h_tail_wing.mac_def[2],
                                        0,
                                        0),
-                           end=Point(0.25 * self.h_w_c_root + self.def_h_tail_wing.mac_def[0] + \
+                           end=Point(0.25 * self.h_w_c_root + self.def_h_tail_wing.mac_def[0] + 
                                      0.75 * self.def_h_tail_wing.mac_def[2],
                                      0,
                                      0),
@@ -688,10 +696,9 @@ class Aircraft(GeomBase):
                                    self.fixed_v_wing[1].edges[8].midpoint.z),
                                label='Horizontal Tail Aerodynamic Centre')
 
-
-    #--------------------
+    # --------------------
     ## AVL and Force Part
-    #--------------------
+    # --------------------
 
     @Part
     def interface(self):
@@ -702,18 +709,19 @@ class Aircraft(GeomBase):
                              close_when_done=True,
                              if_exists="overwrite"
                              )
+
     @Attribute
     def hinge_side_force(self):
         """
         calculate the side force and distributed load due to the aerodynamic load
         :rtype: tuple[float]
         """
-        Cy_dict = self.interface.surface_forces  # Create dictionary from AVL
-        Cy = Cy_dict["surfaces"]["Rudder"]["CY"]  # Side force coefficient
-        S_ref = Cy_dict["surfaces"]["Rudder"]["Ssurf"]  # Reference area
-        print S_ref
+        cy_dict = self.interface.surface_forces  # Create dictionary from AVL
+        cy = cy_dict["surfaces"]["Rudder"]["CY"]  # Side force coefficient
+        s_ref = cy_dict["surfaces"]["Rudder"]["Ssurf"]  # Reference area
+        print s_ref
         q_dyn = 0.5 * self.rho * (self.m_cruise * 340) ** 2  # Dynamic pressure
-        Fy = Cy * q_dyn * S_ref * self.FoS  # Side Force
+        Fy = cy * q_dyn * s_ref * self.FoS  # Side Force
         q = Fy / self.def_v_tail_wing.b_rudder  # Distributed Load
         return Fy, q
 
@@ -730,7 +738,7 @@ class Aircraft(GeomBase):
         for x in range(0, len(self.def_v_tail_wing.hinges)):
             # The below loop determines the midpoints between each hinge and then the lengths between them.
             # It uses these lengths to calculate the hinge reaction forces due to aerodynamic pressure
-            if x == 0: # For the first hinge the distance is between the edge and midpoint
+            if x == 0:  # For the first hinge the distance is between the edge and midpoint
                 p2_z = self.def_v_tail_wing.hinges[x].position.z
                 p1_z = self.def_v_tail_wing.fixed_part.position.z
                 p3_z = self.def_v_tail_wing.hinges[x + 1].position.z
@@ -748,7 +756,8 @@ class Aircraft(GeomBase):
                 l.append(length)  # Append length list
                 force = q * length
                 R.append(force)
-            elif x == (len(self.def_v_tail_wing.hinges) - 1): # For the last hinge the distance is between midpoint and edge
+            elif x == (
+                len(self.def_v_tail_wing.hinges) - 1):  # For the last hinge the distance is between midpoint and edge
                 length = self.def_v_tail_wing.b_rudder - pmid_z  # The length of the last part, total - last mid
                 l.append(length)  # Append lengths
                 force = q * length  # Calculate force
@@ -756,7 +765,6 @@ class Aircraft(GeomBase):
         check = (sum(l) - self.def_v_tail_wing.b_rudder == 0)  # Checks if the calculations of l are valid
 
         return R, check
-
 
     @Attribute
     def actuator_forces(self):
@@ -809,15 +817,15 @@ class Aircraft(GeomBase):
         so this makes it easy to compute
         :rtype: tuple[float]
         """
-        aero_force = self. hinge_reaction_forces    # The forces on all hinges due to aerodynamic load
-        act_force = self.actuator_forces            # The forces on some actuators due to actuator force
+        aero_force = self.hinge_reaction_forces  # The forces on all hinges due to aerodynamic load
+        act_force = self.actuator_forces  # The forces on some actuators due to actuator force
         tot_force = aero_force[0]
-        f1 = sqrt(act_force[1][0][0]**2 + act_force[1][0][1]**2) # Force on the first hinge
-        f2 = sqrt(act_force[1][1][0]**2 + act_force[1][1][1]**2) # Force on the second  hinge
-        f1 = f1 + tot_force[act_force[1][2][0]] # Add the hinge reaction force to the actuator force
-        f2 = f2 + tot_force[act_force[1][2][1]] # Add the hinge reaction force to the actuator force
-        tot_force[act_force[1][2][0]] = f1      # Update correct hinge
-        tot_force[act_force[1][2][1]] = f2      # Update correct hinge
+        f1 = sqrt(act_force[1][0][0] ** 2 + act_force[1][0][1] ** 2)  # Force on the first hinge
+        f2 = sqrt(act_force[1][1][0] ** 2 + act_force[1][1][1] ** 2)  # Force on the second  hinge
+        f1 = f1 + tot_force[act_force[1][2][0]]  # Add the hinge reaction force to the actuator force
+        f2 = f2 + tot_force[act_force[1][2][1]]  # Add the hinge reaction force to the actuator force
+        tot_force[act_force[1][2][0]] = f1  # Update correct hinge
+        tot_force[act_force[1][2][1]] = f2  # Update correct hinge
         return tot_force
 
     @Attribute
@@ -828,91 +836,90 @@ class Aircraft(GeomBase):
         """
         h = self.def_v_tail_wing.d_front_spar * 1000  # in mm
         weight = []
-        for x in range(0,len(self.total_hinge_force)):
-            mass = 0.110 * (1 + (abs(self.total_hinge_force[x]) / 30000)) * ((h/100) + 1)
+        for x in range(0, len(self.total_hinge_force)):
+            mass = 0.110 * (1 + (abs(self.total_hinge_force[x]) / 30000)) * ((h / 100) + 1)
             weight.append(mass)
         return weight
 
     @Attribute
     def rudder_weight(self):
-        obj = ApplyMat(is_default = True,
-                       hinge_forces = self.total_hinge_force,
-                       obj = self)
+        obj = ApplyMat(is_default=True,
+                       hinge_forces=self.total_hinge_force,
+                       obj=self)
         return obj.weights
 
-
-#     # @Attribute(in_tree=False)
-#     # def total_length(self):
-#     #     return self.fuselage_part.fuselage_length
-#     #
-
-
-#     #
+    #     # @Attribute(in_tree=False)
+    #     # def total_length(self):
+    #     #     return self.fuselage_part.fuselage_length
+    #     #
 
 
-#     #
+    #     #
 
-#     #
-#     # @Attribute
-#     # def planes(self):
-#     #     p2_z = self.def_v_tail_wing.hinges[0].position.z
-#     #     p1_z = self.def_v_tail_wing.fixed_part.position.z
-#     #     plane2 = TranslatedPlane(built_from=self.def_v_tail_wing.rudder_plns.first,
-#     #                              displacement=Vector(0, 0, 0.02))
-#     #     plane1 = TranslatedPlane(built_from=plane2,
-#     #                              displacement=Vector(0, 0, p2_z - p1_z))
-#     #     return plane1, plane2
-#     #
-#     # @Attribute
-#     # def rhs_skin_faces(self):
-#     #     return self.def_v_tail_wing.fused_le_skin_right, self.def_v_tail_wing.main_skin_right, self.def_v_tail_wing.te_skin_right
-#     #
-#     # @Attribute
-#     # def lhs_skin_faces(self):
-#     #     return self.def_v_tail_wing.fused_le_skin_left, self.def_v_tail_wing.main_skin_left, self.def_v_tail_wing.te_skin_left
-#     #
-#     # @Attribute
-#     # def spar_faces(self):
-#     #     return self.def_v_tail_wing.rudder_front_spar, self.def_v_tail_wing.rudder_back_spar
-#     #
-#     # @Attribute
-#     # def ref_x(self):
-#     #     x1 = self.def_v_tail_wing.rudder_plns.last.reference.z
-#     #     x2 = self.def_v_tail_wing.rudder_plns.first.reference.z
-#     #     return x1, x2
-#     #
-#     # @Attribute
-#     # def ref_y(self):
-#     #     z_hinge = self.def_v_tail_wing.p_zero + self.def_v_tail_wing.p_rib * (
-#     #         self.def_v_tail_wing.pick_hingeribs[0] - 1)
-#     #     z_1 = self.ref_x[0]
-#     #     z_2 = self.ref_x[1]
-#     #     y_pos_root_begin = self.fixed_part_with_ribs.vertices[25 - 2 * self.pick_hingeribs[0]].point
-#     #     y_pos_root_end = self.fixed_part_with_ribs.vertices[24 - 2 * self.pick_hingeribs[0]].point
-#     #     points = [y_pos_root_begin, y_pos_root_end]
-#     #     distance = Point.distance(*points)
-#     #     y1 = y_pos_root_begin.y + distance * self.def_v_tail_wing.rhl_root + (
-#     #                                                                              self.def_v_tail_wing.hingerib_line.direction_vector.y / self.def_v_tail_wing.hingerib_line.direction_vector.z) * (
-#     #                                                                              z_1 - z_hinge)
-#     #     y2 = y_pos_root_begin.y + distance * self.def_v_tail_wing.rhl_root + (
-#     #                                                                              self.def_v_tail_wing.hingerib_line.direction_vector.y / self.def_v_tail_wing.hingerib_line.direction_vector.z) * (
-#     #                                                                              z_2 - z_hinge)
-#     #     return y1, y2
-#     #
-#     # @Attribute
-#     # def forces(self):
-#     #     p2_z = self.def_v_tail_wing.hinges[0].position.z
-#     #     p1_z = self.def_v_tail_wing.fixed_part.position.z
-#     #     q = self.hinge_reaction_forces[2]
-#     #     R = self.hinge_reaction_forces[0][0]
-#     #     FX = [0, self.actuator_forces[0][0]]
-#     #     FY = [0, q * (p2_z - p1_z) - R]
-#     #     MX = [0, q * (p2_z - p1_z) * (p2_z - p1_z)]
-#     #     MY = [0, 0]
-#     #     MZ = [0, q * (p2_z - p1_z)]
-#     #     return FX, FY, MX, MY, MZ
-#     #
-#     # @Attribute
+
+    #     #
+
+    #     #
+    #     # @Attribute
+    #     # def planes(self):
+    #     #     p2_z = self.def_v_tail_wing.hinges[0].position.z
+    #     #     p1_z = self.def_v_tail_wing.fixed_part.position.z
+    #     #     plane2 = TranslatedPlane(built_from=self.def_v_tail_wing.rudder_plns.first,
+    #     #                              displacement=Vector(0, 0, 0.02))
+    #     #     plane1 = TranslatedPlane(built_from=plane2,
+    #     #                              displacement=Vector(0, 0, p2_z - p1_z))
+    #     #     return plane1, plane2
+    #     #
+    #     # @Attribute
+    #     # def rhs_skin_faces(self):
+    #     #     return self.def_v_tail_wing.fused_le_skin_right, self.def_v_tail_wing.main_skin_right, self.def_v_tail_wing.te_skin_right
+    #     #
+    #     # @Attribute
+    #     # def lhs_skin_faces(self):
+    #     #     return self.def_v_tail_wing.fused_le_skin_left, self.def_v_tail_wing.main_skin_left, self.def_v_tail_wing.te_skin_left
+    #     #
+    #     # @Attribute
+    #     # def spar_faces(self):
+    #     #     return self.def_v_tail_wing.rudder_front_spar, self.def_v_tail_wing.rudder_back_spar
+    #     #
+    #     # @Attribute
+    #     # def ref_x(self):
+    #     #     x1 = self.def_v_tail_wing.rudder_plns.last.reference.z
+    #     #     x2 = self.def_v_tail_wing.rudder_plns.first.reference.z
+    #     #     return x1, x2
+    #     #
+    #     # @Attribute
+    #     # def ref_y(self):
+    #     #     z_hinge = self.def_v_tail_wing.p_zero + self.def_v_tail_wing.p_rib * (
+    #     #         self.def_v_tail_wing.pick_hingeribs[0] - 1)
+    #     #     z_1 = self.ref_x[0]
+    #     #     z_2 = self.ref_x[1]
+    #     #     y_pos_root_begin = self.fixed_part_with_ribs.vertices[25 - 2 * self.pick_hingeribs[0]].point
+    #     #     y_pos_root_end = self.fixed_part_with_ribs.vertices[24 - 2 * self.pick_hingeribs[0]].point
+    #     #     points = [y_pos_root_begin, y_pos_root_end]
+    #     #     distance = Point.distance(*points)
+    #     #     y1 = y_pos_root_begin.y + distance * self.def_v_tail_wing.rhl_root + (
+    #     #                                                                              self.def_v_tail_wing.hingerib_line.direction_vector.y / self.def_v_tail_wing.hingerib_line.direction_vector.z) * (
+    #     #                                                                              z_1 - z_hinge)
+    #     #     y2 = y_pos_root_begin.y + distance * self.def_v_tail_wing.rhl_root + (
+    #     #                                                                              self.def_v_tail_wing.hingerib_line.direction_vector.y / self.def_v_tail_wing.hingerib_line.direction_vector.z) * (
+    #     #                                                                              z_2 - z_hinge)
+    #     #     return y1, y2
+    #     #
+    #     # @Attribute
+    #     # def forces(self):
+    #     #     p2_z = self.def_v_tail_wing.hinges[0].position.z
+    #     #     p1_z = self.def_v_tail_wing.fixed_part.position.z
+    #     #     q = self.hinge_reaction_forces[2]
+    #     #     R = self.hinge_reaction_forces[0][0]
+    #     #     FX = [0, self.actuator_forces[0][0]]
+    #     #     FY = [0, q * (p2_z - p1_z) - R]
+    #     #     MX = [0, q * (p2_z - p1_z) * (p2_z - p1_z)]
+    #     #     MY = [0, 0]
+    #     #     MZ = [0, q * (p2_z - p1_z)]
+    #     #     return FX, FY, MX, MY, MZ
+    #     #
+    #     # @Attribute
 
 
     @Attribute
@@ -968,94 +975,95 @@ class Aircraft(GeomBase):
                                spar_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 2,
                                N=3)
         return analysis
-#     # def bay_analysis(self):
-#     #     skin_1 = ReadMaterial(ply_file=self.ply_file_s1, n_layers=self.n_layers_s1)
-#     #     skin_1 = skin_1.read
-#     #     bay_ana = BayAnalysis(Vx=self.forces[0],
-#     #                           Vy=self.forces[1],
-#     #                           Mx=self.forces[2],
-#     #                           My=self.forces[3],
-#     #                           Mt=self.forces[4],
-#     #                           ref_x=[0] * 2,
-#     #                           ref_y=[0] * 2,
-#     #                           bay_planes=self.planes,
-#     #                           rhs_skin_faces=self.rhs_skin_faces,
-#     #                           lhs_skin_faces=self.lhs_skin_faces,
-#     #                           spar_faces=self.spar_faces,
-#     #                           rhs_skin_materials_t=[skin_1['t']] * 3,
-#     #                           lhs_skin_materials_t=[skin_1['t']] * 3,
-#     #                           spar_materials_t=[skin_1['t']] * 2,
-#     #                           rhs_skin_materials_E=[skin_1['E']] * 3,
-#     #                           lhs_skin_materials_E=[skin_1['E']] * 3,
-#     #                           spar_materials_E=[skin_1['E']] * 2,
-#     #                           rhs_skin_materials_G=[skin_1['G']] * 3,
-#     #                           lhs_skin_materials_G=[skin_1['G']] * 3,
-#     #                           spar_materials_G=[skin_1['G']] * 2,
-#     #                           rhs_skin_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 3,
-#     #                           lhs_skin_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 3,
-#     #                           spar_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 2,
-#     #                           N=3)
-#     #     return bay_ana
-#     #
-#     # @Part(in_tree=False)
-#     # def fuse_fuselage(self):
-#     #     return FusedSolid(shape_in=self.fuselage_part.RotatedMainSolid[1],
-#     #                       tool=[self.fuselage_part.RotatedMainSolid[0], self.fuselage_part.RotatedMainSolid[2]])
-#     #
-#     # @Part(in_tree=False)
-#     # def wet_wings_left(self):
-#     #     return SubtractedSolid(shape_in=self.main_wing[0],
-#     #                            tool = self.fuse_fuselage)
-#     # @Part(in_tree=False)
-#     # def wet_wings_right(self):
-#     #     return SubtractedSolid(shape_in=self.main_wing[1],
-#     #                            tool = self.fuse_fuselage)
-#     #
-#     #
-#     #
-#     #
-#     # @Part(in_tree=False)
-#     # def get_parts(self):
-#     #     return Aircraft()
-#     #
-#     # @Attribute
-#     # def rudder_nodes(self):
-#     #     tail = self.get_parts.def_v_tail_wing
-#     #
-#     #     list = [tail.skins_rudder,
-#     #             tail.rudder_back_spar,
-#     #             tail.rudder_front_spar,
-#     #             tail.actuator_hinge_line,
-#     #             tail.hingerib_line,
-#     #             tail.closure_ribs[0],
-#     #             tail.closure_ribs[1],
-#     #             tail.actuator_hinges[0],
-#     #             tail.actuator_hinges[1]]
-#     #     for x in range(0, len(tail.find_mainskin_ribs)):
-#     #         list.append(tail.find_mainskin_ribs[x])
-#     #     for x in range(0, len(tail.hinges)):
-#     #         list.append(tail.hinges[x])
-#     #     return list
-#     #
-#     # @Part
-#     # def rudder_writer(self):
-#     #     return STEPWriter(nodes=self.rudder_nodes,
-#     #                       default_directory='../output/CAD')
-#     # @Attribute
-#     # def wetted_nodes(self):
-#     #     list = [self.get_parts.tail_wing[0],
-#     #             self.get_parts.tail_wing[1],
-#     #             self.get_parts.tail_wing[2][0],
-#     #             self.get_parts.tail_wing[2][1],
-#     #             self.get_parts.fuse_fuselage,
-#     #             self.get_parts.wet_wings_left,
-#     #             self.get_parts.wet_wings_right]
-#     #
-#     #     return list
-#     # @Part
-#     # def wetted_writer(self):
-#     #     return STEPWriter(nodes=self.wetted_nodes,
-#     #                       default_directory='../output/CAD')
+
+    #     # def bay_analysis(self):
+    #     #     skin_1 = ReadMaterial(ply_file=self.ply_file_s1, n_layers=self.n_layers_s1)
+    #     #     skin_1 = skin_1.read
+    #     #     bay_ana = BayAnalysis(Vx=self.forces[0],
+    #     #                           Vy=self.forces[1],
+    #     #                           Mx=self.forces[2],
+    #     #                           My=self.forces[3],
+    #     #                           Mt=self.forces[4],
+    #     #                           ref_x=[0] * 2,
+    #     #                           ref_y=[0] * 2,
+    #     #                           bay_planes=self.planes,
+    #     #                           rhs_skin_faces=self.rhs_skin_faces,
+    #     #                           lhs_skin_faces=self.lhs_skin_faces,
+    #     #                           spar_faces=self.spar_faces,
+    #     #                           rhs_skin_materials_t=[skin_1['t']] * 3,
+    #     #                           lhs_skin_materials_t=[skin_1['t']] * 3,
+    #     #                           spar_materials_t=[skin_1['t']] * 2,
+    #     #                           rhs_skin_materials_E=[skin_1['E']] * 3,
+    #     #                           lhs_skin_materials_E=[skin_1['E']] * 3,
+    #     #                           spar_materials_E=[skin_1['E']] * 2,
+    #     #                           rhs_skin_materials_G=[skin_1['G']] * 3,
+    #     #                           lhs_skin_materials_G=[skin_1['G']] * 3,
+    #     #                           spar_materials_G=[skin_1['G']] * 2,
+    #     #                           rhs_skin_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 3,
+    #     #                           lhs_skin_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 3,
+    #     #                           spar_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 2,
+    #     #                           N=3)
+    #     #     return bay_ana
+    #     #
+    #     # @Part(in_tree=False)
+    #     # def fuse_fuselage(self):
+    #     #     return FusedSolid(shape_in=self.fuselage_part.RotatedMainSolid[1],
+    #     #                       tool=[self.fuselage_part.RotatedMainSolid[0], self.fuselage_part.RotatedMainSolid[2]])
+    #     #
+    #     # @Part(in_tree=False)
+    #     # def wet_wings_left(self):
+    #     #     return SubtractedSolid(shape_in=self.main_wing[0],
+    #     #                            tool = self.fuse_fuselage)
+    #     # @Part(in_tree=False)
+    #     # def wet_wings_right(self):
+    #     #     return SubtractedSolid(shape_in=self.main_wing[1],
+    #     #                            tool = self.fuse_fuselage)
+    #     #
+    #     #
+    #     #
+    #     #
+    #     # @Part(in_tree=False)
+    #     # def get_parts(self):
+    #     #     return Aircraft()
+    #     #
+    #     # @Attribute
+    #     # def rudder_nodes(self):
+    #     #     tail = self.get_parts.def_v_tail_wing
+    #     #
+    #     #     list = [tail.skins_rudder,
+    #     #             tail.rudder_back_spar,
+    #     #             tail.rudder_front_spar,
+    #     #             tail.actuator_hinge_line,
+    #     #             tail.hingerib_line,
+    #     #             tail.closure_ribs[0],
+    #     #             tail.closure_ribs[1],
+    #     #             tail.actuator_hinges[0],
+    #     #             tail.actuator_hinges[1]]
+    #     #     for x in range(0, len(tail.find_mainskin_ribs)):
+    #     #         list.append(tail.find_mainskin_ribs[x])
+    #     #     for x in range(0, len(tail.hinges)):
+    #     #         list.append(tail.hinges[x])
+    #     #     return list
+    #     #
+    #     # @Part
+    #     # def rudder_writer(self):
+    #     #     return STEPWriter(nodes=self.rudder_nodes,
+    #     #                       default_directory='../output/CAD')
+    #     # @Attribute
+    #     # def wetted_nodes(self):
+    #     #     list = [self.get_parts.tail_wing[0],
+    #     #             self.get_parts.tail_wing[1],
+    #     #             self.get_parts.tail_wing[2][0],
+    #     #             self.get_parts.tail_wing[2][1],
+    #     #             self.get_parts.fuse_fuselage,
+    #     #             self.get_parts.wet_wings_left,
+    #     #             self.get_parts.wet_wings_right]
+    #     #
+    #     #     return list
+    #     # @Part
+    #     # def wetted_writer(self):
+    #     #     return STEPWriter(nodes=self.wetted_nodes,
+    #     #                       default_directory='../output/CAD')
     @Attribute
     def save_vars(self):
         """ Saves the variables of current settings to an output file
@@ -1080,6 +1088,8 @@ class Aircraft(GeomBase):
                         # Write the row to a new file
                         filewriter.writerow(row)
         return 'Saved'
+
+
 if __name__ == '__main__':
     from parapy.gui import display
 
