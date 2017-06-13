@@ -256,7 +256,6 @@ class VTailWing(GeomBase):
         :rtype: TranslatedShape
         """
         return TranslatedShape(shape_in = self.obj_vwing.wing_part,
-        return TranslatedShape(shape_in = self.obj_vwing.wing_part,
                                displacement = Vector(self.x_offset,0,self.z_offset))
 
 
