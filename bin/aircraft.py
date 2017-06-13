@@ -678,7 +678,7 @@ class Aircraft(GeomBase):
                                displacement=Vector(
                                    self.fixed_v_wing[1].edges[8].midpoint.x,
                                    0,
-                                   self.fixed_v_wing[1].edges[8].midpoint.z),
+                                   0.5*self.cabin_diameter),
                                color='blue',
                                line_thickness=3,
                                label='Horizontal Tail MAC')
@@ -693,7 +693,7 @@ class Aircraft(GeomBase):
                                displacement=Vector(
                                    self.fixed_v_wing[1].edges[8].midpoint.x,
                                    0,
-                                   self.fixed_v_wing[1].edges[8].midpoint.z),
+                                   0.5*self.cabin_diameter),
                                label='Horizontal Tail Aerodynamic Centre')
 
     # --------------------
@@ -820,14 +820,18 @@ class Aircraft(GeomBase):
         """
         aero_force = self.hinge_reaction_forces  # The forces on all hinges due to aerodynamic load
         act_force = self.actuator_forces  # The forces on some actuators due to actuator force
-        tot_force = aero_force[0]
-        f1 = sqrt(act_force[1][0][0] ** 2 + act_force[1][0][1] ** 2)  # Force on the first hinge
-        f2 = sqrt(act_force[1][1][0] ** 2 + act_force[1][1][1] ** 2)  # Force on the second  hinge
-        f1 = f1 + tot_force[act_force[1][2][0]]  # Add the hinge reaction force to the actuator force
-        f2 = f2 + tot_force[act_force[1][2][1]]  # Add the hinge reaction force to the actuator force
-        tot_force[act_force[1][2][0]] = f1  # Update correct hinge
-        tot_force[act_force[1][2][1]] = f2  # Update correct hinge
-        return tot_force
+        tot_force_y = aero_force[0]         # Aerodynamic load only works in y direction
+        tot_force_x = [0] * len(tot_force_y)# To be filled with y forces in the actuator forces
+        tot_force = [0] * len(tot_force_y)  # The total forces
+        for index in range(0, len(tot_force_y) - 1):   # Loop over the range of the forces
+            if index == act_force[1][2][0]: # If we are at the first actuator hinge
+                tot_force_y[index] = tot_force_y[index] + act_force[1][0][1]    # Add the y force to the current
+                tot_force_x[index] = tot_force_x[index] + act_force[1][0][0]    # Add the x force to the current
+            if index == act_force[1][2][1]:
+                tot_force_y[index] = tot_force_y[index] + act_force[1][1][1]
+                tot_force_x[index] = tot_force_x[index] + act_force[1][1][0]
+            tot_force[index] = sqrt(tot_force_y[index]**2 + tot_force_x[index]**2)
+        return tot_force, tot_force_x, tot_force_y
 
     @Attribute
     def hinge_mass(self):
@@ -837,15 +841,15 @@ class Aircraft(GeomBase):
         """
         h = self.def_v_tail_wing.d_front_spar * 1000  # in mm
         weight = []
-        for x in range(0, len(self.total_hinge_force)):
-            mass = 0.110 * (1 + (abs(self.total_hinge_force[x]) / 30000)) * ((h / 100) + 1)
+        for x in range(0, len(self.total_hinge_force[0])):
+            mass = 0.110 * (1 + (abs(self.total_hinge_force[0][x]) / 30000)) * ((h / 100) + 1)
             weight.append(mass)
         return weight
 
     @Attribute
     def rudder_weight(self):
         obj = ApplyMat(is_default=True,
-                       hinge_forces=self.total_hinge_force,
+                       hinge_forces=self.total_hinge_force[0],
                        obj=self)
         return obj.weights
 
@@ -933,12 +937,12 @@ class Aircraft(GeomBase):
 
     @Attribute
     def rhs_skin_faces(self):
-        return [self.def_v_tail_wing.fused_le_skin_right.shells[0], self.def_v_tail_wing.main_skin_right.faces[0], \
+        return [self.def_v_tail_wing.fused_le_skin_right.shells[0], self.def_v_tail_wing.main_skin_right.faces[0],
                 self.def_v_tail_wing.te_skin_right.faces[0]]
 
     @Attribute
     def lhs_skin_faces(self):
-        return [self.def_v_tail_wing.fused_le_skin_left.shells[0], self.def_v_tail_wing.main_skin_left.faces[0], \
+        return [self.def_v_tail_wing.fused_le_skin_left.shells[0], self.def_v_tail_wing.main_skin_left.faces[0],
                 self.def_v_tail_wing.te_skin_left.faces[0]]
 
     @Attribute

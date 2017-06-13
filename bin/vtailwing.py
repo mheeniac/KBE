@@ -314,7 +314,7 @@ class VTailWing(GeomBase):
                                 self.rudder_separation_plns[1],
                                 self.hinge_pln])
 
-    @Part(in_tree=False)
+    @Part(in_tree=True)
     def fixed_part(self):
         """ Combine faces to make a fixed part without the rudder
         :rtype: part
@@ -365,7 +365,7 @@ class VTailWing(GeomBase):
                                 ]
                           )
 
-    @Attribute(in_tree=False)
+    @Attribute(in_tree=True)
     def closure_ribs(self):
         """ Define closure_ribs
         :rtype: tuple
