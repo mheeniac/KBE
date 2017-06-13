@@ -747,7 +747,7 @@ class Aircraft(GeomBase):
                 pmid_z = p3_z - 0.5 * (p3_z - p2_z)
                 length = pmid_z - p1_z
                 l.append(length)
-                force = q * length
+                force = - q * length
                 R.append(force)
             elif x > 0 and x < (len(self.def_v_tail_wing.hinges) - 1):  # All the middle hinges
                 p1_z = pmid_z  # Take the previous midpoint and set it as bottom
@@ -756,14 +756,14 @@ class Aircraft(GeomBase):
                 pmid_z = p3_z - 0.5 * (p3_z - p2_z)  # Position middle of current and next hinge
                 length = pmid_z - p1_z  # Length is current middle - last middle
                 l.append(length)  # Append length list
-                force = q * length
+                force = - q * length
                 R.append(force)
             elif x == (
                         len(
                             self.def_v_tail_wing.hinges) - 1):  # For the last hinge the distance is between midpoint and edge
                 length = top_ref - pmid_z  # The length of the last part, total - last mid
                 l.append(length)  # Append lengths
-                force = q * length  # Calculate force
+                force = - q * length  # Calculate force
                 R.append(force)  # Append force
         check = (sum(l) - (top_ref - ref) == 0)  # Checks if the calculations of l are valid
         print l
@@ -789,10 +789,10 @@ class Aircraft(GeomBase):
         Fa_x = Fa * cos(radians(self.rud_angle))
         Fa_y = Fa * sin(radians(self.rud_angle))
         distance = self.force_distances
-        F1 = -Fa * distance[0][1] / sum(distance[0])  # Force on nearest hinge
+        F1 = - Fa * distance[0][1] / sum(distance[0])  # Force on nearest hinge
         F1_x = F1 * cos(radians(self.rud_angle))
         F1_y = F1 * sin(radians(self.rud_angle))
-        F2 = -Fa * distance[0][0] / sum(distance[0])  # Force on second nearest hinge
+        F2 = - Fa * distance[0][0] / sum(distance[0])  # Force on second nearest hinge
         F2_x = F2 * cos(radians(self.rud_angle))
         F2_y = F2 * sin(radians(self.rud_angle))
         Fh = [[F1_x, F1_y], [F2_x, F2_y], distance[1]]  # Forces and their corresponding hinge numbers
