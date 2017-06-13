@@ -188,7 +188,7 @@ class Aircraft(GeomBase):
 
     #: Rudder size fraction. Rudder width/Fin root chord []
     #: :type: float
-    rud_width_frac = Input(0.125)
+    rud_width_frac = Input(0.2)
 
     #: The height offset of the rudder from the bottom of the fin (height offset/first rib height) []
     #: :type: float
