@@ -184,7 +184,7 @@ class Aircraft(GeomBase):
 
     #: Select which ribs are the hinge ribs. Default value is [1,2,3,4,5,6] al hinges are used. []
     #: :type: list of integers
-    pick_hinge_ribs = Input([1, 2, 3, 4, 5, 6])
+    pick_hinge_ribs = Input([2, 4, 5, 6])
 
     #: Rudder size fraction. Rudder width/Fin root chord []
     #: :type: float
@@ -806,13 +806,24 @@ class Aircraft(GeomBase):
         """
         force_point = self.def_v_tail_wing.actuator_hinge_line.midpoint
         distances = []
+        distances_up = []
+        distances_down = []
         for x in range(0, len(self.def_v_tail_wing.hinges)):
-            dist = force_point.distance(self.def_v_tail_wing.hinges[x].position)
-            distances.append(dist)
-        shortest = sorted(distances)[0:2]  # Finds the shortest two distances
+            # First look at all the hinges above the actuator
+            distances.append(force_point.distance(self.def_v_tail_wing.hinges[x].center))
+            if self.def_v_tail_wing.hinges[x].center.z > force_point.z:
+                dist_up = force_point.distance(self.def_v_tail_wing.hinges[x].center)
+                distances_up.append(dist_up)
+            # Look at the hinges below the actuator
+            else:
+                dist_down = force_point.distance(self.def_v_tail_wing.hinges[x].center)
+                distances_down.append(dist_down)
+        shortest_up = sorted(distances_up)[0]       # Finds the shortest distance up
+        shortest_down = sorted(distances_down)[0]   # Finds the shortest distance down
         hinge_number = []
-        hinge_number.append(distances.index(shortest[0]))  # Find the hinge number of the first distance
-        hinge_number.append(distances.index(shortest[1]))  # Find the hinge number of the second distance
+        hinge_number.append(distances.index(shortest_down))  # Find the hinge number of the first distance
+        hinge_number.append(distances.index(shortest_up))  # Find the hinge number of the second distance
+        shortest = [shortest_down, shortest_up]
         return shortest, hinge_number
 
     @Attribute
