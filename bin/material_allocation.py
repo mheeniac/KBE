@@ -132,6 +132,7 @@ class ApplyMat(GeomBase):
         quasi = ReadMaterial(ply_file = "quasi_isotropic.csv").read
         forty_five = ReadMaterial(ply_file="forty_five.csv").read
         zero_ninety = ReadMaterial(ply_file="zero_ninety.csv").read
+
         w_f_s = quasi[str(self.n_spar[0])]["rho"] * areas["Front Spar"]
         w_b_s = quasi[str(self.n_spar[1])]["rho"] * areas["Back Spar"]
         w_c_r = zero_ninety[str(self.n_close_ribs)]["rho"] * (areas["Closure Ribs"][0] + areas["Closure Ribs"][1])

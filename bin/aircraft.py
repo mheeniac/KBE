@@ -630,7 +630,8 @@ class Aircraft(GeomBase):
                                    self.fixed_v_wing[1].edges[8].midpoint.x,
                                    0,
                                    self.fixed_v_wing[1].edges[8].midpoint.z),
-                               quantify=2)
+                               quantify=2,
+                               label = ['Right Side', 'Left Side'][child.index])
 
 
     @Part(in_tree=False)

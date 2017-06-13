@@ -249,12 +249,13 @@ class VTailWing(GeomBase):
                     airfoil_tip=self.airfoil_tip,
                     airfoil_root=self.airfoil_root
                     )
-    @Part(in_tree = True)
+    @Part(in_tree = False)
     def trans_vwing(self):
         """
         Translate the wing solid to its correct position using the offsets
         :rtype: TranslatedShape
         """
+        return TranslatedShape(shape_in = self.obj_vwing.wing_part,
         return TranslatedShape(shape_in = self.obj_vwing.wing_part,
                                displacement = Vector(self.x_offset,0,self.z_offset))
 
@@ -464,7 +465,7 @@ class VTailWing(GeomBase):
                      normal=Vector(0, 0, 1),
                      label='Actuator Rib Plane')
 
-    @Part(in_tree=True)
+    @Part(in_tree=False)
     def formrib_plns(self):
         return Plane(quantify=(int(self.b_rudder / self.p_form_rib) - 1),
                      reference=Point(self.w_c_root - self.d_hinge + self.x_offset,
@@ -684,7 +685,7 @@ class VTailWing(GeomBase):
             tool_list.append(self.formrib_plns[i])
         return tool_list
 
-    @Attribute(in_tree=True)
+    @Attribute(in_tree=False)
     def rudder_ribs(self):
         """ List all planes with its normal in z direction
         :rtype: list
