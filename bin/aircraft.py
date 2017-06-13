@@ -791,11 +791,11 @@ class Aircraft(GeomBase):
         distance = self.force_distances
         F1 = - Fa * distance[0][0] / sum(distance[0])  # Force on nearest hinge
         # F1_x = - F1 * cos(radians(self.rud_angle))
-        F1_x = Fa_x * distance[0][0] / sum(distance[0])
+        F1_x = - Fa_x * distance[0][0] / sum(distance[0])
         F1_y = F1 * sin(radians(self.rud_angle))
         F2 = - Fa * distance[0][1] / sum(distance[0])  # Force on second nearest hinge
         # F2_x = - F2 * cos(radians(self.rud_angle))
-        F2_x = Fa_x * distance[0][1] / sum(distance[0])
+        F2_x = - Fa_x * distance[0][1] / sum(distance[0])
         F2_y = F2 * sin(radians(self.rud_angle))
         Fh = [[F1_x, F1_y], [F2_x, F2_y], distance[1]]  # Forces and their corresponding hinge numbers
         check_x = (F1_x + F2_x) - Fa_x
