@@ -738,9 +738,11 @@ class Aircraft(GeomBase):
         for x in range(0, len(self.def_v_tail_wing.hinges)):
             # The below loop determines the midpoints between each hinge and then the lengths between them.
             # It uses these lengths to calculate the hinge reaction forces due to aerodynamic pressure
+            ref = self.def_v_tail_wing.closure_ribs[0].vertices[0].point.z #Bottom of the rudder
+            top_ref = self.def_v_tail_wing.closure_ribs[1].vertices[0].point.z
             if x == 0:  # For the first hinge the distance is between the edge and midpoint
                 p2_z = self.def_v_tail_wing.hinges[x].position.z
-                p1_z = self.def_v_tail_wing.fixed_part.position.z
+                p1_z = ref
                 p3_z = self.def_v_tail_wing.hinges[x + 1].position.z
                 pmid_z = p3_z - 0.5 * (p3_z - p2_z)
                 length = pmid_z - p1_z
@@ -749,8 +751,8 @@ class Aircraft(GeomBase):
                 R.append(force)
             elif x > 0 and x < (len(self.def_v_tail_wing.hinges) - 1):  # All the middle hinges
                 p1_z = pmid_z  # Take the previous midpoint and set it as bottom
-                p2_z = self.def_v_tail_wing.hinges[x].position.z  # Take the position of current hinge
-                p3_z = self.def_v_tail_wing.hinges[x + 1].position.z  # Take position of the next hinge
+                p2_z = self.def_v_tail_wing.hinges[x].position.z # Take the position of current hinge
+                p3_z = self.def_v_tail_wing.hinges[x + 1].position.z # Take position of the next hinge
                 pmid_z = p3_z - 0.5 * (p3_z - p2_z)  # Position middle of current and next hinge
                 length = pmid_z - p1_z  # Length is current middle - last middle
                 l.append(length)  # Append length list
@@ -759,13 +761,15 @@ class Aircraft(GeomBase):
             elif x == (
                         len(
                             self.def_v_tail_wing.hinges) - 1):  # For the last hinge the distance is between midpoint and edge
-                length = self.def_v_tail_wing.b_rudder - pmid_z  # The length of the last part, total - last mid
+                length = top_ref - pmid_z  # The length of the last part, total - last mid
                 l.append(length)  # Append lengths
                 force = q * length  # Calculate force
                 R.append(force)  # Append force
-        check = (sum(l) - self.def_v_tail_wing.b_rudder == 0)  # Checks if the calculations of l are valid
+        check = (sum(l) - (top_ref - ref) == 0)  # Checks if the calculations of l are valid
+        if check != True:
+            warnings.warn('Something went wrong in the hinge reaction forces, check is false')
 
-        return R, check
+        return R
 
     @Attribute
     def actuator_forces(self):
