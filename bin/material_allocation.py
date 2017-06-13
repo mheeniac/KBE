@@ -1,6 +1,7 @@
 from parapy.geom import *
 from csv_read import *
 
+
 class ApplyMat(GeomBase):
     """
     This class applies the materials for each section of the rudder and calculates the weight. There is a default setting
@@ -129,7 +130,7 @@ class ApplyMat(GeomBase):
     @Attribute
     def weights(self):
         areas = self.areas
-        quasi = ReadMaterial(ply_file = "quasi_isotropic.csv").read
+        quasi = ReadMaterial(ply_file="quasi_isotropic.csv").read
         forty_five = ReadMaterial(ply_file="forty_five.csv").read
         zero_ninety = ReadMaterial(ply_file="zero_ninety.csv").read
 
@@ -143,7 +144,7 @@ class ApplyMat(GeomBase):
         w_te = forty_five[str(self.n_TE)]["rho"] * areas["TE"]
         w_le = forty_five[str(self.n_LE)]["rho"] * areas["LE"]
         w_main = forty_five[str(self.n_main)]["rho"] * areas["Main"]
-        w_form = self.obj.def_v_tail_wing.formrib_plns.quantify * zero_ninety[str(self.n_form_ribs)]["rho"] * areas["Ribs"]
-        total = w_f_s + w_b_s + w_c_r + w_h_r+w_te+w_le+w_main+w_form
+        w_form = self.obj.def_v_tail_wing.formrib_plns.quantify * zero_ninety[str(self.n_form_ribs)]["rho"] * areas[
+            "Ribs"]
+        total = w_f_s + w_b_s + w_c_r + w_h_r + w_te + w_le + w_main + w_form
         return total
-

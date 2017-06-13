@@ -4,13 +4,12 @@ from parapy.geom import *
 import warnings
 from csv_in_out import *
 
-
-
 # TODO:
 # Output/Input handling
 
 # Return the path of the current directory
 DIR = os.path.dirname(__file__)
+
 
 # Test push and commit
 class Fuselage(GeomBase):
@@ -53,9 +52,9 @@ class Fuselage(GeomBase):
         :rtype: float
         """
         angle = self.upsweep_angle
-        radius = (self.cabin_diameter / 2) * self.tail_taper # Radius of the outer tail circle
-        max_height = self.cabin_diameter/2 - radius          # The maximum height possible
-        max_angle = degrees(atan(max_height/self.length_tail))  # The angle corresponding to this height
+        radius = (self.cabin_diameter / 2) * self.tail_taper  # Radius of the outer tail circle
+        max_height = self.cabin_diameter / 2 - radius  # The maximum height possible
+        max_angle = degrees(atan(max_height / self.length_tail))  # The angle corresponding to this height
         if angle > max_angle:
             # The angle is not possible, warn and set to max angle
             warn_str = "Upsweep angle too large, max is: {0}".format(max_angle)
@@ -163,6 +162,7 @@ class Fuselage(GeomBase):
                         height=self.cabin_length,
                         position=self.nose_circles[len(self.nose_sections) - 1].position
                         )
+
     @Attribute
     def tail_x_position(self):
         """ Checks if the user upsweep angle is within a certain limit. Else set it to standard and display warning
@@ -184,7 +184,7 @@ class Fuselage(GeomBase):
         """
         return Circle(radius=[self.cabin_diameter / 2, (self.cabin_diameter / 2) * self.tail_taper][child.index],
                       position=translate(self.cabin_cylinder.edges[0].position,
-                                         'x',self.tail_x_position * \
+                                         'x', self.tail_x_position * \
                                          child.index,
                                          'z', self.cabin_length + self.length_tail * child.index),
                       quantify=2)
@@ -219,7 +219,8 @@ class Fuselage(GeomBase):
                             transparency=0.4,
                             quantify=3,
                             label=['Tail', 'Cabin', 'Nose'][child.index],
-                            color = 'White')  # Name in the tree
+                            color='White')  # Name in the tree
+
     @Attribute
     def save_vars(self):
         """ Saves the variables of current settings to an output file

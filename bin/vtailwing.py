@@ -5,6 +5,7 @@ from wing import Wing
 import warnings
 from csv_in_out import *
 
+
 # TODO:
 # known bug, bij NaN taper ratio gaat hij kapot
 
@@ -149,7 +150,6 @@ class VTailWing(GeomBase):
         """
         return self.root_frac * self.w_span
 
-
     @Attribute
     def d_hinge(self):
         """ Returns the distance from the trailing edge to the hinge plane [m]
@@ -249,35 +249,35 @@ class VTailWing(GeomBase):
                     airfoil_tip=self.airfoil_tip,
                     airfoil_root=self.airfoil_root
                     )
-    @Part(in_tree = False)
+
+    @Part(in_tree=False)
     def trans_vwing(self):
         """
         Translate the wing solid to its correct position using the offsets
         :rtype: TranslatedShape
         """
-        return TranslatedShape(shape_in = self.obj_vwing.wing_part,
-                               displacement = Vector(self.x_offset,0,self.z_offset))
-
-
+        return TranslatedShape(shape_in=self.obj_vwing.wing_part,
+                               displacement=Vector(self.x_offset, 0, self.z_offset))
 
     @Attribute(in_tree=False)
     def rudder_pln_locs(self):
         """ determines the location of the rudder plane
         :rtype: float
         """
-        return [Point(self.w_c_root + self.x_offset, 0, self.r_rudder+self.z_offset),
-                Point(self.w_c_root + self.x_offset, 0, self.r_rudder + self.b_rudder+self.z_offset)]
+        return [Point(self.w_c_root + self.x_offset, 0, self.r_rudder + self.z_offset),
+                Point(self.w_c_root + self.x_offset, 0, self.r_rudder + self.b_rudder + self.z_offset)]
 
     @Part(in_tree=False)
     def hinge_pln(self):
         """ Creates a plane at a distance of d_hinge from the TE
         :rtype: part
         """
-        return Plane(reference=Point(self.w_c_root - self.d_hinge + self.x_offset,  # point at d_hinge from TE in x direction
-                                     0,
-                                     self.z_offset),
-                     normal=Vector(1, 0, 0)  # normal vector of the plane in x direction
-                     )
+        return Plane(
+            reference=Point(self.w_c_root - self.d_hinge + self.x_offset,  # point at d_hinge from TE in x direction
+                            0,
+                            self.z_offset),
+            normal=Vector(1, 0, 0)  # normal vector of the plane in x direction
+            )
 
     @Part(in_tree=False)
     def rudder_separation_plns(self):
@@ -295,9 +295,10 @@ class VTailWing(GeomBase):
         """
         return Plane(
             reference=Point((((self.w_c_root - self.obj_vwing.w_c_tip) /  # Make sure that the origin of the plane...
-                              (self.w_span)) * (self.p_zero + self.p_rib * child.index)+self.x_offset),  # follows the LE
+                              (self.w_span)) * (self.p_zero + self.p_rib * child.index) + self.x_offset),
+                            # follows the LE
                             0,
-                            self.p_zero + self.p_rib * child.index+self.z_offset),
+                            self.p_zero + self.p_rib * child.index + self.z_offset),
             normal=Vector(0, 0, 1),  # normal vector of the plane in z direction
             quantify=8,
             label='Rib Plane'
@@ -312,7 +313,6 @@ class VTailWing(GeomBase):
                           tool=[self.rudder_separation_plns[0],
                                 self.rudder_separation_plns[1],
                                 self.hinge_pln])
-
 
     @Part(in_tree=False)
     def fixed_part(self):
@@ -335,7 +335,7 @@ class VTailWing(GeomBase):
                                 ],
                           transparency=0.6,
                           label='Fixed Fin',
-                          color = 'red')
+                          color='red')
 
     @Part(in_tree=False)
     def fixed_part_with_ribs(self):
@@ -394,14 +394,14 @@ class VTailWing(GeomBase):
         """ Defines x location, z location and length of the mean aerodynamic chord
         :rtype: tuple
         """
-        sweep = radians(self.obj_vwing.sweep_angle)                             #sweep of vtailwing
-        taper = self.obj_vwing.taper_ratio                            #taper of vtailwing
-        span = self.w_span                                                      #span of vtailwing
-        cr = self.w_c_root                                                      #root chord of vtailwing
+        sweep = radians(self.obj_vwing.sweep_angle)  # sweep of vtailwing
+        taper = self.obj_vwing.taper_ratio  # taper of vtailwing
+        span = self.w_span  # span of vtailwing
+        cr = self.w_c_root  # root chord of vtailwing
 
-        z_loc = (2 * span / 6) * ((1 + 2 * taper) / (1 + taper))                #calculate z location
-        x_loc = z_loc / tan((0.5 * pi) - sweep)                                 #calculate x location
-        length = (2 * cr / 3) * ((1 + taper + taper ** 2) / (1 + taper))        #calculate length
+        z_loc = (2 * span / 6) * ((1 + 2 * taper) / (1 + taper))  # calculate z location
+        x_loc = z_loc / tan((0.5 * pi) - sweep)  # calculate x location
+        length = (2 * cr / 3) * ((1 + taper + taper ** 2) / (1 + taper))  # calculate length
         return [x_loc, z_loc, length]
 
     @Attribute(in_tree=False)
@@ -413,7 +413,7 @@ class VTailWing(GeomBase):
         """ Define location of the hinges in x,y,z direction
         :rtype: list
         """
-        #initialize
+        # initialize
         List = []
         number_hinges = len(self.pick_hinge_ribs)
         # Define position of intersection of ribs and egdes.
@@ -429,19 +429,19 @@ class VTailWing(GeomBase):
         tip_distance = Point.distance(*points_tip)
 
         # Define z position
-        z_pos_tip = self.p_zero + self.p_rib * (self.pick_hinge_ribs[number_hinges - 1] - 1)+ self.z_offset
-        z_pos_root = self.p_zero + self.p_rib * (self.pick_hinge_ribs[0] - 1)+ self.z_offset
+        z_pos_tip = self.p_zero + self.p_rib * (self.pick_hinge_ribs[number_hinges - 1] - 1) + self.z_offset
+        z_pos_root = self.p_zero + self.p_rib * (self.pick_hinge_ribs[0] - 1) + self.z_offset
 
         # Append hingeloc points
         for i in xrange(len(self.pick_hinge_ribs)):
             PointList = Point(self.w_c_root - self.d_hinge + self.x_offset,
                               y_pos_root_end_p.y - root_distance * self.rhl_root +
-                              (((y_pos_root_end_p.y - root_distance * self.rhl_root) - (y_pos_tip_end_p.y-tip_distance * self.rhl_tip)) / (z_pos_root - z_pos_tip)) \
-                              * (self.z_offset+self.p_zero + self.p_rib * (self.pick_hinge_ribs[i] - 1) - z_pos_root),
+                              (((y_pos_root_end_p.y - root_distance * self.rhl_root) - (
+                              y_pos_tip_end_p.y - tip_distance * self.rhl_tip)) / (z_pos_root - z_pos_tip)) \
+                              * (self.z_offset + self.p_zero + self.p_rib * (self.pick_hinge_ribs[i] - 1) - z_pos_root),
                               self.p_zero + self.p_rib * (self.pick_hinge_ribs[i] - 1) + self.z_offset)
             List.append(PointList)
         return List
-
 
     @Part(in_tree=False)
     def hingerib_plns(self):
@@ -460,7 +460,8 @@ class VTailWing(GeomBase):
         return Plane(quantify=2,
                      reference=Point(self.w_c_root - self.d_hinge + self.x_offset,
                                      0,
-                                     self.r_actuator + self.r_rudder + (self.d_actuator / 2) * (-1 + 2 * child.index) + self.z_offset),
+                                     self.r_actuator + self.r_rudder + (self.d_actuator / 2) * (
+                                     -1 + 2 * child.index) + self.z_offset),
                      normal=Vector(0, 0, 1),
                      label='Actuator Rib Plane')
 
@@ -469,7 +470,7 @@ class VTailWing(GeomBase):
         return Plane(quantify=(int(self.b_rudder / self.p_form_rib) - 1),
                      reference=Point(self.w_c_root - self.d_hinge + self.x_offset,
                                      0,
-                                     self.r_rudder + (self.p_form_rib * (child.index + 1))+self.z_offset)
+                                     self.r_rudder + (self.p_form_rib * (child.index + 1)) + self.z_offset)
                      )
 
     @Attribute
@@ -477,28 +478,29 @@ class VTailWing(GeomBase):
         """ Define location of the actuator hinges in x,y,z direction
         :rtype: list
         """
-        x_pos = self.w_c_root - self.d_hinge                                                                            # define x posistion
+        x_pos = self.w_c_root - self.d_hinge  # define x posistion
 
-        z_pos2 = self.r_actuator + self.r_rudder + (self.d_actuator / 2)                                                # define z position upper point
-        z_pos1 = self.r_actuator + self.r_rudder - (self.d_actuator / 2)                                                # define z position lower point
+        z_pos2 = self.r_actuator + self.r_rudder + (self.d_actuator / 2)  # define z position upper point
+        z_pos1 = self.r_actuator + self.r_rudder - (self.d_actuator / 2)  # define z position lower point
 
-       # define distance of intersection points with the edges on z location of upperpoint
+        # define distance of intersection points with the edges on z location of upperpoint
         begin_point_y = self.rudder_shell.edges[7].point1.y - self.rudder_shell.edges[7].direction_vector.y / \
-                                                            self.rudder_shell.edges[7].direction_vector.z * \
-                                                            (self.rudder_shell.edges[7].point1.z - z_pos2)
+                                                              self.rudder_shell.edges[7].direction_vector.z * \
+                                                              (self.rudder_shell.edges[7].point1.z - z_pos2)
         end_point_y = (self.rudder_shell.edges[3].point1.y - self.rudder_shell.edges[3].direction_vector.y /
-                     self.rudder_shell.edges[3].direction_vector.z *
-                     (self.rudder_shell.edges[3].point1.z - z_pos2))
+                       self.rudder_shell.edges[3].direction_vector.z *
+                       (self.rudder_shell.edges[3].point1.z - z_pos2))
         begin_point = Point(0, begin_point_y, 0)
         end_point = Point(0, end_point_y, 0)
         points = [begin_point, end_point]
         distance = Point.distance(*points)
 
-        y_pos2 = begin_point_y + distance*self.ahl_tip                                                                  # define y position
+        y_pos2 = begin_point_y + distance * self.ahl_tip  # define y position
         y_pos1 = y_pos2 + self.hingerib_line.direction_vector.y / self.hingerib_line.direction_vector.z * \
                           (z_pos1 - z_pos2)
 
-        return Point(x_pos+self.x_offset, y_pos1, z_pos1+self.z_offset), Point(x_pos+self.x_offset, y_pos2, z_pos2+self.z_offset)
+        return Point(x_pos + self.x_offset, y_pos1, z_pos1 + self.z_offset), Point(x_pos + self.x_offset, y_pos2,
+                                                                                   z_pos2 + self.z_offset)
 
     @Part(in_tree=False)
     def actuator_hinge_line(self):
@@ -545,29 +547,28 @@ class VTailWing(GeomBase):
         pos_tip_begin = self.rudder_shell.vertices[3].point
         pos_tip_end = self.rudder_shell.vertices[5].point
 
-        y_pos_hingeline_root = self.hingerib_line.point1.y -(self.hingerib_line.direction_vector.y /
-                                                             self.hingerib_line.direction_vector.z) * \
-                                                            (pos_root_begin.z - self.hingerib_line.point1.z)
-        y_pos_hingeline_tip = self.hingerib_line.point2.y -(self.hingerib_line.direction_vector.y /
+        y_pos_hingeline_root = self.hingerib_line.point1.y - (self.hingerib_line.direction_vector.y /
+                                                              self.hingerib_line.direction_vector.z) * \
+                                                             (pos_root_begin.z - self.hingerib_line.point1.z)
+        y_pos_hingeline_tip = self.hingerib_line.point2.y - (self.hingerib_line.direction_vector.y /
                                                              self.hingerib_line.direction_vector.z) * \
                                                             (pos_tip_begin.z - self.hingerib_line.point2.z)
 
-        point_origin_circ_root = Point(x_pos,y_pos_hingeline_root,pos_root_begin.z)
-        point_origin_circ_tip = Point(x_pos,y_pos_hingeline_tip,pos_tip_begin.z)
+        point_origin_circ_root = Point(x_pos, y_pos_hingeline_root, pos_root_begin.z)
+        point_origin_circ_tip = Point(x_pos, y_pos_hingeline_tip, pos_tip_begin.z)
 
-        root_begin = (point_origin_circ_root,pos_root_begin)
-        root_end = (point_origin_circ_root,pos_root_end)
-        tip_begin = (point_origin_circ_tip,pos_tip_begin)
-        tip_end= (point_origin_circ_tip,pos_tip_end)
+        root_begin = (point_origin_circ_root, pos_root_begin)
+        root_end = (point_origin_circ_root, pos_root_end)
+        tip_begin = (point_origin_circ_tip, pos_tip_begin)
+        tip_end = (point_origin_circ_tip, pos_tip_end)
 
         radius_root_begin = Point.distance(*root_begin)
         radius_root_end = Point.distance(*root_end)
         radius_tip_begin = Point.distance(*tip_begin)
         radius_tip_end = Point.distance(*tip_end)
 
-
         return [Arc(radius=radius_root_begin,
-                    angle=radians(90+ self.rud_angle),
+                    angle=radians(90 + self.rud_angle),
                     position=Position(location=point_origin_circ_root,
                                       orientation=Orientation(x=Vector(1, 0, 0),
                                                               y=Vector(0, 1, 0),
@@ -661,8 +662,10 @@ class VTailWing(GeomBase):
         """ Collects the rudder back spar face
         :rtype: list
         """
-        if Point.distance(self.fused_spars.faces[14].vertices[1].point,self.fused_spars.faces[14].vertices[2].point) < 0.04:
-            warnings.showwarning(message='d_back_spar = too small', category=UserWarning, filename='vtailwing', lineno=735)
+        if Point.distance(self.fused_spars.faces[14].vertices[1].point,
+                          self.fused_spars.faces[14].vertices[2].point) < 0.04:
+            warnings.showwarning(message='d_back_spar = too small', category=UserWarning, filename='vtailwing',
+                                 lineno=735)
 
         spar = self.fused_spars.faces[14]
         spar.label = 'Back Spar'
@@ -703,9 +706,9 @@ class VTailWing(GeomBase):
         :rtype: part
         """
         return FusedShell(shape_in=self.main_skin_left,
-                          tool=[ self.main_skin_right,
+                          tool=[self.main_skin_right,
                                 self.fused_le_skin_left, self.fused_le_skin_right,
-                                self.te_skin_right,self.te_skin_left],
+                                self.te_skin_right, self.te_skin_left],
                           transparency=0.6,
                           label='Rudder Skin')
 
@@ -743,12 +746,12 @@ class VTailWing(GeomBase):
         """ Gives a list of names
         :rtype: list
         """
-        list = ['Rudder Shell','Hinge Rib','Form Rib','Hinge Rib','Form Rib',
-                'Form Rib','Hinge Rib','Form Rib','Actuator Hinge Rib',
-                'Actuator Hinge Rib','Form Rib','Hinge Rib','Form Rib',
-                'Hinge Rib','Form Rib','Form Rib','Hinge Rib','Form Rib',
-                'Back Spar','Front Spar','Actuator Hinge','Actuator Hinge',
-                'Closure Rib','Closure Rib','Actuator Hinge Line']
+        list = ['Rudder Shell', 'Hinge Rib', 'Form Rib', 'Hinge Rib', 'Form Rib',
+                'Form Rib', 'Hinge Rib', 'Form Rib', 'Actuator Hinge Rib',
+                'Actuator Hinge Rib', 'Form Rib', 'Hinge Rib', 'Form Rib',
+                'Hinge Rib', 'Form Rib', 'Form Rib', 'Hinge Rib', 'Form Rib',
+                'Back Spar', 'Front Spar', 'Actuator Hinge', 'Actuator Hinge',
+                'Closure Rib', 'Closure Rib', 'Actuator Hinge Line']
         return list
 
     @Part(in_tree=True)
@@ -759,7 +762,7 @@ class VTailWing(GeomBase):
         return RotatedShape(shape_in=self.things_for_rotation[child.index], rotation_point=self.hingerib_line.start,
                             vector=self.hingerib_line.direction_vector, angle=radians(30),
                             quantify=len(self.things_for_rotation), transparency=self.transparency_definer[child.index],
-                            label= self.label_definer[child.index])
+                            label=self.label_definer[child.index])
 
     @Attribute
     def save_vars(self):
@@ -772,9 +775,9 @@ class VTailWing(GeomBase):
         with open(path[0], 'rb') as file:  # Open file
             reader = csv.reader(file, delimiter=',', quotechar='|')  # Read into reader and section rows and columns
             with open(path[1], 'wb') as outfile:
-                filewriter = csv.writer(outfile, delimiter=',', quotechar='|') # Create the writer
+                filewriter = csv.writer(outfile, delimiter=',', quotechar='|')  # Create the writer
                 for row in reader:  # Go over the rows in the file
-                    if first_row == True:   # Skip the first row
+                    if first_row == True:  # Skip the first row
                         filewriter.writerow(row)
                         first_row = False
                     else:
@@ -787,6 +790,7 @@ class VTailWing(GeomBase):
                         # Write the row to a new file
                         filewriter.writerow(row)
         return 'Saved'
+
 
 if __name__ == '__main__':
     from parapy.gui import display

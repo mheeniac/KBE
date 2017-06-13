@@ -343,11 +343,11 @@ class Aircraft(GeomBase):
         Create the line for the mean aerodynamic chord in the fuselage body
         :rtype: LineSegment
         """
-        return LineSegment(start=Point(0.25 * self.w_c_root + self.obj_main_wing.mac_def[0] - 
+        return LineSegment(start=Point(0.25 * self.w_c_root + self.obj_main_wing.mac_def[0] -
                                        0.25 * self.obj_main_wing.mac_def[2],
                                        0,
                                        0),
-                           end=Point(0.25 * self.w_c_root + self.obj_main_wing.mac_def[0] + 
+                           end=Point(0.25 * self.w_c_root + self.obj_main_wing.mac_def[0] +
                                      0.75 * self.obj_main_wing.mac_def[2],
                                      0,
                                      0),
@@ -423,7 +423,7 @@ class Aircraft(GeomBase):
         :rtype: float
         """
         x_pos = self.v_shift - (
-        self.cabin_length + self.fuselage_part.length_nose)  # x-position position from start tail
+            self.cabin_length + self.fuselage_part.length_nose)  # x-position position from start tail
         if x_pos > 0:
             x_len = self.fuselage_part.length_tail - x_pos  # X position from the back of the tail
             # Calculate the diff between tops of tail circles
@@ -658,11 +658,11 @@ class Aircraft(GeomBase):
         Create the horizontal tail wing mean aerodynamic chord line at ref position (0,0,0)
         :rtype: LineSegment
         """
-        return LineSegment(start=Point(0.25 * self.h_w_c_root + self.def_h_tail_wing.mac_def[0] - 
+        return LineSegment(start=Point(0.25 * self.h_w_c_root + self.def_h_tail_wing.mac_def[0] -
                                        0.25 * self.def_h_tail_wing.mac_def[2],
                                        0,
                                        0),
-                           end=Point(0.25 * self.h_w_c_root + self.def_h_tail_wing.mac_def[0] + 
+                           end=Point(0.25 * self.h_w_c_root + self.def_h_tail_wing.mac_def[0] +
                                      0.75 * self.def_h_tail_wing.mac_def[2],
                                      0,
                                      0),
@@ -757,7 +757,8 @@ class Aircraft(GeomBase):
                 force = q * length
                 R.append(force)
             elif x == (
-                len(self.def_v_tail_wing.hinges) - 1):  # For the last hinge the distance is between midpoint and edge
+                        len(
+                            self.def_v_tail_wing.hinges) - 1):  # For the last hinge the distance is between midpoint and edge
                 length = self.def_v_tail_wing.b_rudder - pmid_z  # The length of the last part, total - last mid
                 l.append(length)  # Append lengths
                 force = q * length  # Calculate force

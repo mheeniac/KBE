@@ -93,10 +93,10 @@ class Wingset(GeomBase):
         """ This attribute calculates the x-locaton, y-location and length of the mean aerodynamic chord
         :rtype: collections.Sequence[float]
         """
-        sweep = radians(self.obj_wingset.sweep_angle)   # working variable of sweep angle (radians)
-        taper = self.obj_wingset.taper_ratio            # working variable for the taper ratio of the wing
-        span = self.w_span                              # working variable for the span of a single wing half
-        cr = self.w_c_root                              # working variable for the root chord length of the wings
+        sweep = radians(self.obj_wingset.sweep_angle)  # working variable of sweep angle (radians)
+        taper = self.obj_wingset.taper_ratio  # working variable for the taper ratio of the wing
+        span = self.w_span  # working variable for the span of a single wing half
+        cr = self.w_c_root  # working variable for the root chord length of the wings
 
         y_loc = (2 * span / 6) * ((1 + 2 * taper) / (1 + taper))
         x_loc = y_loc / tan((0.5 * pi) - sweep)
@@ -117,11 +117,12 @@ class Wingset(GeomBase):
         translating the main wing
         :rtype: float
         """
-        lowest_point = 0.   # initialise value
-        for points in self.wingset[0].edges[0].sample_points:   # Loop over all the points
-            if points[1] >= lowest_point:                       # If the point is lower than the other lowest
-                lowest_point = points[1]                        # Update the new value
-        return lowest_point                                     # Return value
+        lowest_point = 0.  # initialise value
+        for points in self.wingset[0].edges[0].sample_points:  # Loop over all the points
+            if points[1] >= lowest_point:  # If the point is lower than the other lowest
+                lowest_point = points[1]  # Update the new value
+        return lowest_point  # Return value
+
     @Attribute
     def save_vars(self):
         """ Saves the variables of current settings to an output file
@@ -134,9 +135,9 @@ class Wingset(GeomBase):
         with open(path[0], 'rb') as file:  # Open file
             reader = csv.reader(file, delimiter=',', quotechar='|')  # Read into reader and section rows and columns
             with open(path[1], 'wb') as outfile:
-                filewriter = csv.writer(outfile, delimiter=',', quotechar='|') # Create the writer
+                filewriter = csv.writer(outfile, delimiter=',', quotechar='|')  # Create the writer
                 for row in reader:  # Go over the rows in the file
-                    if first_row == True:   # Skip the first row
+                    if first_row == True:  # Skip the first row
                         filewriter.writerow(row)
                         first_row = False
                     else:

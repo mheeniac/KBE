@@ -72,11 +72,11 @@ def rudder_root_le_te_points(obj):
 
     # Leading Edge
     pt_le_y = 0
-    pt_le_x = obj.fixed_v_wing[1].vertices[7].point.x   # X point
-    pt_le_z = obj.fixed_v_wing[1].vertices[7].point.z     # Z point plus shift
+    pt_le_x = obj.fixed_v_wing[1].vertices[7].point.x  # X point
+    pt_le_z = obj.fixed_v_wing[1].vertices[7].point.z  # Z point plus shift
 
-    pt_le = Point(pt_le_x, pt_le_y, pt_le_z)    # Create point type
-    return pt_le, pt_te                         # Return in tuple
+    pt_le = Point(pt_le_x, pt_le_y, pt_le_z)  # Create point type
+    return pt_le, pt_te  # Return in tuple
 
 
 def rudder_tip_le_te_points(obj):
@@ -85,20 +85,20 @@ def rudder_tip_le_te_points(obj):
     :rtype: avl.tuple[Points]
     """
     # Trailing Edge
-    pt_te_x = obj.def_v_tail_wing.closure_ribs[1].vertices[0].point.x   # X point
-    pt_te_x = pt_te_x                                      # Shift the x point
+    pt_te_x = obj.def_v_tail_wing.closure_ribs[1].vertices[0].point.x  # X point
+    pt_te_x = pt_te_x  # Shift the x point
     pt_te_y = 0
-    pt_te_z = obj.def_v_tail_wing.closure_ribs[1].vertices[0].point.z     # Z point plus shift
+    pt_te_z = obj.def_v_tail_wing.closure_ribs[1].vertices[0].point.z  # Z point plus shift
 
     # Leading Edge
     pt_le_y = 0
-    pt_le_x = obj.def_v_tail_wing.closure_ribs[1].vertices[1].point.x   # X point
-    pt_le_x = pt_le_x                                      # Shift the x point
-    pt_le_z = obj.def_v_tail_wing.closure_ribs[1].vertices[1].point.z     # Z point plus shift
+    pt_le_x = obj.def_v_tail_wing.closure_ribs[1].vertices[1].point.x  # X point
+    pt_le_x = pt_le_x  # Shift the x point
+    pt_le_z = obj.def_v_tail_wing.closure_ribs[1].vertices[1].point.z  # Z point plus shift
 
-    pt_te = Point(pt_te_x, pt_te_y, pt_te_z)    # Create point type
-    pt_le = Point(pt_le_x, pt_le_y, pt_le_z)    # Create point type
-    return pt_te, pt_le                         # Return in tuple
+    pt_te = Point(pt_te_x, pt_te_y, pt_te_z)  # Create point type
+    pt_le = Point(pt_le_x, pt_le_y, pt_le_z)  # Create point type
+    return pt_te, pt_le  # Return in tuple
 
 
 def section_rudder_root(obj):
@@ -155,9 +155,9 @@ def fin_bot_tip_le_te_points(obj):
     # Leading Edge
     crv = obj.def_v_tail_wing.fixed_part.edges[11]
     pt_le = crv.extremum(crv.start, distance="max")["point"]
-    pt_le_x = pt_le.x 
+    pt_le_x = pt_le.x
     pt_le_y = 0
-    pt_le_z = pt_le.z 
+    pt_le_z = pt_le.z
     pt_le = Point(pt_le_x, pt_le_y, pt_le_z)
     return pt_le, pt_te
 
@@ -200,16 +200,16 @@ def fin_cen_root_le_te_points(obj):
     """
     crv = obj.def_v_tail_wing.fixed_part.edges[11]
     # Trailing Edge
-    pt_te_x = crv.start.x 
+    pt_te_x = crv.start.x
     pt_te_y = 0
-    pt_te_z = crv.start.z 
+    pt_te_z = crv.start.z
     pt_te = Point(pt_te_x, pt_te_y, pt_te_z)
 
     # Leading Edge
     pt_le = crv.extremum(crv.start, distance="max")["point"]
-    pt_le_x = pt_le.x 
+    pt_le_x = pt_le.x
     pt_le_y = 0
-    pt_le_z = pt_le.z 
+    pt_le_z = pt_le.z
     pt_le = Point(pt_le_x, pt_le_y, pt_le_z)
     return pt_le, pt_te
 
@@ -221,17 +221,17 @@ def fin_cen_tip_le_te_points(obj):
     """
     crv = obj.def_v_tail_wing.fixed_part.edges[3]
     # Trailing Edge
-    pt_te_x = crv.start.x 
+    pt_te_x = crv.start.x
     pt_te_y = 0
-    pt_te_z = crv.start.z 
+    pt_te_z = crv.start.z
     pt_te = Point(pt_te_x, pt_te_y, pt_te_z)
 
     # Leading Edge
     crv = obj.fixed_v_wing[1].edges[9]
     pt_le = crv.extremum(crv.start, distance="max")["point"]
-    pt_le_x = pt_le.x 
+    pt_le_x = pt_le.x
     pt_le_y = 0
-    pt_le_z = pt_le.z 
+    pt_le_z = pt_le.z
     pt_le = Point(pt_le_x, pt_le_y, pt_le_z)
     return pt_le, pt_te
 
@@ -289,9 +289,9 @@ def fin_top_root_le_te_points(obj):
     # Leading Edge
     crv = obj.fixed_v_wing[1].edges[9]
     pt_le = crv.extremum(crv.start, distance="max")["point"]
-    pt_le_x = pt_le.x 
+    pt_le_x = pt_le.x
     pt_le_y = 0
-    pt_le_z = pt_le.z 
+    pt_le_z = pt_le.z
     pt_le = Point(pt_le_x, pt_le_y, pt_le_z)
     return pt_le, pt_te
 
@@ -343,9 +343,7 @@ def geometry(obj):
                                   ],
                         density=obj.rho,
                         mach_number=obj.m_cruise,
-                        ref_area=obj.w_c_root*obj.w_span,
+                        ref_area=obj.w_c_root * obj.w_span,
                         ref_chord=obj.w_c_root,
                         ref_span=obj.w_span * 2,
                         ref_pt=Point(0, 0, 0))
-
-

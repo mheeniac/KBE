@@ -3,6 +3,7 @@ import os
 import csv
 from parapy.core import *
 
+
 class ReadMaterial(Base):
     """
     This class generates an object with a read attribute that will output a the dictionary of a certain material csv file
@@ -22,7 +23,7 @@ class ReadMaterial(Base):
         path = self.generate_path
         with open(path, 'rb') as file:
             reader = csv.reader(file, delimiter=',', quotechar='|')
-            row_names = next(reader)    # gets the first line
+            row_names = next(reader)  # gets the first line
             for row in reader:
                 sub_dict = {}
                 n_layers = row[0]
