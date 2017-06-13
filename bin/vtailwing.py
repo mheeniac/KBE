@@ -314,7 +314,7 @@ class VTailWing(GeomBase):
                                 self.rudder_separation_plns[1],
                                 self.hinge_pln])
 
-    @Part(in_tree=True)
+    @Part(in_tree=False)
     def fixed_part(self):
         """ Combine faces to make a fixed part without the rudder
         :rtype: part
@@ -365,7 +365,7 @@ class VTailWing(GeomBase):
                                 ]
                           )
 
-    @Attribute(in_tree=True)
+    @Attribute(in_tree=False)
     def closure_ribs(self):
         """ Define closure_ribs
         :rtype: tuple
@@ -651,13 +651,13 @@ class VTailWing(GeomBase):
     def te_skin_right(self):
         return self.fused_spars.faces[11]
 
-    @Attribute(in_tree=True)
+    @Attribute(in_tree=False)
     def rudder_front_spar(self):
         spar = self.fused_spars.faces[13]
         spar.label = 'Front Spar'
         return spar
 
-    @Attribute(in_tree=True)
+    @Attribute(in_tree=False)
     def rudder_back_spar(self):
         """ Collects the rudder back spar face
         :rtype: list
