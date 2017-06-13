@@ -5,6 +5,7 @@ from bay_analysis_tool.bay_analysis import BayAnalysis
 from csv_read import *
 from avl import *
 from material_allocation import *
+from shear_bend import *
 
 # TODO:
 
@@ -167,7 +168,7 @@ class Aircraft(GeomBase):
 
     #: Ratio of local width where the local actuator hinge is located []
     #: :type: float
-    ahl_tip = Input(0.75)
+    ahl_tip = Input(0.25)
 
     #: Distance in z direction between the to actuator hinge planes [m]
     #: :type: float
@@ -824,7 +825,7 @@ class Aircraft(GeomBase):
         """
         aero_force = self.hinge_reaction_forces  # The forces on all hinges due to aerodynamic load
         act_force = self.actuator_forces  # The forces on some actuators due to actuator force
-        tot_force_y = aero_force[0]         # Aerodynamic load only works in y direction
+        tot_force_y = aero_force         # Aerodynamic load only works in y direction
         tot_force_x = [0] * len(tot_force_y)# To be filled with y forces in the actuator forces
         tot_force = [0] * len(tot_force_y)  # The total forces
         for index in range(0, len(tot_force_y) - 1):   # Loop over the range of the forces
@@ -929,6 +930,11 @@ class Aircraft(GeomBase):
     #     #     return FX, FY, MX, MY, MZ
     #     #
     #     # @Attribute
+
+    @Attribute
+    def force_lines(self):
+        return ForceLines(craft=self)
+
 
 
     @Attribute
