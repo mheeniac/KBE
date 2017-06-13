@@ -741,9 +741,9 @@ class Aircraft(GeomBase):
             ref = self.def_v_tail_wing.closure_ribs[0].vertices[0].point.z #Bottom of the rudder
             top_ref = self.def_v_tail_wing.closure_ribs[1].vertices[0].point.z
             if x == 0:  # For the first hinge the distance is between the edge and midpoint
-                p2_z = self.def_v_tail_wing.hinges[x].position.z
+                p2_z = self.def_v_tail_wing.hinges[x].center.z
                 p1_z = ref
-                p3_z = self.def_v_tail_wing.hinges[x + 1].position.z
+                p3_z = self.def_v_tail_wing.hinges[x + 1].center.z
                 pmid_z = p3_z - 0.5 * (p3_z - p2_z)
                 length = pmid_z - p1_z
                 l.append(length)
@@ -751,8 +751,8 @@ class Aircraft(GeomBase):
                 R.append(force)
             elif x > 0 and x < (len(self.def_v_tail_wing.hinges) - 1):  # All the middle hinges
                 p1_z = pmid_z  # Take the previous midpoint and set it as bottom
-                p2_z = self.def_v_tail_wing.hinges[x].position.z # Take the position of current hinge
-                p3_z = self.def_v_tail_wing.hinges[x + 1].position.z # Take position of the next hinge
+                p2_z = self.def_v_tail_wing.hinges[x].center.z # Take the position of current hinge
+                p3_z = self.def_v_tail_wing.hinges[x + 1].center.z # Take position of the next hinge
                 pmid_z = p3_z - 0.5 * (p3_z - p2_z)  # Position middle of current and next hinge
                 length = pmid_z - p1_z  # Length is current middle - last middle
                 l.append(length)  # Append length list
