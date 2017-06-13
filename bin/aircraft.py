@@ -825,12 +825,17 @@ class Aircraft(GeomBase):
         """
         aero_force = self.hinge_reaction_forces  # The forces on all hinges due to aerodynamic load
         act_force = self.actuator_forces  # The forces on some actuators due to actuator force
-        tot_force_y = aero_force         # Aerodynamic load only works in y direction
+        tot_force_y = []
+        for item in aero_force:
+            tot_force_y.append(item)    # Aerodynamic load only works in y direction
         tot_force_x = [0] * len(tot_force_y)# To be filled with y forces in the actuator forces
         tot_force = [0] * len(tot_force_y)  # The total forces
-        for index in range(0, len(tot_force_y) - 1):   # Loop over the range of the forces
+        for index in range(0, len(tot_force_y)):   # Loop over the range of the forces
             if index == act_force[1][2][0]: # If we are at the first actuator hinge
+                print tot_force_y[index]
                 tot_force_y[index] = tot_force_y[index] + act_force[1][0][1]    # Add the y force to the current
+                print tot_force_y[index]
+                print act_force[1][0][1]
                 tot_force_x[index] = tot_force_x[index] + act_force[1][0][0]    # Add the x force to the current
             if index == act_force[1][2][1]:
                 tot_force_y[index] = tot_force_y[index] + act_force[1][1][1]
