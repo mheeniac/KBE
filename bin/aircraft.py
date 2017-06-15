@@ -1,3 +1,5 @@
+from parapy.exchange import STEPWriter
+
 from fuselage import Fuselage
 from wingset import *
 from vtailwing import *
@@ -318,7 +320,7 @@ class Aircraft(GeomBase):
                                displacement=Vector(
                                    self.adc_diff,  # Translate along fuselage length with calculated difference
                                    0,
-                                   self.obj_main_wing.calc_lowest_point),  # Translate down so that it is bottom wing
+                                   self.obj_main_wing.calc_lowest_point+0.01),  # Translate down so that it is bottom wing
                                quantify=2,
                                color='red',
                                label=['Left Wing', 'Right Wing'][child.index]
@@ -786,6 +788,7 @@ class Aircraft(GeomBase):
         M_f = self.hinge_side_force[0] * d_hl  # Moment due to side force
         point_act = self.def_v_tail_wing.actuator_hinge_line.midpoint  # Point on act line
         point_hinge = self.def_v_tail_wing.hingerib_line.midpoint  # point on hinge line
+        # Point to line distance
         min_1 = point_act - self.def_v_tail_wing.hingerib_line.start
         min_2 = point_act - self.def_v_tail_wing.hingerib_line.end
         d1 = self.def_v_tail_wing.hingerib_line.start.distance(self.def_v_tail_wing.hingerib_line.end)
@@ -879,6 +882,10 @@ class Aircraft(GeomBase):
 
     @Attribute
     def rudder_weight(self):
+        """
+        Calls the Apply Material class and returns the weight of the rudder
+        :rtype: float
+        """
         obj = ApplyMat(is_default=True,
                        hinge_forces=self.total_hinge_force[0],
                        obj=self)
@@ -1040,94 +1047,67 @@ class Aircraft(GeomBase):
                                N=3) )
         return analysis
 
-    #     # def bay_analysis(self):
-    #     #     skin_1 = ReadMaterial(ply_file=self.ply_file_s1, n_layers=self.n_layers_s1)
-    #     #     skin_1 = skin_1.read
-    #     #     bay_ana = BayAnalysis(Vx=self.forces[0],
-    #     #                           Vy=self.forces[1],
-    #     #                           Mx=self.forces[2],
-    #     #                           My=self.forces[3],
-    #     #                           Mt=self.forces[4],
-    #     #                           ref_x=[0] * 2,
-    #     #                           ref_y=[0] * 2,
-    #     #                           bay_planes=self.planes,
-    #     #                           rhs_skin_faces=self.rhs_skin_faces,
-    #     #                           lhs_skin_faces=self.lhs_skin_faces,
-    #     #                           spar_faces=self.spar_faces,
-    #     #                           rhs_skin_materials_t=[skin_1['t']] * 3,
-    #     #                           lhs_skin_materials_t=[skin_1['t']] * 3,
-    #     #                           spar_materials_t=[skin_1['t']] * 2,
-    #     #                           rhs_skin_materials_E=[skin_1['E']] * 3,
-    #     #                           lhs_skin_materials_E=[skin_1['E']] * 3,
-    #     #                           spar_materials_E=[skin_1['E']] * 2,
-    #     #                           rhs_skin_materials_G=[skin_1['G']] * 3,
-    #     #                           lhs_skin_materials_G=[skin_1['G']] * 3,
-    #     #                           spar_materials_G=[skin_1['G']] * 2,
-    #     #                           rhs_skin_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 3,
-    #     #                           lhs_skin_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 3,
-    #     #                           spar_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 2,
-    #     #                           N=3)
-    #     #     return bay_ana
-    #     #
-    #     # @Part(in_tree=False)
-    #     # def fuse_fuselage(self):
-    #     #     return FusedSolid(shape_in=self.fuselage_part.RotatedMainSolid[1],
-    #     #                       tool=[self.fuselage_part.RotatedMainSolid[0], self.fuselage_part.RotatedMainSolid[2]])
-    #     #
-    #     # @Part(in_tree=False)
-    #     # def wet_wings_left(self):
-    #     #     return SubtractedSolid(shape_in=self.main_wing[0],
-    #     #                            tool = self.fuse_fuselage)
-    #     # @Part(in_tree=False)
-    #     # def wet_wings_right(self):
-    #     #     return SubtractedSolid(shape_in=self.main_wing[1],
-    #     #                            tool = self.fuse_fuselage)
-    #     #
-    #     #
-    #     #
-    #     #
-    #     # @Part(in_tree=False)
-    #     # def get_parts(self):
-    #     #     return Aircraft()
-    #     #
-    #     # @Attribute
-    #     # def rudder_nodes(self):
-    #     #     tail = self.get_parts.def_v_tail_wing
-    #     #
-    #     #     list = [tail.skins_rudder,
-    #     #             tail.rudder_back_spar,
-    #     #             tail.rudder_front_spar,
-    #     #             tail.actuator_hinge_line,
-    #     #             tail.hingerib_line,
-    #     #             tail.closure_ribs[0],
-    #     #             tail.closure_ribs[1],
-    #     #             tail.actuator_hinges[0],
-    #     #             tail.actuator_hinges[1]]
-    #     #     for x in range(0, len(tail.find_mainskin_ribs)):
-    #     #         list.append(tail.find_mainskin_ribs[x])
-    #     #     for x in range(0, len(tail.hinges)):
-    #     #         list.append(tail.hinges[x])
-    #     #     return list
-    #     #
-    #     # @Part
-    #     # def rudder_writer(self):
-    #     #     return STEPWriter(nodes=self.rudder_nodes,
-    #     #                       default_directory='../output/CAD')
-    #     # @Attribute
-    #     # def wetted_nodes(self):
-    #     #     list = [self.get_parts.tail_wing[0],
-    #     #             self.get_parts.tail_wing[1],
-    #     #             self.get_parts.tail_wing[2][0],
-    #     #             self.get_parts.tail_wing[2][1],
-    #     #             self.get_parts.fuse_fuselage,
-    #     #             self.get_parts.wet_wings_left,
-    #     #             self.get_parts.wet_wings_right]
-    #     #
-    #     #     return list
-    #     # @Part
-    #     # def wetted_writer(self):
-    #     #     return STEPWriter(nodes=self.wetted_nodes,
-    #     #                       default_directory='../output/CAD')
+
+
+    @Part(in_tree=True)
+    def fuse_fuselage(self):
+        """
+        Fuses together the solids of the fuselage
+        :rtype: FusedSolid
+        """
+        return FusedSolid(shape_in=self.fuselage_part.fuselage_assembly[1],
+                          tool=[self.fuselage_part.fuselage_assembly[0], self.fuselage_part.fuselage_assembly[2]])
+
+    @Part(in_tree=True)
+    def wet_wings_left(self):
+        return SubtractedSolid(shape_in=self.main_wing[0],
+                               tool = self.fuse_fuselage)
+    @Part(in_tree=True)
+    def wet_wings_right(self):
+        return SubtractedSolid(shape_in=self.main_wing[1],
+                               tool = self.fuse_fuselage)
+
+
+    @Attribute
+    def rudder_nodes(self):
+        tail = self.def_v_tail_wing
+        list = [tail.skins_rudder,
+                tail.rudder_back_spar,
+                tail.rudder_front_spar,
+                tail.actuator_hinge_line,
+                tail.hingerib_line,
+                tail.closure_ribs[0],
+                tail.closure_ribs[1],
+                tail.actuator_hinges[0],
+                tail.actuator_hinges[1]]
+        for x in range(0, len(tail.rudder_ribs)):
+            list.append(tail.rudder_ribs[x])
+        for x in range(0, len(tail.hinges)):
+            list.append(tail.hinges[x])
+        return list
+
+    @Part()
+    def rudder_writer(self):
+        return STEPWriter(nodes=self.rudder_nodes,
+                          default_directory='../output/CAD')
+    @Attribute
+    def wetted_nodes(self):
+        list = [self.fixed_v_wing[0],
+                self.fixed_v_wing[1],
+                self.translate_h_tail_wing[0],
+                self.translate_h_tail_wing[1],
+                self.def_v_tail_wing.skins_rudder,
+                self.fuse_fuselage,
+                self.wet_wings_left,
+                self.wet_wings_right]
+        return list
+    @Part
+    def wetted_writer(self):
+        return STEPWriter(nodes=self.wetted_nodes,
+                          default_directory='../output/CAD')
+    @Attribute
+    def wetted_area(self):
+        main_wings = 2 * (self.wet_wings_left.faces[0].area + self.wet_wings_left.faces[1].area)
     @Attribute
     def save_vars(self):
         """ Saves the variables of current settings to an output file
