@@ -804,7 +804,7 @@ class Aircraft(GeomBase):
         print check_x
         return [Fa_x, Fa_y], Fh, M_f
 
-    
+
     def force_distances(self):
         """
         Calculates the distance between the actuator force and the nearest two hinges
@@ -1055,6 +1055,7 @@ class Aircraft(GeomBase):
 
     def split_faces(self):
         facelist = []
+        list = []
         for i in self.rhs_skin_faces():
             facelist.append(i)
         for i in self.lhs_skin_faces():
