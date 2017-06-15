@@ -1051,6 +1051,30 @@ class Aircraft(GeomBase):
                                N=3) )
         return analysis
 
+    @Attribute
+    def color_list(self):
+        color_rhs_LE = ["RED", "GREEN", "BLUE", "YELLOW", "CYAN", "ORANGE"]
+        color_rhs_main = ["RED", "GREEN", "BLUE", "YELLOW", "CYAN", "ORANGE"]
+        color_rhs_TE = ["RED", "GREEN", "BLUE", "YELLOW", "CYAN", "ORANGE"]
+        color_lhs_LE = ["RED", "GREEN", "BLUE", "YELLOW", "CYAN", "ORANGE"]
+        color_lhs_main = ["RED", "GREEN", "BLUE", "YELLOW", "CYAN", "ORANGE"]
+        color_lhs_TE = ["RED", "GREEN", "BLUE", "YELLOW", "CYAN", "ORANGE"]
+        color_front_spar = ["RED", "GREEN", "BLUE", "YELLOW", "CYAN", "ORANGE"]
+        color_back_spar = ["RED", "GREEN", "BLUE", "YELLOW", "CYAN", "ORANGE"]
+        return [color_rhs_LE,color_rhs_main,color_rhs_TE,color_lhs_LE,color_lhs_main,color_lhs_TE,color_front_spar,color_back_spar]
+
+    @Attribute
+    def split_faces(self):
+        facelist = []
+        for i in self.rhs_skin_faces:
+            facelist.append(i)
+        for i in self.lhs_skin_faces:
+            facelist.append(i)
+        for i in self.spar_faces:
+            facelist.append(i)
+        for i in xrange(len(facelist)):
+            list.append(SplitSurface(built_from= facelist[i], tool = self.bays, colors = self.color_list[i]))
+        return list
 
 
     @Part(in_tree=True)
