@@ -215,6 +215,10 @@ class Aircraft(GeomBase):
     #: :type: float
     form_rib_frac = Input(0.075)
 
+    #: Iteration size of to make the shear and bend moment lines [m]
+    #: :type: float
+    dx = Input(0.001)
+
     # -----------------
     ## HTail variables
     # ----------------
@@ -957,15 +961,29 @@ class Aircraft(GeomBase):
     def force_lines(self):
         return ForceLines(craft=self)
 
-
+    @Attribute
+    def sorted_ribs(self):
+        return sorted(self.def_v_tail_wing.rudder_ribs,  key=lambda face: face.cog.z)
 
     @Attribute
-    def planes(self):
-        plane1 = TranslatedPlane(built_from=self.def_v_tail_wing.rudder_ribs[0].u_reversed,
-                                 displacement=Vector(0, 0, 0.02))
-        plane2 = TranslatedPlane(built_from=self.def_v_tail_wing.rudder_ribs[1].u_reversed,
-                                 displacement=Vector(10, 0, -0.02))
-        return plane1, plane2
+    def bays (self):
+        list = []
+        list.append(TranslatedPlane(built_from=self.def_v_tail_wing.closure_ribs[0].u_reversed,
+                                 displacement=Vector(0, 0, 0.01)))
+        for i in xrange(len(self.sorted_ribs)):
+            list.append(self.sorted_ribs[i].u_reversed)
+        list.append(TranslatedPlane(built_from=self.def_v_tail_wing.closure_ribs[1].u_reversed,
+                                    displacement=Vector(0, 0, -0.01)))
+        return list
+
+    @Attribute
+    def positions_planes(self):
+        list = []
+        dx = self.dx
+        for i in xrange(len(self.bays)):
+            list.append(int((self.bays[i].uv_center_point.z- self.def_v_tail_wing.closure_ribs[0].vertices[0].point.z)/dx))
+
+        return list
 
     @Attribute
     def rhs_skin_faces(self):
@@ -983,34 +1001,43 @@ class Aircraft(GeomBase):
 
     @Attribute
     def bay_analysis(self):
-        ply_file_s1 = "forty_five.csv"
-        n_layers_s1 = 4
-        skin_1 = ReadMaterial(ply_file=ply_file_s1, n_layers=n_layers_s1)
-        skin_1 = skin_1.read
-        analysis = BayAnalysis(Vx=[10000] * 2,
-                               Vy=[10000] * 2,
-                               Mx=[100000000] * 2,
-                               My=[100000000] * 2,
-                               Mt=[100000000] * 2,
+        quasi = ReadMaterial(ply_file="quasi_isotropic.csv").read
+        forty_five = ReadMaterial(ply_file="forty_five.csv").read
+        obj = ApplyMat(is_default= True,
+                       hinge_forces=self.total_hinge_force[0],
+                       obj=self)
+        analysis = []
+
+        for i in xrange(len(self.bays)-1):
+            analysis.append( BayAnalysis(Vx=[self.force_lines.force_lines[0][i],self.force_lines.force_lines[0][i+1]],
+                               Vy=[self.force_lines.force_lines[1][i],self.force_lines.force_lines[1][i+1]],
+                               Mx=[self.force_lines.force_lines[2][i],self.force_lines.force_lines[2][i+1]],
+                               My=[self.force_lines.force_lines[3][i],self.force_lines.force_lines[3][i+1]],
+                               Mt=[self.force_lines.force_lines[4][i],self.force_lines.force_lines[4][i+1]],
                                ref_x=[0] * 2,
                                ref_y=[0] * 2,
-                               bay_planes=self.planes,
+                               bay_planes=[self.bays[i],self.bays[i+1]],
                                rhs_skin_faces=self.lhs_skin_faces,
                                lhs_skin_faces=self.rhs_skin_faces,
                                spar_faces=self.spar_faces,
-                               rhs_skin_materials_t=[skin_1['t']] * 3,
-                               lhs_skin_materials_t=[skin_1['t']] * 3,
-                               spar_materials_t=[skin_1['t']] * 2,
-                               rhs_skin_materials_E=[skin_1['E']] * 3,
-                               lhs_skin_materials_E=[skin_1['E']] * 3,
-                               spar_materials_E=[skin_1['E']] * 2,
-                               rhs_skin_materials_G=[skin_1['G']] * 3,
-                               lhs_skin_materials_G=[skin_1['G']] * 3,
-                               spar_materials_G=[skin_1['G']] * 2,
-                               rhs_skin_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 3,
-                               lhs_skin_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 3,
-                               spar_materials_D=[[skin_1['D11'], skin_1['D22'], skin_1['D22'], skin_1['D12']]] * 2,
-                               N=3)
+                               rhs_skin_materials_t=[forty_five[str(obj.n_LE)]['t'],forty_five[str(obj.n_main)]['t'],forty_five[str(obj.n_TE)]['t']] ,
+                               lhs_skin_materials_t=[forty_five[str(obj.n_LE)]['t'],forty_five[str(obj.n_main)]['t'],forty_five[str(obj.n_TE)]['t']],
+                               spar_materials_t=[quasi[str(obj.n_spar[0])]['t'],quasi[str(obj.n_spar[1])]['t']],
+                               rhs_skin_materials_E=[forty_five[str(obj.n_LE)]['E'],forty_five[str(obj.n_main)]['E'],forty_five[str(obj.n_TE)]['E']],
+                               lhs_skin_materials_E=[forty_five[str(obj.n_LE)]['E'],forty_five[str(obj.n_main)]['E'],forty_five[str(obj.n_TE)]['E']],
+                               spar_materials_E=[quasi[str(obj.n_spar[0])]['E'],quasi[str(obj.n_spar[1])]['E']],
+                               rhs_skin_materials_G=[forty_five[str(obj.n_LE)]['G'],forty_five[str(obj.n_main)]['G'],forty_five[str(obj.n_TE)]['G']],
+                               lhs_skin_materials_G=[forty_five[str(obj.n_LE)]['G'],forty_five[str(obj.n_main)]['G'],forty_five[str(obj.n_TE)]['G']],
+                               spar_materials_G=[quasi[str(obj.n_spar[0])]['G'],quasi[str(obj.n_spar[1])]['G']],
+                               rhs_skin_materials_D=[[forty_five[str(obj.n_LE)]['D11'], forty_five[str(obj.n_LE)]['D22'], forty_five[str(obj.n_LE)]['D22'], forty_five[str(obj.n_LE)]['D12']],
+                                                     [forty_five[str(obj.n_main)]['D11'], forty_five[str(obj.n_main)]['D22'], forty_five[str(obj.n_main)]['D22'], forty_five[str(obj.n_main)]['D12']],
+                                                     [forty_five[str(obj.n_TE)]['D11'], forty_five[str(obj.n_TE)]['D22'], forty_five[str(obj.n_TE)]['D22'], forty_five[str(obj.n_TE)]['D12']]],
+                               lhs_skin_materials_D=[[forty_five[str(obj.n_LE)]['D11'], forty_five[str(obj.n_LE)]['D22'], forty_five[str(obj.n_LE)]['D22'], forty_five[str(obj.n_LE)]['D12']],
+                                                     [forty_five[str(obj.n_main)]['D11'], forty_five[str(obj.n_main)]['D22'], forty_five[str(obj.n_main)]['D22'], forty_five[str(obj.n_main)]['D12']],
+                                                     [forty_five[str(obj.n_TE)]['D11'], forty_five[str(obj.n_TE)]['D22'], forty_five[str(obj.n_TE)]['D22'], forty_five[str(obj.n_TE)]['D12']]],
+                               spar_materials_D=[[quasi[str(obj.n_spar[0])]['D11'], quasi[str(obj.n_spar[0])]['D22'], quasi[str(obj.n_spar[0])]['D22'], quasi[str(obj.n_spar[0])]['D12']],
+                                                 [quasi[str(obj.n_spar[1])]['D11'], quasi[str(obj.n_spar[1])]['D22'], quasi[str(obj.n_spar[1])]['D22'], quasi[str(obj.n_spar[1])]['D12']]],
+                               N=3) )
         return analysis
 
     #     # def bay_analysis(self):

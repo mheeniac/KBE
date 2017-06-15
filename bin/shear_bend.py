@@ -8,10 +8,10 @@ from parapy.geom import *
 class ForceLines(Base):
     craft = Input()
     plot = Input()
-
+    dx = Input(0.001)
     @Attribute
     def force_lines(self):
-        dx = 0.001
+        dx = self.dx
         L = self.craft.def_v_tail_wing.b_rudder
         X = numpy.linspace(0, L, int(L / dx) + 1)
         q = self.craft.hinge_side_force[1]
