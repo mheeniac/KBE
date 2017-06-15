@@ -1007,6 +1007,10 @@ class Aircraft(GeomBase):
         return [self.def_v_tail_wing.rudder_front_spar.faces[0], self.def_v_tail_wing.rudder_back_spar.faces[0]]
 
     @Attribute
+    def n_ply_list(self):
+        return
+
+    @Attribute
     def bay_analysis(self):
         quasi = ReadMaterial(ply_file="quasi_isotropic.csv").read
         forty_five = ReadMaterial(ply_file="forty_five.csv").read
