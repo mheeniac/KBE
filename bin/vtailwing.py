@@ -700,7 +700,7 @@ class VTailWing(GeomBase):
             list[x].label = 'Rib'
         return list
 
-    @Part(in_tree=False)
+    @Part(in_tree=True)
     def skins_rudder(self):
         """ Fuses all rudder skins
         :rtype: part
@@ -756,11 +756,11 @@ class VTailWing(GeomBase):
 
     @Part(in_tree=True)
     def turned_rudder(self):
-        """ Turnes all defined faces/skins/shells in things_for_rotation
+        """ Turns all defined faces/skins/shells in things_for_rotation
         :rtype: part
         """
         return RotatedShape(shape_in=self.things_for_rotation[child.index], rotation_point=self.hingerib_line.start,
-                            vector=self.hingerib_line.direction_vector, angle=radians(30),
+                            vector=self.hingerib_line.direction_vector, angle=radians(self.rud_angle),
                             quantify=len(self.things_for_rotation), transparency=self.transparency_definer[child.index],
                             label=self.label_definer[child.index])
 

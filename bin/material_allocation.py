@@ -44,7 +44,7 @@ class ApplyMat(GeomBase):
     @Input
     def n_hinge_ribs(self):
         """
-        The number of plies for the closure ribs
+        The number of plies for the hinge ribs
         :rtype: int
         """
         if self.is_default:
@@ -113,18 +113,18 @@ class ApplyMat(GeomBase):
         area_dict = {}
         area_dict["Front Spar"] = self.obj.def_v_tail_wing.rudder_front_spar.area
         area_dict["Back Spar"] = self.obj.def_v_tail_wing.rudder_back_spar.area
-        area_dict["Closure Ribs"] = [self.obj.def_v_tail_wing.turned_rudder[22].shape_in.area,
-                                     self.obj.def_v_tail_wing.turned_rudder[23].shape_in.area]
-        area_dict["Ribs"] = (self.obj.def_v_tail_wing.turned_rudder[1].shape_in.area +
-                             self.obj.def_v_tail_wing.turned_rudder[1].shape_in.area) / 2
-        area_dict["TE"] = (self.obj.def_v_tail_wing.turned_rudder[0].faces[0].area +
-                           self.obj.def_v_tail_wing.turned_rudder[0].faces[1].area +
-                           self.obj.def_v_tail_wing.turned_rudder[0].faces[6].area +
-                           self.obj.def_v_tail_wing.turned_rudder[0].faces[7].area)
-        area_dict["Main"] = (self.obj.def_v_tail_wing.turned_rudder[0].faces[2].area +
-                             self.obj.def_v_tail_wing.turned_rudder[0].faces[5].area)
-        area_dict["LE"] = (self.obj.def_v_tail_wing.turned_rudder[0].faces[3].area +
-                           self.obj.def_v_tail_wing.turned_rudder[0].faces[4].area)
+        area_dict["Closure Ribs"] = [self.obj.def_v_tail_wing.closure_ribs[0].area,
+                                     self.obj.def_v_tail_wing.closure_ribs[1].area]
+        area_dict["Ribs"] = (self.obj.def_v_tail_wing.rudder_ribs[0].area +
+                             self.obj.def_v_tail_wing.rudder_ribs[len(self.obj.def_v_tail_wing.rudder_ribs)-1].area) / 2
+        area_dict["TE"] = (self.obj.def_v_tail_wing.skins_rudder.faces[3].area +
+                           self.obj.def_v_tail_wing.skins_rudder.faces[4].area)
+        area_dict["Main"] = (self.obj.def_v_tail_wing.skins_rudder.faces[2].area +
+                             self.obj.def_v_tail_wing.skins_rudder.faces[5].area)
+        area_dict["LE"] = (self.obj.def_v_tail_wing.skins_rudder.faces[0].area +
+                           self.obj.def_v_tail_wing.skins_rudder.faces[1].area +
+                           self.obj.def_v_tail_wing.skins_rudder.faces[6].area+
+                           self.obj.def_v_tail_wing.skins_rudder.faces[7].area)
         return area_dict
 
     @Attribute
