@@ -5,8 +5,9 @@ D
 1.225
 
 X
-G
-LO
+fs output\FullAircraft.fs
+fn output\FullAircraft.fn
+fe output\FullAircraft.fe
 
 
 q

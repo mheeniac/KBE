@@ -14,30 +14,30 @@ class ForceLines(Base):
         dx = self.dx
         L = self.craft.def_v_tail_wing.b_rudder
         X = numpy.linspace(0, L, int(L / dx) + 1)
-        q = self.craft.hinge_side_force[1]
+        q = self.craft.hinge_side_force()[1]
 
         y_hinge_forces = []
         for i in xrange(len(self.craft.total_hinge_force[2])):
             y_hinge_forces.append(self.craft.total_hinge_force[2][i])
-            if i == self.craft.force_distances[1][0]:
+            if i == self.craft.force_distances()[1][0]:
                 y_hinge_forces.append(self.craft.actuator_forces[0][1])
 
         x_hinge_forces = []
-        for i in xrange(len(self.craft.force_distances[1])):
-            x_hinge_forces.append(self.craft.total_hinge_force[1][self.craft.force_distances[1][i]])
-            if i == self.craft.force_distances[1][0]:
+        for i in xrange(len(self.craft.force_distances()[1])):
+            x_hinge_forces.append(self.craft.total_hinge_force[1][self.craft.force_distances()[1][i]])
+            if i == self.craft.force_distances()[1][0]:
                 x_hinge_forces.append(self.craft.actuator_forces[0][0])
 
         pos_y_hinge_forces = []
         for x in xrange(len(self.craft.def_v_tail_wing.hinges)):
            pos_y_hinge_forces.append(int((self.craft.def_v_tail_wing.hinges[x].center.z - self.craft.def_v_tail_wing.closure_ribs[0].vertices[0].point.z)/dx))
-           if x == self.craft.force_distances[1][0]:
+           if x == self.craft.force_distances()[1][0]:
                pos_y_hinge_forces.append(int((self.craft.def_v_tail_wing.actuator_hinge_line.midpoint.z - self.craft.def_v_tail_wing.closure_ribs[0].vertices[0].point.z)/dx))
 
         pos_x_hinge_forces = []
-        for x in xrange(len(self.craft.force_distances[1])):
-           pos_x_hinge_forces.append(int((self.craft.def_v_tail_wing.hinges[self.craft.force_distances[1][x]].center.z - self.craft.def_v_tail_wing.closure_ribs[0].vertices[0].point.z)/dx))
-           if x == self.craft.force_distances[1][0]:
+        for x in xrange(len(self.craft.force_distances()[1])):
+           pos_x_hinge_forces.append(int((self.craft.def_v_tail_wing.hinges[self.craft.force_distances()[1][x]].center.z - self.craft.def_v_tail_wing.closure_ribs[0].vertices[0].point.z)/dx))
+           if x == self.craft.force_distances()[1][0]:
                pos_x_hinge_forces.append(int((self.craft.def_v_tail_wing.actuator_hinge_line.midpoint.z - self.craft.def_v_tail_wing.closure_ribs[0].vertices[0].point.z)/dx))
 
 
