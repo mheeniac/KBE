@@ -1066,6 +1066,7 @@ class Aircraft(GeomBase):
     @Attribute
     def split_faces(self):
         facelist = []
+        list = []
         for i in self.rhs_skin_faces:
             facelist.append(i)
         for i in self.lhs_skin_faces:
