@@ -274,6 +274,10 @@ class Aircraft(GeomBase):
     #: :type: float
     x_fc = Input(const["x_fc"])
 
+    # Overwrite optimization
+    #: :type: Bool
+    override = Input(False)
+
     @Part
     def fuselage_part(self):
         # Create a part from the fuselage class
@@ -997,7 +1001,7 @@ class Aircraft(GeomBase):
     def spar_faces(self):
         return [self.def_v_tail_wing.rudder_front_spar.faces[0], self.def_v_tail_wing.rudder_back_spar.faces[0]]
 
-    @Input
+    @Attribute(settable=True)
     def n_ply_list(self):
         length = len(self.bays) - 1
         n_ply_rhs_LE = [8] * length
@@ -1009,6 +1013,7 @@ class Aircraft(GeomBase):
         n_ply_front_spar = [8] * length
         n_ply_back_spar = [8] * length
         return n_ply_rhs_LE,n_ply_rhs_main,n_ply_rhs_TE,n_ply_lhs_LE,n_ply_lhs_main,n_ply_lhs_TE,n_ply_front_spar,n_ply_back_spar
+
     @Attribute
     def ref_y(self):
         y = []
@@ -1058,8 +1063,13 @@ class Aircraft(GeomBase):
         quasi = ReadMaterial(ply_file="quasi_isotropic.csv").read
         forty_five = ReadMaterial(ply_file="forty_five.csv").read
         zero_ninety = ReadMaterial(ply_file="zero_ninety.csv").read
-        
-        for k in range(1,4):
+
+        if self.override == True:
+            p = 3
+        else:
+            p = 4
+
+        for k in range(1,p):
             if k == 1:
                 mat_dict = [0] * 8
                 mat_dict[0] = forty_five
@@ -1110,6 +1120,7 @@ class Aircraft(GeomBase):
                     shear_lhs_te.append(shear[5])
                     shear_front_spar.append(shear[6])
                     shear_back_spar.append(shear[7])
+
                 comp_rhs_le = sum(comp_rhs_le) / len(comp_rhs_le)
                 comp_rhs_main = sum(comp_rhs_main) / len(comp_rhs_main)
                 comp_rhs_te = sum(comp_rhs_te) / len(comp_rhs_te)
@@ -1141,21 +1152,22 @@ class Aircraft(GeomBase):
                 for index in xrange(len(fracs)):
                     if abs(fracs[index]) < 0.1:
                         mat_dict[index] = forty_five
-                        print "45"
                     elif abs(fracs[index]) >= 0.1 and abs(fracs[index]) <= 50:
                         mat_dict[index] = quasi
-                        print "quasi"
                     elif abs(fracs[index]) > 50:
                         mat_dict[index] = zero_ninety
-                        print "090"
                 bay_new = self.bay_analysis(mat=mat_dict,n_ply_list = n_ply_list)
             if k == 3:
-                bay_current = bay_new
-                was_smaller = [[False] * len(bay_current)] * len(fracs)
+                was_smaller = [[False] * len(bay_new) for _ in range(len(fracs)) ]
+
                 for runs in range(0,6):
-                    for i in xrange(len(bay_current)):
+                    for i in xrange(len(bay_new)):
+                        # Iterate over the sections (bays)
+
                         for j in xrange(len(fracs)):
-                            x =  bay_current[i].buckling_rf_combined[j] - 1
+                            # Iterate over the parts in the section
+
+                            x =  bay_new[i].buckling_rf_combined[j] - 1
                             if x > 1.2 and was_smaller[j][i] == False:
                                 if n_ply_list[j][i] != 4:
                                     n_ply_list[j][i] = n_ply_list[j][i] - 2
@@ -1164,17 +1176,12 @@ class Aircraft(GeomBase):
                                     n_ply_list[j][i] = n_ply_list[j][i] + 2
                                     was_smaller[j][i] = True
                     print n_ply_list
-                    bay_current = self.bay_analysis(mat=mat_dict,n_ply_list = n_ply_list)
+                    bay_new = self.bay_analysis(mat=mat_dict,n_ply_list = n_ply_list)
+
+
                             
 
-        return bay_current
-
-
-
-
-                
-
-
+        return bay_new
 
 
     @Attribute
@@ -1188,10 +1195,9 @@ class Aircraft(GeomBase):
         color_front_spar = ["YELLOW"]*(len(self.bays)+1)
         color_back_spar = ["YELLOW"]*(len(self.bays)+1)
         array = [color_rhs_LE, color_rhs_main, color_rhs_TE, color_lhs_LE, color_lhs_main, color_lhs_TE, color_front_spar,color_back_spar]
-        for i in xrange(len(self.bay_analysis)):
+        for i in xrange(len(self.optimise_material)):
             for j in xrange(len(array)):
-                x =  self.bay_analysis[i].buckling_rf_combined[j] -1
-                print x
+                x =  self.optimise_material[i].buckling_rf_combined[j] -1
                 if x < 1:
                     array[j][i+1] = "RED"
                 elif x >= 1 and x <= 1.2:
