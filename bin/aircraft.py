@@ -997,62 +997,96 @@ class Aircraft(GeomBase):
     def spar_faces(self):
         return [self.def_v_tail_wing.rudder_front_spar.faces[0], self.def_v_tail_wing.rudder_back_spar.faces[0]]
 
-    @Attribute
+    @Input
     def n_ply_list(self):
-        return
+        length = len(self.bays) - 1
+        n_ply_rhs_LE = [4] * length
+        n_ply_rhs_main = [8] * length
+        n_ply_rhs_TE = [4] * length
+        n_ply_lhs_LE = [4] * length
+        n_ply_lhs_main = [4] * length
+        n_ply_lhs_TE = [4] * length
+        n_ply_front_spar = [4] * length
+        n_ply_back_spar = [4] * length
+        return n_ply_rhs_LE,n_ply_rhs_main,n_ply_rhs_TE,n_ply_lhs_LE,n_ply_lhs_main,n_ply_lhs_TE,n_ply_front_spar,n_ply_back_spar
+    @Attribute
+    def ref_y(self):
+        y = []
+        for i in xrange(len(self.bays)):
+            ref = self.def_v_tail_wing.hingerib_line.start.y +self.def_v_tail_wing.hingerib_line.direction_vector.y/self.def_v_tail_wing.hingerib_line.direction_vector.z*(self.def_v_tail_wing.hingerib_line.start.z-self.bays[i].uv_center_point.z)
+            y.append(ref)
+        return y
 
     @Attribute
     def bay_analysis(self):
         quasi = ReadMaterial(ply_file="quasi_isotropic.csv").read
         forty_five = ReadMaterial(ply_file="forty_five.csv").read
+        zero_ninety = ReadMaterial(ply_file="zero_ninety.csv").read
         obj = ApplyMat(is_default= True,
                        hinge_forces=self.total_hinge_force[0],
                        obj=self)
         analysis = []
 
         for i in xrange(len(self.bays)-1):
-            analysis.append( BayAnalysis(Vx=[self.force_lines.force_lines[0][i],self.force_lines.force_lines[0][i+1]],
-                               Vy=[self.force_lines.force_lines[1][i],self.force_lines.force_lines[1][i+1]],
-                               Mx=[self.force_lines.force_lines[2][i],self.force_lines.force_lines[2][i+1]],
-                               My=[self.force_lines.force_lines[3][i],self.force_lines.force_lines[3][i+1]],
-                               Mt=[self.force_lines.force_lines[4][i],self.force_lines.force_lines[4][i+1]],
-                               ref_x=[0] * 2,
-                               ref_y=[0] * 2,
+            analysis.append( BayAnalysis(Vx=[self.force_lines.force_lines[0][self.positions_planes[i]],self.force_lines.force_lines[0][self.positions_planes[i+1]]],
+                               Vy=[self.force_lines.force_lines[1][self.positions_planes[i]],self.force_lines.force_lines[1][self.positions_planes[i+1]]],
+                               Mx=[self.force_lines.force_lines[2][self.positions_planes[i]],self.force_lines.force_lines[2][self.positions_planes[i+1]]],
+                               My=[self.force_lines.force_lines[3][self.positions_planes[i]],self.force_lines.force_lines[3][self.positions_planes[i+1]]],
+                               Mt=[self.force_lines.force_lines[4][self.positions_planes[i]],self.force_lines.force_lines[4][self.positions_planes[i+1]]],
+                               ref_x=[self.def_v_tail_wing.d_hinge] * 2,
+                               ref_y=[self.ref_y[i],self.ref_y[i+1]],
                                bay_planes=[self.bays[i],self.bays[i+1]],
                                rhs_skin_faces=self.lhs_skin_faces(),
                                lhs_skin_faces=self.rhs_skin_faces(),
                                spar_faces=self.spar_faces(),
-                               rhs_skin_materials_t=[forty_five[str(obj.n_LE)]['t'],forty_five[str(obj.n_main)]['t'],forty_five[str(obj.n_TE)]['t']] ,
-                               lhs_skin_materials_t=[forty_five[str(obj.n_LE)]['t'],forty_five[str(obj.n_main)]['t'],forty_five[str(obj.n_TE)]['t']],
-                               spar_materials_t=[quasi[str(obj.n_spar[0])]['t'],quasi[str(obj.n_spar[1])]['t']],
-                               rhs_skin_materials_E=[forty_five[str(obj.n_LE)]['E'],forty_five[str(obj.n_main)]['E'],forty_five[str(obj.n_TE)]['E']],
-                               lhs_skin_materials_E=[forty_five[str(obj.n_LE)]['E'],forty_five[str(obj.n_main)]['E'],forty_five[str(obj.n_TE)]['E']],
-                               spar_materials_E=[quasi[str(obj.n_spar[0])]['E'],quasi[str(obj.n_spar[1])]['E']],
-                               rhs_skin_materials_G=[forty_five[str(obj.n_LE)]['G'],forty_five[str(obj.n_main)]['G'],forty_five[str(obj.n_TE)]['G']],
-                               lhs_skin_materials_G=[forty_five[str(obj.n_LE)]['G'],forty_five[str(obj.n_main)]['G'],forty_five[str(obj.n_TE)]['G']],
-                               spar_materials_G=[quasi[str(obj.n_spar[0])]['G'],quasi[str(obj.n_spar[1])]['G']],
-                               rhs_skin_materials_D=[[forty_five[str(obj.n_LE)]['D11'], forty_five[str(obj.n_LE)]['D22'], forty_five[str(obj.n_LE)]['D22'], forty_five[str(obj.n_LE)]['D12']],
-                                                     [forty_five[str(obj.n_main)]['D11'], forty_five[str(obj.n_main)]['D22'], forty_five[str(obj.n_main)]['D22'], forty_five[str(obj.n_main)]['D12']],
-                                                     [forty_five[str(obj.n_TE)]['D11'], forty_five[str(obj.n_TE)]['D22'], forty_five[str(obj.n_TE)]['D22'], forty_five[str(obj.n_TE)]['D12']]],
-                               lhs_skin_materials_D=[[forty_five[str(obj.n_LE)]['D11'], forty_five[str(obj.n_LE)]['D22'], forty_five[str(obj.n_LE)]['D22'], forty_five[str(obj.n_LE)]['D12']],
-                                                     [forty_five[str(obj.n_main)]['D11'], forty_five[str(obj.n_main)]['D22'], forty_five[str(obj.n_main)]['D22'], forty_five[str(obj.n_main)]['D12']],
-                                                     [forty_five[str(obj.n_TE)]['D11'], forty_five[str(obj.n_TE)]['D22'], forty_five[str(obj.n_TE)]['D22'], forty_five[str(obj.n_TE)]['D12']]],
-                               spar_materials_D=[[quasi[str(obj.n_spar[0])]['D11'], quasi[str(obj.n_spar[0])]['D22'], quasi[str(obj.n_spar[0])]['D22'], quasi[str(obj.n_spar[0])]['D12']],
-                                                 [quasi[str(obj.n_spar[1])]['D11'], quasi[str(obj.n_spar[1])]['D22'], quasi[str(obj.n_spar[1])]['D22'], quasi[str(obj.n_spar[1])]['D12']]],
+                               rhs_skin_materials_t=[forty_five[str(self.n_ply_list[0][i])]['t'],quasi[str(self.n_ply_list[1][i])]['t'],forty_five[str(self.n_ply_list[2][i])]['t']] ,
+                               lhs_skin_materials_t=[forty_five[str(self.n_ply_list[3][i])]['t'],quasi[str(self.n_ply_list[4][i])]['t'],forty_five[str(self.n_ply_list[5][i])]['t']],
+                               spar_materials_t=[quasi[str(self.n_ply_list[6][i])]['t'],quasi[str(self.n_ply_list[7][i])]['t']],
+                               rhs_skin_materials_E=[forty_five[str(self.n_ply_list[0][i])]['E'],quasi[str(self.n_ply_list[1][i])]['E'],forty_five[str(self.n_ply_list[2][i])]['E']],
+                               lhs_skin_materials_E=[forty_five[str(self.n_ply_list[3][i])]['E'],quasi[str(self.n_ply_list[4][i])]['E'],forty_five[str(self.n_ply_list[5][i])]['E']],
+                               spar_materials_E=[quasi[str(self.n_ply_list[6][i])]['E'],quasi[str(self.n_ply_list[7][i])]['E']],
+                               rhs_skin_materials_G=[forty_five[str(self.n_ply_list[0][i])]['G'],quasi[str(self.n_ply_list[1][i])]['G'],forty_five[str(self.n_ply_list[2][i])]['G']],
+                               lhs_skin_materials_G=[forty_five[str(self.n_ply_list[3][i])]['G'],quasi[str(self.n_ply_list[4][i])]['G'],forty_five[str(self.n_ply_list[5][i])]['G']],
+                               spar_materials_G=[quasi[str(self.n_ply_list[6][i])]['G'],quasi[str(self.n_ply_list[7][i])]['G']],
+                               rhs_skin_materials_D=[[forty_five[str(self.n_ply_list[0][i])]['D11'], forty_five[str(self.n_ply_list[0][i])]['D22'], forty_five[str(self.n_ply_list[0][i])]['D22'], forty_five[str(self.n_ply_list[0][i])]['D12']],
+                                                     [quasi[str(self.n_ply_list[1][i])]['D11'], quasi[str(self.n_ply_list[1][i])]['D22'], quasi[str(self.n_ply_list[1][i])]['D22'], quasi[str(self.n_ply_list[1][i])]['D12']],
+                                                     [forty_five[str(self.n_ply_list[2][i])]['D11'], forty_five[str(self.n_ply_list[2][i])]['D22'], forty_five[str(self.n_ply_list[2][i])]['D22'], forty_five[str(self.n_ply_list[2][i])]['D12']]],
+                               lhs_skin_materials_D=[[forty_five[str(self.n_ply_list[3][i])]['D11'], forty_five[str(self.n_ply_list[3][i])]['D22'], forty_five[str(self.n_ply_list[3][i])]['D22'], forty_five[str(self.n_ply_list[3][i])]['D12']],
+                                                     [quasi[str(self.n_ply_list[4][i])]['D11'], quasi[str(self.n_ply_list[4][i])]['D22'], quasi[str(self.n_ply_list[4][i])]['D22'], quasi[str(self.n_ply_list[4][i])]['D12']],
+                                                     [forty_five[str(self.n_ply_list[5][i])]['D11'], forty_five[str(self.n_ply_list[5][i])]['D22'], forty_five[str(self.n_ply_list[5][i])]['D22'], forty_five[str(self.n_ply_list[5][i])]['D12']]],
+                               spar_materials_D=[[quasi[str(self.n_ply_list[6][i])]['D11'], quasi[str(self.n_ply_list[6][i])]['D22'], quasi[str(self.n_ply_list[6][i])]['D22'], quasi[str(self.n_ply_list[6][i])]['D12']],
+                                                 [quasi[str(self.n_ply_list[7][i])]['D11'], quasi[str(self.n_ply_list[7][i])]['D22'], quasi[str(self.n_ply_list[7][i])]['D22'], quasi[str(self.n_ply_list[7][i])]['D12']]],
                                N=3) )
         return analysis
 
+    @Attribute
     def color_list(self):
-        color_rhs_LE = ["RED", "GREEN", "BLUE", "YELLOW", "CYAN", "ORANGE"]
-        color_rhs_main = ["RED", "GREEN", "BLUE", "YELLOW", "CYAN", "ORANGE"]
-        color_rhs_TE = ["RED", "GREEN", "BLUE", "YELLOW", "CYAN", "ORANGE"]
-        color_lhs_LE = ["RED", "GREEN", "BLUE", "YELLOW", "CYAN", "ORANGE"]
-        color_lhs_main = ["RED", "GREEN", "BLUE", "YELLOW", "CYAN", "ORANGE"]
-        color_lhs_TE = ["RED", "GREEN", "BLUE", "YELLOW", "CYAN", "ORANGE"]
-        color_front_spar = ["RED", "GREEN", "BLUE", "YELLOW", "CYAN", "ORANGE"]
-        color_back_spar = ["RED", "GREEN", "BLUE", "YELLOW", "CYAN", "ORANGE"]
-        return [color_rhs_LE,color_rhs_main,color_rhs_TE,color_lhs_LE,color_lhs_main,color_lhs_TE,color_front_spar,color_back_spar]
+        color_rhs_LE = ["YELLOW"]*(len(self.bays)+1)
+        color_rhs_main = ["YELLOW"]*(len(self.bays)+1)
+        color_rhs_TE = ["YELLOW"]*(len(self.bays)+1)
+        color_lhs_LE = ["YELLOW"]*(len(self.bays)+1)
+        color_lhs_main = ["YELLOW"]*(len(self.bays)+1)
+        color_lhs_TE = ["YELLOW"]*(len(self.bays)+1)
+        color_front_spar = ["YELLOW"]*(len(self.bays)+1)
+        color_back_spar = ["YELLOW"]*(len(self.bays)+1)
+        array = [color_rhs_LE, color_rhs_main, color_rhs_TE, color_lhs_LE, color_lhs_main, color_lhs_TE, color_front_spar,color_back_spar]
+        for i in xrange(len(self.bay_analysis)):
+            for j in xrange(len(array)):
+                x =  self.bay_analysis[i].buckling_rf_combined[j] -1
+                print x
+                if x < 1:
+                    array[j][i+1] = "RED"
+                elif x >= 1 and x <= 1.2:
+                        array[j][i+1] = "GREEN"
+                elif x > 1.2:
+                    array[j][i+1] = "BLUE"
+                else:
+                    array[j][i+1] = "YELLOW"
 
+
+        return array
+
+    @Attribute
     def split_faces(self):
         facelist = []
         list = []
@@ -1063,7 +1097,14 @@ class Aircraft(GeomBase):
         for i in self.spar_faces():
             facelist.append(i)
         for i in xrange(len(facelist)):
-            list.append(SplitSurface(built_from= facelist[i], tool = self.bays, colors = self.color_list()[i]))
+            list.append(SplitSurface(built_from= facelist[i], tool = self.bays, colors = self.color_list[i]))
+        return list
+
+    @Attribute
+    def show_split_faces(self):
+        list = []
+        for i in xrange(len(self.split_faces)):
+            list.append(self.split_faces[i].faces)
         return list
 
 
