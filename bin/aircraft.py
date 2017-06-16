@@ -887,7 +887,9 @@ class Aircraft(GeomBase):
         """
         obj = ApplyMat(is_default=True,
                        hinge_forces=self.total_hinge_force[0],
-                       obj=self)
+                       obj=self,
+                       n_plies = self.n_ply_list,
+                       mat_dict = self.optimise_material[1])
         return obj.weights + sum(self.hinge_mass[0]) + sum(self.hinge_mass[1])
 
     #     # @Attribute(in_tree=False)
@@ -1181,7 +1183,7 @@ class Aircraft(GeomBase):
 
                             
 
-        return bay_new
+        return bay_new, mat_dict
 
 
     @Attribute
@@ -1195,9 +1197,9 @@ class Aircraft(GeomBase):
         color_front_spar = ["YELLOW"]*(len(self.bays)+1)
         color_back_spar = ["YELLOW"]*(len(self.bays)+1)
         array = [color_rhs_LE, color_rhs_main, color_rhs_TE, color_lhs_LE, color_lhs_main, color_lhs_TE, color_front_spar,color_back_spar]
-        for i in xrange(len(self.optimise_material)):
+        for i in xrange(len(self.optimise_material[0])):
             for j in xrange(len(array)):
-                x =  self.optimise_material[i].buckling_rf_combined[j] -1
+                x =  self.optimise_material[0][i].buckling_rf_combined[j] -1
                 if x < 1:
                     array[j][i+1] = "RED"
                 elif x >= 1 and x <= 1.2:

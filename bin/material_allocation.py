@@ -19,16 +19,11 @@ class ApplyMat(GeomBase):
     #: Reference to self of the aircraft
     obj = Input()
 
-    @Input
-    def n_spar(self):
-        """
-        The number of plies for the front spar [0] and the back spar [1]
-        :rtype: tuple[int]
-        """
-        if self.is_default:
-            return [8, 8]
-        else:
-            return None
+    #: Multi array with the number of plies per segment
+    n_plies = Input()
+
+    #: Material dictionary to see which materials are needed
+    mat_dict = Input()
 
     @Input
     def n_close_ribs(self):
@@ -71,39 +66,6 @@ class ApplyMat(GeomBase):
         else:
             return None
 
-    @Input
-    def n_LE(self):
-        """
-        The number of plies for leading edge of the rudder skin
-        :rtype: int
-        """
-        if self.is_default:
-            return 8
-        else:
-            return None
-
-    @Input
-    def n_main(self):
-        """
-        The number of plies for the main skin of the rudder
-        :rtype: int
-        """
-        if self.is_default:
-            return 10
-        else:
-            return None
-
-    @Input
-    def n_TE(self):
-        """
-        The number of plies for the leading edge skin of the rudder
-        :rtype: int
-        """
-        if self.is_default:
-            return 4
-        else:
-            return None
-
     @Attribute
     def areas(self):
         """
@@ -111,40 +73,39 @@ class ApplyMat(GeomBase):
         :rtype: dict
         """
         area_dict = {}
-        area_dict["Front Spar"] = self.obj.def_v_tail_wing.rudder_front_spar.area
-        area_dict["Back Spar"] = self.obj.def_v_tail_wing.rudder_back_spar.area
         area_dict["Closure Ribs"] = [self.obj.def_v_tail_wing.closure_ribs[0].area,
                                      self.obj.def_v_tail_wing.closure_ribs[1].area]
         area_dict["Ribs"] = (self.obj.def_v_tail_wing.rudder_ribs[0].area +
                              self.obj.def_v_tail_wing.rudder_ribs[len(self.obj.def_v_tail_wing.rudder_ribs)-1].area) / 2
-        area_dict["TE"] = (self.obj.def_v_tail_wing.skins_rudder.faces[3].area +
-                           self.obj.def_v_tail_wing.skins_rudder.faces[4].area)
-        area_dict["Main"] = (self.obj.def_v_tail_wing.skins_rudder.faces[2].area +
-                             self.obj.def_v_tail_wing.skins_rudder.faces[5].area)
-        area_dict["LE"] = (self.obj.def_v_tail_wing.skins_rudder.faces[0].area +
-                           self.obj.def_v_tail_wing.skins_rudder.faces[1].area +
-                           self.obj.def_v_tail_wing.skins_rudder.faces[6].area+
-                           self.obj.def_v_tail_wing.skins_rudder.faces[7].area)
         return area_dict
 
     @Attribute
     def weights(self):
         areas = self.areas
+        bay_weights = []
         quasi = ReadMaterial(ply_file="quasi_isotropic.csv").read
         forty_five = ReadMaterial(ply_file="forty_five.csv").read
         zero_ninety = ReadMaterial(ply_file="zero_ninety.csv").read
 
-        w_f_s = quasi[str(self.n_spar[0])]["rho"] * areas["Front Spar"]
-        w_b_s = quasi[str(self.n_spar[1])]["rho"] * areas["Back Spar"]
+        part_in = 0
+        for part in self.n_plies:
+            index = 1
+            for nr in part:
+                area = self.obj.split_faces[part_in].faces[index].area
+                bay_weights.append(self.mat_dict[part_in][str(nr)]["rho"] * area)
+                index = index + 1
+            part_in = part_in + 1
+        # bay_weights.append(self.mat_dict[0][str(self.n_plies[0][0])]["rho"] * areas["LE"])
+        # bay_weights.append(self.mat_dict[3][str(self.n_plies[3][0])]["rho"] * areas["TE"])
+        bay_weights = sum(bay_weights)
+
+
         w_c_r = zero_ninety[str(self.n_close_ribs)]["rho"] * (areas["Closure Ribs"][0] + areas["Closure Ribs"][1])
         w_h_r = []
         for nr_plies in self.n_hinge_ribs:
             w_h_r.append(zero_ninety[str(nr_plies)]["rho"] * areas["Ribs"])
         w_h_r = sum(w_h_r)
-        w_te = forty_five[str(self.n_TE)]["rho"] * areas["TE"]
-        w_le = forty_five[str(self.n_LE)]["rho"] * areas["LE"]
-        w_main = forty_five[str(self.n_main)]["rho"] * areas["Main"]
         w_form = self.obj.def_v_tail_wing.formrib_plns.quantify * zero_ninety[str(self.n_form_ribs)]["rho"] * areas[
             "Ribs"]
-        total = w_f_s + w_b_s + w_c_r + w_h_r + w_te + w_le + w_main + w_form
+        total = bay_weights + w_c_r + w_h_r + w_form
         return total
