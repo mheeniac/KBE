@@ -1000,14 +1000,14 @@ class Aircraft(GeomBase):
     @Input
     def n_ply_list(self):
         length = len(self.bays) - 1
-        n_ply_rhs_LE = [4] * length
-        n_ply_rhs_main = [8] * length
+        n_ply_rhs_LE = [8] * length
+        n_ply_rhs_main = [10] * length
         n_ply_rhs_TE = [4] * length
-        n_ply_lhs_LE = [4] * length
-        n_ply_lhs_main = [4] * length
+        n_ply_lhs_LE = [8] * length
+        n_ply_lhs_main = [10] * length
         n_ply_lhs_TE = [4] * length
-        n_ply_front_spar = [4] * length
-        n_ply_back_spar = [4] * length
+        n_ply_front_spar = [8] * length
+        n_ply_back_spar = [8] * length
         return n_ply_rhs_LE,n_ply_rhs_main,n_ply_rhs_TE,n_ply_lhs_LE,n_ply_lhs_main,n_ply_lhs_TE,n_ply_front_spar,n_ply_back_spar
     @Attribute
     def ref_y(self):
@@ -1017,16 +1017,9 @@ class Aircraft(GeomBase):
             y.append(ref)
         return y
 
-    @Attribute
-    def bay_analysis(self):
-        quasi = ReadMaterial(ply_file="quasi_isotropic.csv").read
-        forty_five = ReadMaterial(ply_file="forty_five.csv").read
-        zero_ninety = ReadMaterial(ply_file="zero_ninety.csv").read
-        obj = ApplyMat(is_default= True,
-                       hinge_forces=self.total_hinge_force[0],
-                       obj=self)
-        analysis = []
 
+    def bay_analysis(self, mat,n_ply_list):
+        analysis = []
         for i in xrange(len(self.bays)-1):
             analysis.append( BayAnalysis(Vx=[self.force_lines.force_lines[0][self.positions_planes[i]],self.force_lines.force_lines[0][self.positions_planes[i+1]]],
                                Vy=[self.force_lines.force_lines[1][self.positions_planes[i]],self.force_lines.force_lines[1][self.positions_planes[i+1]]],
@@ -1039,25 +1032,150 @@ class Aircraft(GeomBase):
                                rhs_skin_faces=self.lhs_skin_faces(),
                                lhs_skin_faces=self.rhs_skin_faces(),
                                spar_faces=self.spar_faces(),
-                               rhs_skin_materials_t=[forty_five[str(self.n_ply_list[0][i])]['t'],quasi[str(self.n_ply_list[1][i])]['t'],forty_five[str(self.n_ply_list[2][i])]['t']] ,
-                               lhs_skin_materials_t=[forty_five[str(self.n_ply_list[3][i])]['t'],quasi[str(self.n_ply_list[4][i])]['t'],forty_five[str(self.n_ply_list[5][i])]['t']],
-                               spar_materials_t=[quasi[str(self.n_ply_list[6][i])]['t'],quasi[str(self.n_ply_list[7][i])]['t']],
-                               rhs_skin_materials_E=[forty_five[str(self.n_ply_list[0][i])]['E'],quasi[str(self.n_ply_list[1][i])]['E'],forty_five[str(self.n_ply_list[2][i])]['E']],
-                               lhs_skin_materials_E=[forty_five[str(self.n_ply_list[3][i])]['E'],quasi[str(self.n_ply_list[4][i])]['E'],forty_five[str(self.n_ply_list[5][i])]['E']],
-                               spar_materials_E=[quasi[str(self.n_ply_list[6][i])]['E'],quasi[str(self.n_ply_list[7][i])]['E']],
-                               rhs_skin_materials_G=[forty_five[str(self.n_ply_list[0][i])]['G'],quasi[str(self.n_ply_list[1][i])]['G'],forty_five[str(self.n_ply_list[2][i])]['G']],
-                               lhs_skin_materials_G=[forty_five[str(self.n_ply_list[3][i])]['G'],quasi[str(self.n_ply_list[4][i])]['G'],forty_five[str(self.n_ply_list[5][i])]['G']],
-                               spar_materials_G=[quasi[str(self.n_ply_list[6][i])]['G'],quasi[str(self.n_ply_list[7][i])]['G']],
-                               rhs_skin_materials_D=[[forty_five[str(self.n_ply_list[0][i])]['D11'], forty_five[str(self.n_ply_list[0][i])]['D22'], forty_five[str(self.n_ply_list[0][i])]['D22'], forty_five[str(self.n_ply_list[0][i])]['D12']],
-                                                     [quasi[str(self.n_ply_list[1][i])]['D11'], quasi[str(self.n_ply_list[1][i])]['D22'], quasi[str(self.n_ply_list[1][i])]['D22'], quasi[str(self.n_ply_list[1][i])]['D12']],
-                                                     [forty_five[str(self.n_ply_list[2][i])]['D11'], forty_five[str(self.n_ply_list[2][i])]['D22'], forty_five[str(self.n_ply_list[2][i])]['D22'], forty_five[str(self.n_ply_list[2][i])]['D12']]],
-                               lhs_skin_materials_D=[[forty_five[str(self.n_ply_list[3][i])]['D11'], forty_five[str(self.n_ply_list[3][i])]['D22'], forty_five[str(self.n_ply_list[3][i])]['D22'], forty_five[str(self.n_ply_list[3][i])]['D12']],
-                                                     [quasi[str(self.n_ply_list[4][i])]['D11'], quasi[str(self.n_ply_list[4][i])]['D22'], quasi[str(self.n_ply_list[4][i])]['D22'], quasi[str(self.n_ply_list[4][i])]['D12']],
-                                                     [forty_five[str(self.n_ply_list[5][i])]['D11'], forty_five[str(self.n_ply_list[5][i])]['D22'], forty_five[str(self.n_ply_list[5][i])]['D22'], forty_five[str(self.n_ply_list[5][i])]['D12']]],
-                               spar_materials_D=[[quasi[str(self.n_ply_list[6][i])]['D11'], quasi[str(self.n_ply_list[6][i])]['D22'], quasi[str(self.n_ply_list[6][i])]['D22'], quasi[str(self.n_ply_list[6][i])]['D12']],
-                                                 [quasi[str(self.n_ply_list[7][i])]['D11'], quasi[str(self.n_ply_list[7][i])]['D22'], quasi[str(self.n_ply_list[7][i])]['D22'], quasi[str(self.n_ply_list[7][i])]['D12']]],
+                               rhs_skin_materials_t=[mat[0][str(n_ply_list[0][i])]['t'],mat[1][str(n_ply_list[1][i])]['t'],mat[2][str(n_ply_list[2][i])]['t']] ,
+                               lhs_skin_materials_t=[mat[3][str(n_ply_list[3][i])]['t'],mat[4][str(n_ply_list[4][i])]['t'],mat[5][str(n_ply_list[5][i])]['t']],
+                               spar_materials_t=[mat[6][str(n_ply_list[6][i])]['t'],mat[7][str(n_ply_list[7][i])]['t']],
+                               rhs_skin_materials_E=[mat[0][str(n_ply_list[0][i])]['E'],mat[1][str(n_ply_list[1][i])]['E'],mat[2][str(n_ply_list[2][i])]['E']],
+                               lhs_skin_materials_E=[mat[3][str(n_ply_list[3][i])]['E'],mat[4][str(n_ply_list[4][i])]['E'],mat[5][str(n_ply_list[5][i])]['E']],
+                               spar_materials_E=[mat[6][str(n_ply_list[6][i])]['E'],mat[7][str(n_ply_list[7][i])]['E']],
+                               rhs_skin_materials_G=[mat[0][str(n_ply_list[0][i])]['G'],mat[1][str(n_ply_list[1][i])]['G'],mat[2][str(n_ply_list[2][i])]['G']],
+                               lhs_skin_materials_G=[mat[3][str(n_ply_list[3][i])]['G'],mat[4][str(n_ply_list[4][i])]['G'],mat[5][str(n_ply_list[5][i])]['G']],
+                               spar_materials_G=[mat[6][str(n_ply_list[6][i])]['G'],mat[7][str(n_ply_list[7][i])]['G']],
+                               rhs_skin_materials_D=[[mat[0][str(n_ply_list[0][i])]['D11'], mat[0][str(n_ply_list[0][i])]['D22'], mat[0][str(n_ply_list[0][i])]['D22'], mat[0][str(n_ply_list[0][i])]['D12']],
+                                                     [mat[1][str(n_ply_list[1][i])]['D11'], mat[1][str(n_ply_list[1][i])]['D22'], mat[1][str(n_ply_list[1][i])]['D22'], mat[1][str(n_ply_list[1][i])]['D12']],
+                                                     [mat[2][str(n_ply_list[2][i])]['D11'], mat[2][str(n_ply_list[2][i])]['D22'], mat[2][str(n_ply_list[2][i])]['D22'], mat[2][str(n_ply_list[2][i])]['D12']]],
+                               lhs_skin_materials_D=[[mat[3][str(n_ply_list[3][i])]['D11'], mat[3][str(n_ply_list[3][i])]['D22'], mat[3][str(n_ply_list[3][i])]['D22'], mat[3][str(n_ply_list[3][i])]['D12']],
+                                                     [mat[1][str(n_ply_list[4][i])]['D11'], mat[1][str(n_ply_list[4][i])]['D22'], mat[1][str(n_ply_list[4][i])]['D22'], mat[1][str(n_ply_list[4][i])]['D12']],
+                                                     [mat[5][str(n_ply_list[5][i])]['D11'], mat[5][str(n_ply_list[5][i])]['D22'], mat[5][str(n_ply_list[5][i])]['D22'], mat[5][str(n_ply_list[5][i])]['D12']]],
+                               spar_materials_D=[[mat[6][str(n_ply_list[6][i])]['D11'], mat[6][str(n_ply_list[6][i])]['D22'], mat[6][str(n_ply_list[6][i])]['D22'], mat[6][str(n_ply_list[6][i])]['D12']],
+                                                 [mat[7][str(n_ply_list[7][i])]['D11'], mat[7][str(n_ply_list[7][i])]['D22'], mat[7][str(n_ply_list[7][i])]['D22'], mat[7][str(n_ply_list[7][i])]['D12']]],
                                N=3) )
         return analysis
+        
+
+    @Attribute
+    def optimise_material(self):
+        quasi = ReadMaterial(ply_file="quasi_isotropic.csv").read
+        forty_five = ReadMaterial(ply_file="forty_five.csv").read
+        zero_ninety = ReadMaterial(ply_file="zero_ninety.csv").read
+        
+        for k in range(1,4):
+            if k == 1:
+                mat_dict = [0] * 8
+                mat_dict[0] = forty_five
+                mat_dict[1] = forty_five
+                mat_dict[2] = forty_five
+                mat_dict[3] = forty_five
+                mat_dict[4] = forty_five
+                mat_dict[5] = forty_five
+                mat_dict[6] = forty_five
+                mat_dict[7] = forty_five
+                n_ply_list = self.n_ply_list
+                bay = self.bay_analysis(mat=mat_dict,n_ply_list = n_ply_list)
+                comp_rhs_le = []
+                comp_rhs_main = []
+                comp_rhs_te = []
+                comp_lhs_le = []
+                comp_lhs_main = []
+                comp_lhs_te = []
+                comp_front_spar = []
+                comp_back_spar = []
+                
+                shear_rhs_le = []
+                shear_rhs_main = []
+                shear_rhs_te = []
+                shear_lhs_le = []
+                shear_lhs_main = []
+                shear_lhs_te = []
+                shear_front_spar = []
+                shear_back_spar = []
+                
+                for sections in bay:
+                    comp = sections.max_compression_lst
+                    shear = sections.max_shear_lst
+                    comp_rhs_le.append(comp[0])
+                    comp_rhs_main.append(comp[1])
+                    comp_rhs_te.append(comp[2])
+                    comp_lhs_le.append(comp[3])
+                    comp_lhs_main.append(comp[4])
+                    comp_lhs_te.append(comp[5])
+                    comp_front_spar.append(comp[6])
+                    comp_back_spar.append(comp[7])
+                    
+                    shear_rhs_le.append(shear[0])
+                    shear_rhs_main.append(shear[1])
+                    shear_rhs_te.append(shear[2])
+                    shear_lhs_le.append(shear[3])
+                    shear_lhs_main.append(shear[4])
+                    shear_lhs_te.append(shear[5])
+                    shear_front_spar.append(shear[6])
+                    shear_back_spar.append(shear[7])
+                comp_rhs_le = sum(comp_rhs_le) / len(comp_rhs_le)
+                comp_rhs_main = sum(comp_rhs_main) / len(comp_rhs_main)
+                comp_rhs_te = sum(comp_rhs_te) / len(comp_rhs_te)
+                comp_lhs_le = sum(comp_lhs_le) / len(comp_lhs_le)
+                comp_lhs_main = sum(comp_lhs_main) / len(comp_lhs_main)
+                comp_lhs_te = sum(comp_lhs_te) / len(comp_lhs_te)
+                comp_front_spar = sum(comp_front_spar) / len(comp_front_spar)
+                comp_back_spar = sum(comp_back_spar) / len(comp_back_spar)
+                
+                shear_rhs_le = sum(shear_rhs_le) / len(shear_rhs_le)
+                shear_rhs_main = sum(shear_rhs_main) / len(shear_rhs_main)
+                shear_rhs_te = sum(shear_rhs_te) / len(shear_rhs_te)
+                shear_lhs_le = sum(shear_lhs_le) / len(shear_lhs_le)
+                shear_lhs_main = sum(shear_lhs_main) / len(shear_lhs_main)
+                shear_lhs_te = sum(shear_lhs_te) / len(shear_lhs_te)
+                shear_front_spar = sum(shear_front_spar) / len(shear_front_spar)
+                shear_back_spar = sum(shear_back_spar) / len(shear_back_spar)
+                
+                fracs = []
+                fracs.append(comp_rhs_le/shear_rhs_le)
+                fracs.append(comp_rhs_main/shear_rhs_main)
+                fracs.append(comp_rhs_te/shear_rhs_te)
+                fracs.append(comp_lhs_le/shear_lhs_le)
+                fracs.append(comp_lhs_main/shear_lhs_main)
+                fracs.append(comp_lhs_te/shear_lhs_te)
+                fracs.append(comp_front_spar/shear_front_spar)
+                fracs.append(comp_back_spar/shear_back_spar)                
+            if k == 2:
+                for index in xrange(len(fracs)):
+                    if abs(fracs[index]) < 0.1:
+                        mat_dict[index] = forty_five
+                        print "45"
+                    elif abs(fracs[index]) >= 0.1 and abs(fracs[index]) <= 50:
+                        mat_dict[index] = quasi
+                        print "quasi"
+                    elif abs(fracs[index]) > 50:
+                        mat_dict[index] = zero_ninety
+                        print "090"
+                bay_new = self.bay_analysis(mat=mat_dict,n_ply_list = n_ply_list)
+            if k == 3:
+                bay_current = bay_new
+                was_smaller = [[False] * len(bay_current)] * len(fracs)
+                for runs in range(0,6):
+                    for i in xrange(len(bay_current)):
+                        for j in xrange(len(fracs)):
+                            x =  bay_current[i].buckling_rf_combined[j] - 1
+                            if x > 1.2 and was_smaller[j][i] == False:
+                                if n_ply_list[j][i] != 4:
+                                    n_ply_list[j][i] = n_ply_list[j][i] - 2
+                            elif x < 1:
+                                if n_ply_list[j][i] != 20:
+                                    n_ply_list[j][i] = n_ply_list[j][i] + 2
+                                    was_smaller[j][i] = True
+                    print n_ply_list
+                    bay_current = self.bay_analysis(mat=mat_dict,n_ply_list = n_ply_list)
+                            
+
+        return bay_current
+
+
+
+
+                
+
+
+
 
     @Attribute
     def color_list(self):
