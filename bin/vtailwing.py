@@ -598,12 +598,12 @@ class VTailWing(GeomBase):
 
     @Part(in_tree=False)
     def curve_surface1(self):
-        return MultiSectionSurface(profiles=[self.curves[0], self.curves[2]],
+        return MultiSectionSurface(profiles=[self.crv[0], self.crv[2]],
                                    path=self.rudder_shell.edges[3])
 
     @Part(in_tree=False)
     def curve_surface2(self):
-        return MultiSectionSurface(profiles=[self.curves[1], self.curves[3]],
+        return MultiSectionSurface(profiles=[self.crv[1], self.crv[3]],
                                    path=self.rudder_shell.edges[7])
 
     @Part(in_tree=False)
@@ -626,14 +626,39 @@ class VTailWing(GeomBase):
                           tool=[self.pln_back_spar, self.pln_front_spar])
 
     @Attribute
+    def crv(self):
+        start= self.fused_spars.faces[1].vertices[1].point
+        end = self.fused_spars.faces[1].vertices[0].point
+        crv1 = LineSegment(start=start, end=end)
+        crv2 = self.curves[0]
+        obj1 = ComposedCurve(built_from=[crv1, crv2])
+
+        start= self.fused_spars.faces[4].vertices[0].point
+        end = self.fused_spars.faces[4].vertices[1].point
+        crv1 = LineSegment(start=start, end=end)
+        crv2 = self.curves[1]
+        obj2 = ComposedCurve(built_from=[crv1, crv2])
+
+        start= self.fused_spars.faces[1].vertices[2].point
+        end = self.fused_spars.faces[1].vertices[3].point
+        crv1 = LineSegment(start=start, end=end)
+        crv2 = self.curves[2]
+        obj3 = ComposedCurve(built_from=[crv1, crv2])
+
+        start= self.fused_spars.faces[4].vertices[3].point
+        end = self.fused_spars.faces[4].vertices[2].point
+        crv1 = LineSegment(start=start, end=end)
+        crv2 = self.curves[3]
+        obj4 = ComposedCurve(built_from=[crv1, crv2])
+        return obj1,obj2,obj3,obj4
+
+    @Attribute
     def fused_le_skin_left(self):
-        return FusedShell(shape_in=self.fused_spars.faces[1],
-                          tool=[self.curve_surface1])
+        return self.curve_surface1
 
     @Attribute
     def fused_le_skin_right(self):
-        return FusedShell(shape_in=self.fused_spars.faces[4],
-                          tool=[self.curve_surface2])
+        return self.curve_surface2
 
     @Attribute
     def main_skin_left(self):

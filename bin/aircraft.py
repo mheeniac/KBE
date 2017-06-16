@@ -991,17 +991,17 @@ class Aircraft(GeomBase):
         return list
 
     def rhs_skin_faces(self):
-        return [self.def_v_tail_wing.fused_le_skin_right.shells[0], self.def_v_tail_wing.main_skin_right.faces[0],
+        return [self.def_v_tail_wing.fused_le_skin_right, self.def_v_tail_wing.main_skin_right.faces[0],
                 self.def_v_tail_wing.te_skin_right.faces[0]]
 
     def lhs_skin_faces(self):
-        return [self.def_v_tail_wing.fused_le_skin_left.shells[0], self.def_v_tail_wing.main_skin_left.faces[0],
+        return [self.def_v_tail_wing.fused_le_skin_left, self.def_v_tail_wing.main_skin_left.faces[0],
                 self.def_v_tail_wing.te_skin_left.faces[0]]
 
     def spar_faces(self):
         return [self.def_v_tail_wing.rudder_front_spar.faces[0], self.def_v_tail_wing.rudder_back_spar.faces[0]]
 
-    @Attribute(settable=True)
+    @Input(settable=True)
     def n_ply_list(self):
         length = len(self.bays) - 1
         n_ply_rhs_LE = [8] * length
