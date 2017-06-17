@@ -15,42 +15,42 @@ from csv_in_out import *
 
 class Wingset(GeomBase):
     # This class creates a set of wings that can be used for the main wings or horizontal tail of a plane
-
+    wingset = csvr.read_input("mwing.csv")  # Main wing Settings
     #: length of the root chord [m]
     #: :type: float
-    w_c_root = Input(3)
+    w_c_root = Input(wingset["w_c_root"])
 
     #: single wing span [m]
     #: :type: float
-    w_span = Input(7)
+    w_span = Input(wingset["w_span"])
 
     #: wing sweep angle [degrees]
     #: :type: float or str
-    sweep_angle = Input('NaN')  # Overwrites default function if ~= 'NaN'
+    sweep_angle_user = Input(wingset["sweep_angle"])  # Overwrites default function if ~= 'NaN'
 
     #: wing taper ratio []
     #: :type: float or str
-    taper_ratio = Input('NaN')  # Overwrites the default function if ~= 'NaN'
+    taper_ratio_user = Input(wingset["taper_ratio"])  # Overwrites the default function if ~= 'NaN'
 
     #: wing dihedral angle [degrees]
     #: :type: float or str
-    dihedral_angle = Input('NaN')  # Overwrites the default function if ~= 'NaN'
+    dihedral_angle_user = Input(wingset["dihedral_angle"])  # Overwrites the default function if ~= 'NaN'
 
     #: jet cruise speed [mach]
     #: :type: float
-    m_cruise = Input(0.8)  # Used to calculate the default sweep angle
+    m_cruise = Input(wingset["m_cruise"])  # Used to calculate the default sweep angle
 
     #: airfoil technology factor []
     #: :type: float
-    TechFactor = Input(0.86)  # Technology factor is equal to 0.87 NACA 6 airfoil and 1 to other conventional airfoils
+    TechFactor = Input(wingset["TechFactor"])  # Technology factor is equal to 0.87 NACA 6 airfoil and 1 to other conventional airfoils
 
     #: the name of the root airfoil file
     #: :type: string
-    airfoil_root = Input('airfoil.dat')
+    airfoil_root = Input(wingset["airfoil_root"])
 
     #: the name of the tip airfoil file
     #: :type: string
-    airfoil_tip = Input('airfoil.dat')
+    airfoil_tip = Input(wingset["airfoil_tip"])
 
     # Label for the tree
     label = 'Wing Set'

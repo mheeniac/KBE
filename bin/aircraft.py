@@ -109,7 +109,7 @@ class Aircraft(GeomBase):
 
     #: The desired distance between the vertical tail aerodynamic centre and the main wing aerodynamic centre
     #: :type: float
-    l_v = Input(6.)
+    l_v = Input(const["l_v"])
 
     #: Fraction to determine root chord size in relation to the span length
     #: :type: float
@@ -146,43 +146,43 @@ class Aircraft(GeomBase):
 
     #: Distance in x direction of hinge plane with respect to the trailing edge[m]
     #: :type: float
-    d_hinge_user = Input('NaN')  # Overwrites the default function if ~= 'NaN'
+    d_hinge_user = Input(vtail["d_hinge_user"])  # Overwrites the default function if ~= 'NaN'
 
-    #: Distance in z direction of fist fin rib with respect to the root[m]
+    #: Distance in z direction of first fin rib with respect to the root[m]
     #: :type: float
-    p_zero_user = Input('NaN')  # Overwrites the default function if ~= 'NaN'
+    p_zero_user = Input(vtail["p_zero_user"])  # Overwrites the default function if ~= 'NaN'
 
     #: Distance in z direction of following fin ribs with respect to the previous one [m]
     #: :type: float
-    p_rib_user = Input('NaN')  # Overwrites the default function if ~= 'NaN'
+    p_rib_user = Input(vtail["p_rib_user"])  # Overwrites the default function if ~= 'NaN'
 
     #: Distance in z direction of the form rib with respect to the first form rib [m]
     #: :type: float
-    p_form_rib_user = Input('NaN')  # Overwrites the default function if ~= 'NaN'
+    p_form_rib_user = Input(vtail["p_form_rib_user"])  # Overwrites the default function if ~= 'NaN'
 
     #: Ratio of local width where the local hinge is located []
     #: :type: float
-    rhl_root = Input(0.25)
+    rhl_root = Input(vtail["rhl_root"])
 
     #: Ratio of local width where the local hinge is located []
     #: :type: float
-    rhl_tip = Input(0.25)
+    rhl_tip = Input(vtail["rhl_tip"])
 
     #: Ratio of local width where the local actuator hinge is located []
     #: :type: float
-    ahl_tip = Input(0.25)
+    ahl_tip = Input(vtail["ahl_tip"])
 
     #: Distance in z direction between the to actuator hinge planes [m]
     #: :type: float
-    d_actuator = Input(0.125)
+    d_actuator = Input(vtail["d_actuator"])
 
     #: Distance of front spar with respect to the hinge plane [m]
     #: :type: float
-    d_front_spar = Input(0.07)
+    d_front_spar = Input(vtail["d_front_spar"])
 
     #: Distance of back spar with respect to the trailing edge [m]
     #: :type: float
-    d_back_spar = Input(0.025)
+    d_back_spar = Input(vtail["d_back_spar"])
 
     #: Select which ribs are the hinge ribs. Default value is [1,2,3,4,5,6] al hinges are used. []
     #: :type: list of integers
@@ -190,36 +190,36 @@ class Aircraft(GeomBase):
 
     #: Rudder size fraction. Rudder width/Fin root chord []
     #: :type: float
-    rud_width_frac = Input(0.2)
+    rud_width_frac = Input(vtail["rud_width_frac"])
 
     #: The height offset of the rudder from the bottom of the fin (height offset/first rib height) []
     #: :type: float
-    rud_height_frac = Input(0.8)
+    rud_height_frac = Input(vtail["rud_height_frac"])
 
     #: The fraction of the length of the rudder (rudder length/fin span) []
     #: :type: float
-    rud_length_frac = Input(0.75)
+    rud_length_frac = Input(vtail["rud_length_frac"])
 
     #: The fraction of the height of the actuator box from the bottom (box height/fin span)
     #: If you want the actuator n ribs lower or higher just input 0.33 +/- p_rib*n
     #: :type: float
-    actuator_frac = Input(0.33)
+    actuator_frac = Input(vtail["actuator_frac"])
 
     #: The fraction of the height of the first rib from the bottom (rib height/fin span) []
     #: :type: float
-    rib0_frac = Input(0.0625)
+    rib0_frac = Input(vtail["rib0_frac"])
 
     #: The fraction of the height of the ribs (rib height/fin span) []
     #: :type: float
-    rib_frac = Input(0.125)
+    rib_frac = Input(vtail["rib_frac"])
 
     #: The fraction of the height of the form ribs (form rib height/fin span) []
     #: :type: float
-    form_rib_frac = Input(0.075)
+    form_rib_frac = Input(vtail["form_rib_frac"])
 
     #: Iteration size of to make the shear and bend moment lines [m]
     #: :type: float
-    dx = Input(0.001)
+    dx = Input(const["dx"])
 
     # -----------------
     ## HTail variables
@@ -239,8 +239,7 @@ class Aircraft(GeomBase):
 
     #: airfoil technology factor []
     #: :type: float
-    hor_TechFactor = Input(htail[
-                               "TechFactor"])  # Technology factor is equal to 0.87 NACA 6 airfoil and 1 to other conventional airfoils
+    hor_TechFactor = Input(htail["TechFactor"])  # Technology factor is equal to 0.87 NACA 6 airfoil and 1 to other conventional airfoils
 
     #: the name of the root airfoil file
     #: :type: string

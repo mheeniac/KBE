@@ -3,7 +3,7 @@ import os
 from parapy.core import *
 from parapy.geom import *
 import warnings
-
+import csv_handle as csvr
 
 # TODO:
 #
@@ -12,42 +12,42 @@ import warnings
 
 class Wing(GeomBase):
     # This class creates a single wing part
-
+    mwing = csvr.read_input("mwing.csv")  # Main wing Settings
     #: length of the root chord [m]
     #: :type: float
-    w_c_root = Input(3)
+    w_c_root = Input(mwing["w_c_root"])
 
     #: single wing span [m]
     #: :type: float
-    w_span = Input(7)
+    w_span = Input(mwing["w_span"])
 
     #: wing sweep angle [degrees]
     #: :type: float or str
-    sweep_angle_user = Input('NaN')  # Overwrites default function if ~= 'NaN'
+    sweep_angle_user = Input(mwing["sweep_angle"])  # Overwrites default function if ~= 'NaN'
 
     #: wing taper ratio []
     #: :type: float or str
-    taper_ratio_user = Input('NaN')  # Overwrites the default function if ~= 'NaN'
+    taper_ratio_user = Input(mwing["taper_ratio"])  # Overwrites the default function if ~= 'NaN'
 
     #: wing dihedral angle [degrees]
     #: :type: float or str
-    dihedral_angle_user = Input('NaN')  # Overwrites the default function if ~= 'NaN'
+    dihedral_angle_user = Input(mwing["dihedral_angle"])  # Overwrites the default function if ~= 'NaN'
 
     #: jet cruise speed [mach]
     #: :type: float
-    m_cruise = Input(0.8)  # Used to calculate the default sweep angle
+    m_cruise = Input(mwing["m_cruise"])  # Used to calculate the default sweep angle
 
     #: airfoil technology factor []
     #: :type: float
-    TechFactor = Input(0.86)  # Technology factor is equal to 0.87 NACA 6 airfoil and 1 to other conventional airfoils
+    TechFactor = Input(mwing["TechFactor"])  # Technology factor is equal to 0.87 NACA 6 airfoil and 1 to other conventional airfoils
 
     #: the name of the root airfoil file
     #: :type: string
-    airfoil_root = Input('airfoil.dat')
+    airfoil_root = Input(mwing["airfoil_root"])
 
     #: the name of the tip airfoil file
     #: :type: string
-    airfoil_tip = Input('airfoil.dat')
+    airfoil_tip = Input(mwing["airfoil_tip"])
 
     # Label for the tree
     label = 'Wing'

@@ -5,3 +5,5 @@ Vv,0.083,[],Volume coefficient (float)
 rho,1.225,[kg/m^3],Density of air at flight altitude (float)
 FoS,3.0,[],Factor of safety for the AVL analysis (float)
 x_fc,0.2,[],Rudder force width offset fraction of total rudder width (float)
+l_v,6.,[],The desired distance between the vertical tail aerodynamic center
+dx,0.001,[m],Iteration size of to make the shear and bend moment lines

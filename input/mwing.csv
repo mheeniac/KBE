@@ -7,3 +7,4 @@ TechFactor,0.86,[],TechFactor of the main wing
 w_span,7.0,[m],W span of the main wing 
 airfoil_root,airfoil.dat,[],airfoil file name
 airfoil_tip,airfoil.dat,[],airfoil file name
+m_cruise,0.8,[mach],jet cruise speed
