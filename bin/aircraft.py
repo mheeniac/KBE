@@ -296,9 +296,9 @@ class Aircraft(GeomBase):
     def obj_main_wing(self):
         # Create a wing object for the main wings of the plane from the wingset class
         return Wingset(w_c_root=self.w_c_root,
-                       sweep_angle=self.sweep_angle,
-                       taper_ratio=self.taper_ratio,
-                       dihedral_angle=self.dihedral_angle,
+                       sweep_angle_user=self.sweep_angle,
+                       taper_ratio_user=self.taper_ratio,
+                       dihedral_angle_user=self.dihedral_angle,
                        m_cruise=self.m_cruise,
                        TechFactor=self.TechFactor,
                        w_span=self.w_span,
@@ -428,8 +428,7 @@ class Aircraft(GeomBase):
         Calculates the z_offset for the vertical tail such that the tip will be flush with the tail cone
         :rtype: float
         """
-        x_pos = self.v_shift() - (
-            self.cabin_length + self.fuselage_part.length_nose)  # x-position position from start tail
+        x_pos = self.v_shift() - (self.cabin_length + self.fuselage_part.length_nose)  # x-position position from start tail
         if x_pos > 0:
             x_len = self.fuselage_part.length_tail - x_pos  # X position from the back of the tail
             # Calculate the diff between tops of tail circles
@@ -437,7 +436,6 @@ class Aircraft(GeomBase):
                  self.fuselage_part.fuselage_assembly[0].edges[2].point1.z
             z_pos = ((dv / self.fuselage_part.length_tail) * x_len) + \
                     self.fuselage_part.fuselage_assembly[0].edges[2].point1.z  # Simple triangle calculation
-            print x_len
             return z_pos
         else:
             return self.cabin_diameter
@@ -609,9 +607,9 @@ class Aircraft(GeomBase):
         :rtype: Wingset
         """
         return Wingset(w_c_root=self.h_w_c_root,
-                       sweep_angle=self.hor_sweep_angle_user,
-                       taper_ratio=self.hor_taper_ratio_user,
-                       dihedral_angle=self.hor_dihedral_angle_user,
+                       sweep_angle_user=self.hor_sweep_angle_user,
+                       taper_ratio_user=self.hor_taper_ratio_user,
+                       dihedral_angle_user=self.hor_dihedral_angle_user,
                        m_cruise=self.m_cruise,
                        TechFactor=self.hor_TechFactor,
                        w_span=self.hor_w_span,
@@ -768,7 +766,6 @@ class Aircraft(GeomBase):
                 force = - q * length  # Calculate force
                 R.append(force)  # Append force
         check = (sum(l) - (top_ref - ref) == 0)  # Checks if the calculations of l are valid
-        print l
         if check != True:
             warnings.warn('Something went wrong in the hinge reaction forces, check is false')
 
@@ -804,7 +801,6 @@ class Aircraft(GeomBase):
         F2_y = F2 * sin(radians(self.rud_angle))
         Fh = [[F1_x, F1_y], [F2_x, F2_y], distance[1]]  # Forces and their corresponding hinge numbers
         check_x = (F1_x + F2_x) + Fa_x
-        print check_x
         return [Fa_x, Fa_y], Fh, M_f
 
 
@@ -852,10 +848,7 @@ class Aircraft(GeomBase):
         tot_force = [0] * len(tot_force_y)  # The total forces
         for index in range(0, len(tot_force_y)):   # Loop over the range of the forces
             if index == act_force[1][2][0]: # If we are at the first actuator hinge
-                print tot_force_y[index]
                 tot_force_y[index] = tot_force_y[index] + act_force[1][0][1]    # Add the y force to the current
-                print tot_force_y[index]
-                print act_force[1][0][1]
                 tot_force_x[index] = tot_force_x[index] + act_force[1][0][0]    # Add the x force to the current
             if index == act_force[1][2][1]:
                 tot_force_y[index] = tot_force_y[index] + act_force[1][1][1]
@@ -1176,7 +1169,6 @@ class Aircraft(GeomBase):
                                 if n_ply_list[j][i] != 20:
                                     n_ply_list[j][i] = n_ply_list[j][i] + 2
                                     was_smaller[j][i] = True
-                    print n_ply_list
                     bay_new = self.bay_analysis(mat=mat_dict,n_ply_list = n_ply_list)
 
 

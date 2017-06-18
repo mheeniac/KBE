@@ -63,12 +63,12 @@ class Wingset(GeomBase):
     # object of class wing using local input
     def obj_wingset(self):
         return Wing(w_c_root=self.w_c_root,
-                    dihedral_angle_user=self.dihedral_angle,
+                    dihedral_angle_user=self.dihedral_angle_user,
                     w_span=self.w_span,
-                    taper_ratio_user=self.taper_ratio,
+                    taper_ratio_user=self.taper_ratio_user,
                     TechFactor=self.TechFactor,
                     m_cruise=self.m_cruise,
-                    sweep_angle_user=self.sweep_angle,
+                    sweep_angle_user=self.sweep_angle_user,
                     airfoil_root=self.airfoil_root,
                     airfoil_tip=self.airfoil_tip)
 
