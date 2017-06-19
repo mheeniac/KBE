@@ -5,8 +5,6 @@ from wingset import *
 from vtailwing import *
 from bay_analysis_tool.bay_analysis import BayAnalysis
 from avl import *
-from material_allocation import *
-from shear_bend import *
 from save_summary import *
 from bayanalysis import *
 
