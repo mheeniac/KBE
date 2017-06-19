@@ -14,7 +14,7 @@ class VTailWing(GeomBase):
     # This class creates a vertical wing including rudder
 
     # Label for the tree
-    label = 'Ruder'
+    label = 'VTP'
 
     # Create dicts
     constants = csvr.read_input("constants.csv")  # Fuselage Settings
