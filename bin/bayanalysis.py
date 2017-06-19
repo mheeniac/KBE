@@ -7,15 +7,27 @@ class BayAna(Base):
     
     @Attribute
     def force_lines(self):
+        """
+        Creates the force_lines
+        :rtype: object
+        """
         return ForceLines(craft=self.craft)
     
     
     def sorted_ribs(self):
+        """
+        Sorts the ribs
+        :rtype: list
+        """
         return sorted(self.craft.def_v_tail_wing.rudder_ribs, key=lambda face: face.cog.z)
     
     
     @Attribute
     def bays(self):
+        """
+        Creates the bay planes
+        :rtype: list
+        """
         list = []
         list.append(TranslatedPlane(built_from=self.craft.def_v_tail_wing.closure_ribs[0].u_reversed,
                                     displacement=Vector(0, 0, 0.01)))
@@ -28,6 +40,10 @@ class BayAna(Base):
     
     @Attribute
     def positions_planes(self):
+        """
+        Returns the bay planes z positions
+        :rtype: list
+        """
         list = []
         dx = self.craft.dx
         for i in xrange(len(self.bays)):
@@ -35,24 +51,39 @@ class BayAna(Base):
                 int((self.bays[i].uv_center_point.z - self.craft.def_v_tail_wing.closure_ribs[0].vertices[0].point.z) / dx))
     
         return list
-    
-    
+
     def lhs_skin_faces(self):
+        """
+        Left hand side skin faces
+        :rtype: list
+        """
         return [self.craft.def_v_tail_wing.fused_le_skin_right, self.craft.def_v_tail_wing.main_skin_right.faces[0],
                 self.craft.def_v_tail_wing.te_skin_right.faces[0]]
     
     
     def rhs_skin_faces(self):
+        """
+        Right hand side skin faces
+        :rtype: list
+        """
         return [self.craft.def_v_tail_wing.fused_le_skin_left, self.craft.def_v_tail_wing.main_skin_left.faces[0],
                 self.craft.def_v_tail_wing.te_skin_left.faces[0]]
     
     
     def spar_faces(self):
+        """
+        Front and back spar faces
+        :rtype: list
+        """
         return [self.craft.def_v_tail_wing.rudder_front_spar.faces[0], self.craft.def_v_tail_wing.rudder_back_spar.faces[0]]
     
     
     @Input(settable=True)
     def n_ply_list(self):
+        """
+        Will give the default ply list
+        :rtype: list
+        """
         length = len(self.bays) - 1
         n_ply_rhs_LE = [8] * length
         n_ply_rhs_main = [10] * length
@@ -67,6 +98,10 @@ class BayAna(Base):
     
     @Attribute
     def ref_y(self):
+        """
+        Calculates the ref y
+        :rtype: list
+        """
         y = []
         for i in xrange(len(self.bays)):
             ref = self.craft.def_v_tail_wing.hingerib_line.start.y + self.craft.def_v_tail_wing.hingerib_line.direction_vector.y / self.craft.def_v_tail_wing.hingerib_line.direction_vector.z * (
@@ -76,6 +111,10 @@ class BayAna(Base):
     
     
     def bay_analysis(self, mat, n_ply_list):
+        """
+        Computes the bay analysis
+        :rtype: object
+        """
         analysis = []
         for i in xrange(len(self.bays) - 1):
             analysis.append(BayAnalysis(Vx=[self.force_lines.force_lines[0][self.positions_planes[i]],
