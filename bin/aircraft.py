@@ -886,7 +886,7 @@ class Aircraft(GeomBase):
         Calls the Apply Material class and returns the weight of the rudder
         :rtype: float
         """
-        obj = self.rudder_weights_obj()
+        obj = self.rudder_weights_obj
         return obj.weights + sum(self.hinge_mass[0]) + sum(self.hinge_mass[1])
 
     @Attribute
