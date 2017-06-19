@@ -59,6 +59,23 @@ class Wingset(GeomBase):
     #: :type: str
     save_name = Input()
 
+
+    #: The sweep angle of the main wing (if applicable)
+    #: :type: float
+    main_sweep = Input(None)
+
+    @Attribute
+    def tail_sweep(self):
+        """
+        Calculates the sweep angle of the VTP based on the main wing sweep
+        :rtype: float
+        """
+        if self.main_sweep != None and self.sweep_angle_user == 'NaN':
+            tail_sweep = self.main_sweep + 10
+        else:
+            tail_sweep = self.sweep_angle_user
+        return tail_sweep
+
     @Part(in_tree=False)
     # object of class wing using local input
     def obj_wingset(self):

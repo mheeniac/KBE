@@ -615,6 +615,7 @@ class Aircraft(GeomBase):
                        w_span=self.hor_w_span,
                        airfoil_root=self.hor_airfoil_root,
                        airfoil_tip=self.hor_airfoil_tip,
+                       main_sweep = self.obj_main_wing.obj_wingset.sweep_angle,
                        save_name="htail.csv")
 
     @Part(in_tree=False)
