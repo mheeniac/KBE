@@ -38,19 +38,13 @@ Before running the software a couple of files are required for set-up.
   from start to end along its perimeter, without defining the chord. 
 - At least one material .csv file, adhering to the format of the sample files provided in the materials
   folder (see Folder Structure). 
-- A variables.txt file containing at least all the variables that can be found in the sample
-  input_citationCJ4_.txt file. Note: all files adhering to this format and want to be included in the 
-  program should end in '_.txt'. If any files with 'json' in the name are present in the folder, 
-  these will overrule the '_.txt' files. 
-- A constants.txt file containing at least all the variables that can be found in the sample
-  constants_citationCJ4_.txt
+- All .csv files in the Input folder containing at least all the variables that can be found in the sample
+  sample files.
 
-The user is to define all variables in the input*_.txt file. Explanation and units can be found in the 
-file itself. Please adhere to the same structure or the programma may fail. 
-The output json files (see Outputs) can also be used by simply copying them to the input folder. They will
-always overrule the '*_.txt' files. 
+The user is to define all variables in the input folder files. Explanation and units can be found in the 
+file itself. Please adhere to the same structure or the programme may fail. 
 
-Note that some not often changed values may be found in the constants*_.txt file. Change these as you wish. 
+Note that some not often changed values may be found in the constants.csv file. Change these as you wish. 
 __________
 4. RUNNING 
 ----------
