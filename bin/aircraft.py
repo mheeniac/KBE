@@ -443,6 +443,10 @@ class Aircraft(GeomBase):
 
     @Part(in_tree=True)
     def def_v_tail_wing(self):
+        """
+        Call the vertical tail wing class
+        :rtype: object
+        """
         return VTailWing(w_span=self.vert_w_span(),
                          sweep_angle_user=self.vert_sweep_angle_user,
                          taper_ratio_user=self.vert_taper_ratio_user,
@@ -706,6 +710,10 @@ class Aircraft(GeomBase):
 
     @Part
     def interface(self):
+        """
+        Calls the avl interface
+        :rtype: object
+        """
         return avl.Interface(filename="FullAircraft",
                              directory="output",
                              geometry=geometry(self),
@@ -888,11 +896,19 @@ class Aircraft(GeomBase):
 
     @Attribute(in_tree=False)
     def total_length(self):
+        """
+        Calculate the total length
+        :rtype: float
+        """
         return self.fuselage_part.fuselage_length
 
 
     @Part
     def bay_analysis(self):
+        """
+        Call the bay_analysis class
+        :rtype: object
+        """
         return BayAna(craft=self)
 
 
