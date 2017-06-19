@@ -885,78 +885,10 @@ class Aircraft(GeomBase):
                        mat_dict = self.optimise_material[1])
         return obj.weights + sum(self.hinge_mass[0]) + sum(self.hinge_mass[1])
 
-    #     # @Attribute(in_tree=False)
-    #     # def total_length(self):
-    #     #     return self.fuselage_part.fuselage_length
-    #     #
+    @Attribute(in_tree=False)
+    def total_length(self):
+        return self.fuselage_part.fuselage_length
 
-
-    #     #
-
-
-    #     #
-
-    #     #
-    #     # @Attribute
-    #     # def planes(self):
-    #     #     p2_z = self.def_v_tail_wing.hinges[0].position.z
-    #     #     p1_z = self.def_v_tail_wing.fixed_part.position.z
-    #     #     plane2 = TranslatedPlane(built_from=self.def_v_tail_wing.rudder_plns.first,
-    #     #                              displacement=Vector(0, 0, 0.02))
-    #     #     plane1 = TranslatedPlane(built_from=plane2,
-    #     #                              displacement=Vector(0, 0, p2_z - p1_z))
-    #     #     return plane1, plane2
-    #     #
-    #     # @Attribute
-    #     # def rhs_skin_faces(self):
-    #     #     return self.def_v_tail_wing.fused_le_skin_right, self.def_v_tail_wing.main_skin_right, self.def_v_tail_wing.te_skin_right
-    #     #
-    #     # @Attribute
-    #     # def lhs_skin_faces(self):
-    #     #     return self.def_v_tail_wing.fused_le_skin_left, self.def_v_tail_wing.main_skin_left, self.def_v_tail_wing.te_skin_left
-    #     #
-    #     # @Attribute
-    #     # def spar_faces(self):
-    #     #     return self.def_v_tail_wing.rudder_front_spar, self.def_v_tail_wing.rudder_back_spar
-    #     #
-    #     # @Attribute
-    #     # def ref_x(self):
-    #     #     x1 = self.def_v_tail_wing.rudder_plns.last.reference.z
-    #     #     x2 = self.def_v_tail_wing.rudder_plns.first.reference.z
-    #     #     return x1, x2
-    #     #
-    #     # @Attribute
-    #     # def ref_y(self):
-    #     #     z_hinge = self.def_v_tail_wing.p_zero + self.def_v_tail_wing.p_rib * (
-    #     #         self.def_v_tail_wing.pick_hingeribs[0] - 1)
-    #     #     z_1 = self.ref_x[0]
-    #     #     z_2 = self.ref_x[1]
-    #     #     y_pos_root_begin = self.fixed_part_with_ribs.vertices[25 - 2 * self.pick_hingeribs[0]].point
-    #     #     y_pos_root_end = self.fixed_part_with_ribs.vertices[24 - 2 * self.pick_hingeribs[0]].point
-    #     #     points = [y_pos_root_begin, y_pos_root_end]
-    #     #     distance = Point.distance(*points)
-    #     #     y1 = y_pos_root_begin.y + distance * self.def_v_tail_wing.rhl_root + (
-    #     #                                                                              self.def_v_tail_wing.hingerib_line.direction_vector.y / self.def_v_tail_wing.hingerib_line.direction_vector.z) * (
-    #     #                                                                              z_1 - z_hinge)
-    #     #     y2 = y_pos_root_begin.y + distance * self.def_v_tail_wing.rhl_root + (
-    #     #                                                                              self.def_v_tail_wing.hingerib_line.direction_vector.y / self.def_v_tail_wing.hingerib_line.direction_vector.z) * (
-    #     #                                                                              z_2 - z_hinge)
-    #     #     return y1, y2
-    #     #
-    #     # @Attribute
-    #     # def forces(self):
-    #     #     p2_z = self.def_v_tail_wing.hinges[0].position.z
-    #     #     p1_z = self.def_v_tail_wing.fixed_part.position.z
-    #     #     q = self.hinge_reaction_forces()[2]
-    #     #     R = self.hinge_reaction_forces()[0][0]
-    #     #     FX = [0, self.actuator_forces[0][0]]
-    #     #     FY = [0, q * (p2_z - p1_z) - R]
-    #     #     MX = [0, q * (p2_z - p1_z) * (p2_z - p1_z)]
-    #     #     MY = [0, 0]
-    #     #     MZ = [0, q * (p2_z - p1_z)]
-    #     #     return FX, FY, MX, MY, MZ
-    #     #
-    #     # @Attribute
 
     @Attribute
     def force_lines(self):
