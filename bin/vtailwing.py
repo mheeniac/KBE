@@ -689,10 +689,11 @@ class VTailWing(GeomBase):
         """
         if Point.distance(self.fused_spars.faces[14].vertices[1].point,
                           self.fused_spars.faces[14].vertices[2].point) < 0.04:
-            warnings.showwarning(message='d_back_spar = too small', category=UserWarning, filename='vtailwing',
-                                 lineno=735)
-
-        spar = self.fused_spars.faces[14]
+            warnings.showwarning(message='back_spar = too small, change d_back_spar to the minimal distance of 0.57 and run again for result', category=UserWarning, filename='vtailwing',
+                                 lineno=690)
+            spar = self.fused_spars.faces[14]
+        else:
+            spar = self.fused_spars.faces[14]
         spar.label = 'Back Spar'
         return spar
 
@@ -725,7 +726,7 @@ class VTailWing(GeomBase):
             list[x].label = 'Rib'
         return list
 
-    @Part(in_tree=True)
+    @Part(in_tree=False)
     def skins_rudder(self):
         """ Fuses all rudder skins
         :rtype: part

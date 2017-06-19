@@ -7,3 +7,20 @@ TechFactor,0.86,[],TechFactor of the vertical  wing
 airfoil_root,airfoil.dat,[],root airfoil file name
 airfoil_tip,airfoil.dat,[],tip airfoil file name
 rud_angle,32.0,[degrees],The rotation angle of the rudder
+d_hinge_user,NaN,[],Distance of hinges in x direction
+p_zero_user,NaN,[],Distance in z direction of first fin rib
+p_rib_user,NaN,[],Distance in z direction of following fin ribs
+p_form_rib_user,NaN,[],Distance in z direction of the form rib
+rhl_root,0.25,[],Ratio of local width where the local hinge is located
+rhl_tip,0.25,[],Ratio of local width where the local hinge is located
+ahl_tip,0.25,[],Ratio of local width where the local actuator hinge is located
+d_actuator,0.125,[m],Distance in z direction between the to actuator hinge planes
+d_front_spar,0.07,[m],Distance of front spar with respect to the hinge plane
+d_back_spar,0.025,[m],Distance of back spar with respect to the trailing edge
+rud_width_frac,0.2,[],Rudder size fraction. Rudder width/Fin root chord
+rud_height_frac,0.8,[],The height offset of the rudder from the bottom of the fin
+rud_length_frac,0.75,[],The fraction of the length of the rudder
+actuator_frac,0.33,[],The fraction of the height of the actuator box from the bottom
+rib0_frac,0.0625,[],The fraction of the height of the first rib from the bottom
+rib_frac,0.125,[],The fraction of the height of the ribs
+form_rib_frac,0.075,[],The fraction of the height of the form ribs

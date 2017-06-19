@@ -16,7 +16,7 @@ rhl_tip,0.25,[],Ratio of local width where the local hinge is located
 ahl_tip,0.25,[],Ratio of local width where the local actuator hinge is located
 d_actuator,0.125,[m],Distance in z direction between the to actuator hinge planes
 d_front_spar,0.07,[m],Distance of front spar with respect to the hinge plane
-d_back_spar,0.025,[m],Distance of back spar with respect to the trailing edge
+d_back_spar,0.057,[m],Distance of back spar with respect to the trailing edge
 rud_width_frac,0.2,[],Rudder size fraction. Rudder width/Fin root chord
 rud_height_frac,0.8,[],The height offset of the rudder from the bottom of the fin
 rud_length_frac,0.75,[],The fraction of the length of the rudder
