@@ -91,7 +91,7 @@ class ApplyMat(GeomBase):
         for part in self.n_plies:
             index = 1
             for nr in part:
-                area = self.obj.split_faces[part_in].faces[index].area
+                area = self.obj.bay_analysis.split_faces[part_in].faces[index].area
                 bay_weights.append(self.mat_dict[part_in][str(nr)]["rho"] * area)
                 index = index + 1
             part_in = part_in + 1

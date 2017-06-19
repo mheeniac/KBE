@@ -13,6 +13,15 @@ def generate_path(file_name):
     out_path = os.path.join(out_dir, file_name)
     return in_path, out_path
 
+def generate_sum_path(file_name):
+    """ This attributed stitches together the file name and the file directory to get the path for the input file
+    :rtype: str
+    """
+    out_dir = '../output'
+    in_path = 'summary_template.csv'
+    out_path = os.path.join(out_dir, file_name)
+    return in_path, out_path
+
 
 def read_input(file_name):
     """ This reads the CSV file. Skips the first row (contains no useful information). Then determines if it should

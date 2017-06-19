@@ -4,10 +4,10 @@ from fuselage import Fuselage
 from wingset import *
 from vtailwing import *
 from bay_analysis_tool.bay_analysis import BayAnalysis
-from csv_read import *
 from avl import *
 from material_allocation import *
 from shear_bend import *
+from save_summary import *
 from bayanalysis import *
 
 # TODO:
@@ -70,15 +70,15 @@ class Aircraft(GeomBase):
 
     #: wing sweep angle [degrees]
     #: :type: float or str
-    sweep_angle = Input(mwing["sweep_angle"])  # Overwrites default function if ~= 'NaN'
+    sweep_angle = Input(mwing["sweep_angle_user"])  # Overwrites default function if ~= 'NaN'
 
     #: wing taper ratio []
     #: :type: float or str
-    taper_ratio = Input(mwing["taper_ratio"])  # Overwrites the default function if ~= 'NaN'
+    taper_ratio = Input(mwing["taper_ratio_user"])  # Overwrites the default function if ~= 'NaN'
 
     #: wing dihedral angle [degrees]
     #: :type: float or str
-    dihedral_angle = Input(mwing["dihedral_angle"])  # Overwrites the default function if ~= 'NaN'
+    dihedral_angle = Input(mwing["dihedral_angle_user"])  # Overwrites the default function if ~= 'NaN'
 
     #: jet cruise speed [mach]
     #: :type: float
@@ -228,15 +228,15 @@ class Aircraft(GeomBase):
 
     #: wing sweep angle [degrees]
     #: :type: float or str
-    hor_sweep_angle_user = Input(htail["sweep_angle"])  # Overwrites default function if ~= 'NaN'
+    hor_sweep_angle_user = Input(htail["sweep_angle_user"])  # Overwrites default function if ~= 'NaN'
 
     #: wing taper ratio []
     #: :type: float or str
-    hor_taper_ratio_user = Input(htail["taper_ratio"])  # Overwrites the default function if ~= 'NaN'
+    hor_taper_ratio_user = Input(htail["taper_ratio_user"])  # Overwrites the default function if ~= 'NaN'
 
     #: wing dihedral angle [degrees]
     #: :type: float or str
-    hor_dihedral_angle_user = Input(htail["dihedral_angle"])  # Overwrites the default function if ~= 'NaN'
+    hor_dihedral_angle_user = Input(htail["dihedral_angle_user"])  # Overwrites the default function if ~= 'NaN'
 
     #: airfoil technology factor []
     #: :type: float
@@ -890,8 +890,8 @@ class Aircraft(GeomBase):
         obj = ApplyMat(is_default=True,
                        hinge_forces=self.total_hinge_force[0],
                        obj=self,
-                       n_plies = self.n_ply_list,
-                       mat_dict = self.optimise_material[1])
+                       n_plies = self.bay_analysis.n_ply_list,
+                       mat_dict = self.bay_analysis.optimise_material[1])
         return obj.weights + sum(self.hinge_mass[0]) + sum(self.hinge_mass[1])
 
     @Attribute(in_tree=False)
@@ -1005,7 +1005,7 @@ class Aircraft(GeomBase):
                  + self.fixed_v_wing[0].area)
         fuselage = (self.fuse_fuselage.area - (self.fixed_v_wing[1].faces[11].area + self.fixed_v_wing[1].faces[9].area)
                     - 2*self.wet_wings_left.faces[2].area)
-        return main_wings+h_t_p+v_t_p+fuselage
+        return [main_wings, h_t_p, v_t_p, fuselage]
 
     def save_vars(self):
         """ Saves the variables of current settings to an output file
@@ -1030,6 +1030,14 @@ class Aircraft(GeomBase):
                         # Write the row to a new file
                         filewriter.writerow(row)
         return 'Saved'
+
+    @Attribute
+    def save_summary(self):
+        return save_sum(self=self,
+                        main=self.obj_main_wing,
+                        vtp=self.def_v_tail_wing,
+                        htp=self.def_h_tail_wing,
+                        fuse=self.fuselage_part)
 
 
 if __name__ == '__main__':

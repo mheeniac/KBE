@@ -1,8 +1,8 @@
 var_name,Value,Unit,Comment
-cabin_diameter,2.2,[m],Diameter of the fuselage cabin
-cabin_length,7.8,[m],Length of the fuselage cabin
-nose_slenderness,1.8,[ratio],Fuselage nose slenderness (length over base diameter)
-tail_slenderness,2.5,[ratio],Fuselage tail slenderness (length over base diameter)
-upsweep_angle,7.0,[degrees],Tailcone upsweep angle
-tail_taper,0.3,[ratio],The taper of te tail section (tip over base)
-n_section,10.0,[integer],Number of circular sections that make up the nose
+cabin_diameter,2.2,[m],Diameter of the fuselage cabin (float)
+cabin_length,7.8,[m],Length of the fuselage cabin (float)
+nose_slenderness,1.8,[ratio],Fuselage nose slenderness (length over base diameter) (float)
+tail_slenderness,2.5,[ratio],Fuselage tail slenderness (length over base diameter) (float)
+upsweep_angle,7.0,[degrees],Tailcone upsweep angle (float)
+tail_taper,0.3,[ratio],The taper of te tail section (tip over base) (float)
+n_section,10.0,[],Number of circular sections that make up the nose (float)

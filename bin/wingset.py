@@ -26,15 +26,15 @@ class Wingset(GeomBase):
 
     #: wing sweep angle [degrees]
     #: :type: float or str
-    sweep_angle_user = Input(wingset["sweep_angle"])  # Overwrites default function if ~= 'NaN'
+    sweep_angle_user = Input(wingset["sweep_angle_user"])  # Overwrites default function if ~= 'NaN'
 
     #: wing taper ratio []
     #: :type: float or str
-    taper_ratio_user = Input(wingset["taper_ratio"])  # Overwrites the default function if ~= 'NaN'
+    taper_ratio_user = Input(wingset["taper_ratio_user"])  # Overwrites the default function if ~= 'NaN'
 
     #: wing dihedral angle [degrees]
     #: :type: float or str
-    dihedral_angle_user = Input(wingset["dihedral_angle"])  # Overwrites the default function if ~= 'NaN'
+    dihedral_angle_user = Input(wingset["dihedral_angle_user"])  # Overwrites the default function if ~= 'NaN'
 
     #: jet cruise speed [mach]
     #: :type: float

@@ -195,7 +195,7 @@ class VTailWing(GeomBase):
 
     @Attribute
     def p_rib(self):
-        """ Returns the height of the ribs (excluding the first one) [m]
+        """ Returns the distance of the ribs (excluding the first one) [m]
         :rtype: float
         """
         if self.p_rib_user == 'NaN':  # if not defined, use default formula
