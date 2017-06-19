@@ -406,6 +406,9 @@ class VTailWing(GeomBase):
 
     @Attribute(in_tree=False)
     def ref_area(self):
+        """ returns reference area
+          :rtype: float
+          """
         return 0.5 * (self.w_c_root + self.obj_vwing.w_c_tip) * self.w_span
 
     @Attribute
@@ -445,18 +448,27 @@ class VTailWing(GeomBase):
 
     @Part(in_tree=False)
     def hingerib_plns(self):
+        """ creates visible actuator hinge line at actuator hinge line position
+          :rtype: object
+          """
         return Plane(quantify=len(self.hinge_locs),
                      reference=self.hinge_locs[child.index],
                      normal=Vector(0, 0, 1))
 
     @Part
     def hingerib_line(self):
+        """ creates visible hinge line at hinge line position
+          :rtype: object
+          """
         return LineSegment(self.hinge_locs[0],
                            self.hinge_locs[len(self.hinge_locs) - 1],
                            label='Rudder Hinge Line')
 
     @Part
     def actuator_planes(self):
+        """ creates actuator planes at the posistion of the actuator rods
+          :rtype: object
+          """
         return Plane(quantify=2,
                      reference=Point(self.w_c_root - self.d_hinge + self.x_offset,
                                      0,
@@ -467,6 +479,9 @@ class VTailWing(GeomBase):
 
     @Part(in_tree=False)
     def formrib_plns(self):
+        """ creates form rib planes
+          :rtype: object
+          """
         return Plane(quantify=(int(self.b_rudder / self.p_form_rib) - 1),
                      reference=Point(self.w_c_root - self.d_hinge + self.x_offset,
                                      0,
@@ -504,12 +519,18 @@ class VTailWing(GeomBase):
 
     @Part(in_tree=False)
     def actuator_hinge_line(self):
+        """ creates visible actuator hinge line at actuator hinge line position
+          :rtype: object
+          """
         return LineSegment(self.actuator_hinge_locs[0],
                            self.actuator_hinge_locs[len(self.actuator_hinge_locs) - 1],
                            label='Actuator Hinge Line')
 
     @Part
     def actuator(self):
+        """ creates visible actuator at actuator position
+          :rtype: object
+          """
         return Box(0.1, 0.1, 0.2,
                    position=Position(location=Point(self.w_c_root - self.d_hinge - 0.25 + self.x_offset,
                                                     self.actuator_hinge_locs[0].y - 0.1 / 2,
@@ -520,6 +541,9 @@ class VTailWing(GeomBase):
 
     @Part(in_tree=False)
     def actuator_hinges(self):
+        """ creates visible actuator hinges at actuator hinge position
+          :rtype: object
+          """
         return Cylinder(0.02, 0.05,
                         position=translate(Position(location=self.actuator_hinge_locs[child.index],
                                                     orientation=Orientation(x=Vector(1, 0, 0), y=Vector(0, 1, 0),
@@ -530,6 +554,9 @@ class VTailWing(GeomBase):
 
     @Part
     def hinges(self):
+        """ creates visible hinges at hinge position
+         :rtype: object
+         """
         return Cylinder(0.02, 0.05,
                         position=translate(Position(location=self.hinge_locs[child.index],
                                                     orientation=Orientation(x=Vector(1, 0, 0), y=Vector(0, 1, 0),
@@ -540,6 +567,9 @@ class VTailWing(GeomBase):
 
     @Attribute
     def curves(self):
+        """ Creates curved TE skin curve
+         :rtype: list
+         """
         x_pos = self.w_c_root - self.d_hinge + self.x_offset
 
         pos_root_begin = self.rudder_shell.vertices[0].point
@@ -598,16 +628,25 @@ class VTailWing(GeomBase):
 
     @Part(in_tree=False)
     def curve_surface1(self):
+        """ Creates curved TE skin
+         :rtype: object
+         """
         return MultiSectionSurface(profiles=[self.crv[0], self.crv[2]],
                                    path=self.rudder_shell.edges[3])
 
     @Part(in_tree=False)
     def curve_surface2(self):
+        """ Creates curved TE skin
+         :rtype: object
+         """
         return MultiSectionSurface(profiles=[self.crv[1], self.crv[3]],
                                    path=self.rudder_shell.edges[7])
 
     @Part(in_tree=False)
     def pln_front_spar(self):
+        """ Creates front spar plane
+         :rtype: object
+         """
         return Plane(reference=Point(self.w_c_root - self.d_hinge + self.d_front_spar + self.x_offset,
                                      0,
                                      self.z_offset),
@@ -615,6 +654,9 @@ class VTailWing(GeomBase):
 
     @Part(in_tree=False)
     def pln_back_spar(self):
+        """ Creates back spar plane
+         :rtype: object
+         """
         return Plane(reference=Point(self.w_c_root - self.d_back_spar + self.x_offset,
                                      0,
                                      self.z_offset),
@@ -622,11 +664,17 @@ class VTailWing(GeomBase):
 
     @Part(in_tree=False)
     def fused_spars(self):
+        """ fuses the spars
+         :rtype: object
+         """
         return FusedShell(shape_in=self.rudder_shell,
                           tool=[self.pln_back_spar, self.pln_front_spar])
 
     @Attribute
     def crv(self):
+        """ Extend the curves created in curves
+         :rtype: list
+         """
         start= self.fused_spars.faces[1].vertices[1].point
         end = self.fused_spars.faces[1].vertices[0].point
         crv1 = LineSegment(start=start, end=end)
@@ -654,30 +702,51 @@ class VTailWing(GeomBase):
 
     @Attribute
     def fused_le_skin_left(self):
+        """ Collects the rudder le_skin
+         :rtype: list
+         """
         return self.curve_surface1
 
     @Attribute
     def fused_le_skin_right(self):
+        """ Collects the rudder le_skin
+         :rtype: list
+         """
         return self.curve_surface2
 
     @Attribute
     def main_skin_left(self):
+        """ Collects the rudder main_skin
+         :rtype: list
+         """
         return self.fused_spars.faces[8]
 
     @Attribute
     def main_skin_right(self):
+        """ Collects the rudder main_skin
+         :rtype: list
+         """
         return self.fused_spars.faces[5]
 
     @Attribute
     def te_skin_left(self):
+        """ Collects the rudder te_skin
+         :rtype: list
+         """
         return self.fused_spars.faces[9]
 
     @Attribute
     def te_skin_right(self):
+        """ Collects the rudder te_skin
+         :rtype: list
+         """
         return self.fused_spars.faces[11]
 
     @Attribute(in_tree=False)
     def rudder_front_spar(self):
+        """ Collects the rudder front spar face
+         :rtype: list
+         """
         spar = self.fused_spars.faces[13]
         spar.label = 'Front Spar'
         return spar
@@ -699,11 +768,19 @@ class VTailWing(GeomBase):
 
     @Part(in_tree=False)
     def fuse_mainskin_ribs(self):
+        """
+        Fuses skin and spars with rib planes
+        :rtype: object
+        """
         return FusedShell(shape_in=self.main_skin_left,
                           tool=self.tool_creator)
 
     @Attribute
     def tool_creator(self):
+        """
+        creates tool that needs to be fused in fuse mainskin_ribs
+        :rtype: list
+        """
         tool_list = [self.main_skin_right, self.rudder_front_spar, self.rudder_back_spar]
         for i in xrange(len(self.hingerib_plns)):
             tool_list.append(self.hingerib_plns[i])

@@ -6,8 +6,6 @@ from vtailwing import *
 from bay_analysis_tool.bay_analysis import BayAnalysis
 from csv_read import *
 from avl import *
-from material_allocation import *
-from shear_bend import *
 from bayanalysis import *
 
 # TODO:
