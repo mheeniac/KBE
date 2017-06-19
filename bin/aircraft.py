@@ -7,6 +7,7 @@ from bay_analysis_tool.bay_analysis import BayAnalysis
 from avl import *
 from save_summary import *
 from bayanalysis import *
+from save_rudder import *
 
 # TODO:
 
@@ -885,12 +886,21 @@ class Aircraft(GeomBase):
         Calls the Apply Material class and returns the weight of the rudder
         :rtype: float
         """
+        obj = self.rudder_weights_obj()
+        return obj.weights + sum(self.hinge_mass[0]) + sum(self.hinge_mass[1])
+
+    @Attribute
+    def rudder_weights_obj(self):
+        """
+        Calls the Apply Material class and returns the weight of the rudder
+        :rtype: float
+        """
         obj = ApplyMat(is_default=True,
                        hinge_forces=self.total_hinge_force[0],
                        obj=self,
-                       n_plies = self.bay_analysis.n_ply_list,
-                       mat_dict = self.bay_analysis.optimise_material[1])
-        return obj.weights + sum(self.hinge_mass[0]) + sum(self.hinge_mass[1])
+                       n_plies=self.bay_analysis.n_ply_list,
+                       mat_dict=self.bay_analysis.optimise_material[1])
+        return obj
 
     @Attribute(in_tree=False)
     def total_length(self):
@@ -1029,7 +1039,7 @@ class Aircraft(GeomBase):
                         filewriter.writerow(row)
         return 'Saved'
 
-    @Attribute
+    @gui_callable(label='Save Summary', icon='save.png')
     def save_summary(self):
         return save_sum(self=self,
                         main=self.obj_main_wing,
@@ -1037,6 +1047,13 @@ class Aircraft(GeomBase):
                         htp=self.def_h_tail_wing,
                         fuse=self.fuselage_part)
 
+    @gui_callable(label='Save Rudder Weights', icon='save.png')
+    def save_rudder(self):
+        return save_rud(self=self,
+                        main=self.obj_main_wing,
+                        vtp=self.def_v_tail_wing,
+                        htp=self.def_h_tail_wing,
+                        fuse=self.fuselage_part)
 
 if __name__ == '__main__':
     from parapy.gui import display

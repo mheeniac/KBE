@@ -1,0 +1,80 @@
+var_name,Value,Unit,Comment
+//,//, //,THE MAIN WING INPUT VARIABLES
+w_c_root,,[m],Length of the main wing root chord
+sweep_angle_user,,[degrees],Sweep angle of the main wing (NaN for auto)
+taper_ratio_user,,[ratio],Taper ratio of the main wing (NaN for auto)
+dihedral_angle_user,,[degrees],Dihedral angle of the main wing (NaN for auto)
+TechFactor,,[],TechFactor of the main wing
+w_span,,[m],W span of the main wing 
+airfoil_root,,[],airfoil file name
+airfoil_tip,,[],airfoil file name
+m_cruise,,[mach],jet cruise speed
+,,,
+//,//, //,THE HTP WING INPUT VARIABLES
+w_span,,[m],Span of a single wing side (float)
+sweep_angle_user,,[degrees],Sweep angle of the vertical wing (NaN for auto)
+taper_ratio_user,,[ratio],Taper ratio of the vertical wing (NaN for auto)
+dihedral_angle_user,,[degrees],Dihedral angle of the main wing (NaN for auto)
+TechFactor,,[],TechFactor of the vertical  wing (float)
+airfoil_root,,[],root airfoil file name (string)
+airfoil_tip,,[],tip airfoil file name (string)
+w_c_root,,[m],The root chord length (float)
+,,,
+//,//, //,THE VTP WING INPUT VARIABLES
+root_frac,,[ratio],Root chord / span of the vertical tail (float)
+sweep_angle_user,,[degrees],Sweep angle of the vertical wing (NaN for auto)
+taper_ratio_user,,[ratio],Taper ratio of the vertical wing (NaN for auto)
+dihedral_angle_user,,[degrees],Dihedral angle of the main wing (NaN for auto)
+TechFactor,,[],TechFactor of the vertical  wing (float)
+airfoil_root,,[],root airfoil file name (string)
+airfoil_tip,,[],tip airfoil file name (string)
+rud_angle,,[degrees],The rotation angle of the rudder (float)
+d_hinge_user,,[m],Distance trailing edge to hinge plane (float)
+p_zero_user,,[m],Height of the first rib from the bottom (float)
+p_rib_user,,[m],Distance in z direction of following fin ribs
+p_form_rib_user,,[m],Distance in z direction of the form rib
+rhl_root,,[ratio],Ratio of local width where the local hinge is located at root (float)
+rhl_tip,,[ratio],Ratio of local width where the local hinge is located at tip (float)
+ahl_tip,,[ratio],Ratio of local width where the local actuator hinge is located at tip (float)
+d_actuator,,[m],Distance in z direction between the to actuator hinge planes (float)
+d_front_spar,,[m],Distance of front spar with respect to the hinge plane (float)
+d_back_spar,,[m],Distance of back spar with respect to the trailing edge (float)
+rud_width_frac,,[ratio],Rudder size fraction. Rudder width/Fin root chord (float)
+rud_height_frac,,[ratio],The height offset fraction of the rudder from the bottom of the fin (float)
+rud_length_frac,,[ratio],The fraction of the length of the rudder (float)
+actuator_frac,,[ratio],The fraction of the height of the actuator box from the bottom (float)
+rib0_frac,,[ratio],The fraction of the height of the first rib from the bottom (float)
+rib_frac,,[ratio],The fraction of the height of the ribs (float)
+form_rib_frac,,[ratio],The fraction of the height of the form ribs (float)
+,,,
+//,//, //,THE FUSELAGE INPUT VARIABLLES
+cabin_diameter,,[m],Diameter of the fuselage cabin (float)
+cabin_length,,[m],Length of the fuselage cabin (float)
+nose_slenderness,,[ratio],Fuselage nose slenderness (length over base diameter) (float)
+tail_slenderness,,[ratio],Fuselage tail slenderness (length over base diameter) (float)
+upsweep_angle,,[degrees],Tailcone upsweep angle (float)
+tail_taper,,[ratio],The taper of te tail section (tip over base) (float)
+n_section,,[],Number of circular sections that make up the nose (float)
+,,,
+//,//, //,CONSTANTS INPUT VARIABLES
+m_cruise,,[Mach],Cruise speed of the jet (float)
+w_loc_perc,,[%],lengthwise position of the wing MAC as percentage of the length of the cabin (float)
+Vv,,[],Volume coefficient (float)
+rho,,[kg/m^3],Density of air at flight altitude (float)
+FoS,,[],Factor of safety for the AVL analysis (float)
+x_fc,,[],Rudder force width offset fraction of total rudder width (float)
+l_v,,[m],The desired distance between the vertical tail aerodynamic center and main wing ADC (float)
+dx,,[m],Stepsize fot the generation of the moment and force lines (float)
+,,,
+//,//, //,COMPUTED/DERIVED VALUES
+total_length,,[m],The total length of the aircraft fuselage (float)
+ver_aspect_ratio,,[ratio],The aspect ratio of the vtp (float)
+hor_aspect_ratio,,[ratio],The aspect ratio of the htp (float)
+Vh,,[m],Distance from the vtp ADC to the main wing ADC (float)
+Actuator Force,,[N],The actuator forces Fax and Fay (tupple)
+Hinge Forces,,[N],The total force per rotation hinge (float)
+Hinge Masses,,[kg],The mass per rotation hinge (float)
+Wetted Area,,,The wetted areas of the different parts of the jet (float)
+rudder_weight,,[kg],The weight of the complete rudder assembly
+Main Wing,,[degrees],
+Horizontal Wing,,[degrees],

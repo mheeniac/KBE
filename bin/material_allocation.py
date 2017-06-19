@@ -80,7 +80,7 @@ class ApplyMat(GeomBase):
         return area_dict
 
     @Attribute
-    def weights(self):
+    def weights_seg(self):
         areas = self.areas
         bay_weights = []
         quasi = ReadMaterial(ply_file="quasi_isotropic.csv").read
@@ -97,7 +97,7 @@ class ApplyMat(GeomBase):
             part_in = part_in + 1
         # bay_weights.append(self.mat_dict[0][str(self.n_plies[0][0])]["rho"] * areas["LE"])
         # bay_weights.append(self.mat_dict[3][str(self.n_plies[3][0])]["rho"] * areas["TE"])
-        bay_weights = sum(bay_weights)
+        bay_weights_sum = sum(bay_weights)
 
 
         w_c_r = zero_ninety[str(self.n_close_ribs)]["rho"] * (areas["Closure Ribs"][0] + areas["Closure Ribs"][1])
@@ -107,5 +107,7 @@ class ApplyMat(GeomBase):
         w_h_r = sum(w_h_r)
         w_form = self.obj.def_v_tail_wing.formrib_plns.quantify * zero_ninety[str(self.n_form_ribs)]["rho"] * areas[
             "Ribs"]
-        total = bay_weights + w_c_r + w_h_r + w_form
-        return total
+        return [bay_weights_sum, w_c_r, w_h_r, w_form, bay_weights]
+    @Attribute
+    def weights(self):
+        return sum([self.weights_seg[0], self.weights_seg[1], self.weights_seg[2], self.weights_seg[3]])
